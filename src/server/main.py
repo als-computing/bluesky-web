@@ -45,7 +45,7 @@ def read_prefix(pv_prefix, response: Response):
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"404 Error": "PV " + pv_prefix +" not found"}
 
-@app.post("/pv/initialize/{pv_prefix}", status_code=201)
+@app.put("/pv/initialize/{pv_prefix}", status_code=201)
 def initialize_pv(pv_prefix, response: Response):
     if pv_prefix in pv_dict:
         response.status_code = status.HTTP_409_CONFLICT
