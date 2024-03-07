@@ -12,8 +12,8 @@ export default function ReqListItemPut( { setRequestHistoryArray, requestHistory
     //make a fetch GET request to the URL, update view on webpage, save to history Array
     try {
       const response = await axios.put(url);
-      const responseJSON = await response.json();
-      const responsePretty = JSON.stringify(responseJSON, null, 2); //the additional args to JSON.stringify() add HTML spacing and tabs for use with printing to the DOM
+      //const responseJSON = await response.json();
+      const responsePretty = JSON.stringify(response.data, null, 2); //the additional args to JSON.stringify() add HTML spacing and tabs for use with printing to the DOM
       setResponse(responsePretty);
       const respObject = {
         id : requestHistoryArray.length + 1,

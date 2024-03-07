@@ -60,6 +60,11 @@ function App() {
     <main className="bg-white min-h-screen w-full p-12">
       <ReqList setRequestHistoryArray={setRequestHistoryArray} requestHistoryArray={requestHistoryArray}/>
       <ResList requestHistoryArray={requestHistoryArray} />
+
+      <h2>Sample endpoints</h2>
+      <p>http://127.0.0.1:8000/pv/</p>
+      <p>http://127.0.0.1:8000/pv/initialize</p>
+      <p>http://127.0.0.1:8000/pv/move</p>
     </main>
   );
 }
