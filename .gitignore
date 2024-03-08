@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+src/server/__pycache__/main.cpython-311.pyc
+src/server/__pycache__
+
