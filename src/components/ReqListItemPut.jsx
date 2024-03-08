@@ -7,12 +7,19 @@ export default function ReqListItemPut( { setRequestHistoryArray, requestHistory
   const [url, setUrl] = useState('');
   const [title, setTitle] = useState('Sample Title');
   const [response, setResponse] = useState('');
+  const [textContent, setTextContent] = useState('');
+  const [warning, setWarning] = useState('');
     
   async function makeRequest(url) {
     //make a fetch GET request to the URL, update view on webpage, save to history Array
+    if (!isValidJson(textContent)) {
+        setWarning("Attempt failed: Please ensure text input is valid JSON string object");
+        setResponse('');
+        setResponseVisible(false);
+        return;
+    }
     try {
-      const response = await axios.put(url);
-      //const responseJSON = await response.json();
+      const response = await axios.put(url, JSON.parse(textContent));
       const responsePretty = JSON.stringify(response.data, null, 2); //the additional args to JSON.stringify() add HTML spacing and tabs for use with printing to the DOM
       setResponse(responsePretty);
       const respObject = {
@@ -31,6 +38,16 @@ export default function ReqListItemPut( { setRequestHistoryArray, requestHistory
       setResponse('Error occured: ' + error);
     }
   }
+
+  function isValidJson(input) {
+    try {
+        JSON.parse(input);
+    } catch (e) {
+        return false;
+    }
+    return true;
+  }
+
     return (
         <div className="min-h-36 w-auto p-6 mx-12 my-8 border-2 border-slate-400 rounded-md">
           <div className="flex h-10 mt-4">
@@ -41,6 +58,15 @@ export default function ReqListItemPut( { setRequestHistoryArray, requestHistory
             </div>
             <button className="w-1/12 min-w-12 mx-8 bg-sky-600 rounded-lg text-white hover:bg-sky-700" onClick={() => makeRequest(url)}>Send</button>
           </div>
+          <label className="flex flex-col pt-6">
+            Body: Raw JSON String
+            <textarea 
+                className="p-2 mt-2 h-28"
+                value={textContent}
+                onChange={e => setTextContent(e.target.value)}
+            />
+          </label>
+          <p className={warning === '' ? "hidden" : "block"}>{warning}</p>
           <div className={responseVisible ? "block" : "hidden"}>
             <hr className="bg-slate-400 h-1 my-4"/>
             <pre className="overflow-x-auto text-wrap">{response}</pre>

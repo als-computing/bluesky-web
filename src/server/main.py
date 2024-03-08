@@ -10,7 +10,7 @@ device_dict = {"IOC:m7": m7} # initalize dictionary to hold all PVs
 # link for commands for a device: https://nsls-ii.github.io/ophyd/generated/ophyd.device.Device.html#ophyd.device.Device
 
 class DeviceInstruction(BaseModel):
-    pv_prefix: str
+    prefix: str
     set_value: int
     timeout: int | None = None
 
