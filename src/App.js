@@ -65,7 +65,7 @@ function App() {
 
       <p>{`http://127.0.0.1:8000/devices/{prefix}/position`}</p>
       <p>{`http://127.0.0.1:8000/devices/{prefix}`}</p>
-      <p>http://127.0.0.1:8000/device/move</p>
+      <p>{`http://127.0.0.1:8000/device/move</p>`}
 
     </main>
   );

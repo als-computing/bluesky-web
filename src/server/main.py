@@ -47,11 +47,11 @@ def list_devices( response: Response):
         response.status_code = status.HTTP_404_NOT_FOUND
     return {"404 Error": "No devices found"}
 
-@app.post("/pv/initialize/{pv_prefix}", status_code=201)
-def initialize_pv(pv_prefix, response: Response):
-    if pv_prefix in pv_dict:
+@app.post("/pv/initialize/{prefix}", status_code=201)
+def initialize_pv(prefix, response: Response):
+    if prefix in device_dict:
         response.status_code = status.HTTP_409_CONFLICT
-        return {"409 Error" : "PV " + pv_prefix + " already exists, duplicate connections not allowed"}
+        return {"409 Error" : "PV " + prefix + " already exists, duplicate connections not allowed"}
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
     return {"404 Error": "Device " + prefix +" not found"}
@@ -84,13 +84,13 @@ def initialize_device(prefix, response: Response):
             response.status_code = status.HTTP_408_REQUEST_TIMEOUT
             return {"408 Error" : "Device " + prefix + " is not connected"}
 
-        pv_dict[pv_prefix] = testSignal
+        device_dict[prefix] = testSignal
         return {"201" : "PV " + pv_prefix + " is connected"}
     
-@app.put("/pv/position", status_code=200)
+@app.put("/device/position", status_code=200)
 async def move_pv(instruction: PVInstruction, response: Response):
-    if instruction.pv_prefix in pv_dict:
-        pv = pv_dict.get(instruction.pv_prefix)
+    if instruction.pv_prefix in device_dict:
+        pv = device_dict.get(instruction.pv_prefix)
         try:
             pv.set(instruction.set_value).wait(timeout=1)
             return{"200" : "Instruction accepted, positioned " + instruction.pv_prefix + " to " + str(instruction.set_value) + "."}
@@ -102,8 +102,3 @@ async def move_pv(instruction: PVInstruction, response: Response):
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"404 Error": "Device " + instruction.prefix  + " not found"}
-
-
-#@app.get("/items/{item_id}")
-#def read_item(item_id: int, q: Union[str, None] = None):
-#    return {"item_id": item_id, "q": q}
