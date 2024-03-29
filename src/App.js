@@ -62,9 +62,11 @@ function App() {
       <ResList requestHistoryArray={requestHistoryArray} />
 
       <h2>Sample endpoints</h2>
-      <p>http://127.0.0.1:8000/pv/</p>
-      <p>http://127.0.0.1:8000/pv/initialize</p>
-      <p>http://127.0.0.1:8000/pv/move</p>
+
+      <p>{`http://127.0.0.1:8000/devices/{prefix}/position`}</p>
+      <p>{`http://127.0.0.1:8000/devices/{prefix}`}</p>
+      <p>http://127.0.0.1:8000/device/move</p>
+
     </main>
   );
 }

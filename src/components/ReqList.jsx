@@ -1,5 +1,6 @@
 import ReqListItemGet from "./ReqListItemGet"
 import ReqListItemPost from "./ReqListItemPost"
+import ReqListItemPut from "./ReqListItemPut"
 
 export default function ReqList( { setRequestHistoryArray, requestHistoryArray }) {
 
@@ -9,6 +10,7 @@ export default function ReqList( { setRequestHistoryArray, requestHistoryArray }
             <h2 className="text-xl font-medium pt-4 pl-4">Requests</h2>
             <ReqListItemGet setRequestHistoryArray={setRequestHistoryArray} requestHistoryArray={requestHistoryArray}/>
             <ReqListItemPost setRequestHistoryArray={setRequestHistoryArray} requestHistoryArray={requestHistoryArray}/>
+            <ReqListItemPut setRequestHistoryArray={setRequestHistoryArray} requestHistoryArray={requestHistoryArray} />
         </div>
     )
 }
