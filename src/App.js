@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import ResList from './components/ResList.jsx';
 import ReqList from './components/ReqList.jsx';
+import Canvas from './components/Canvas.jsx';
 
 import { useState } from 'react';
 
@@ -58,6 +59,7 @@ function App() {
 
   return (
     <main className="bg-white min-h-screen w-full p-12">
+      <Canvas />
       <ReqList setRequestHistoryArray={setRequestHistoryArray} requestHistoryArray={requestHistoryArray}/>
       <ResList requestHistoryArray={requestHistoryArray} />
 
