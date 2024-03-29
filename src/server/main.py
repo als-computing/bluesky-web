@@ -62,16 +62,16 @@ def initialize_pv(pv_prefix, response: Response):
             response.status_code = status.HTTP_408_REQUEST_TIMEOUT
             return {"408 Error" : "PV " + pv_prefix + " is not connected"}
 
-        pv_dict[pv_prefix] = pv_prefix
+        pv_dict[pv_prefix] = testSignal
         return {"201" : "PV " + pv_prefix + " is connected"}
     
-@app.post("/pv/move", status_code=200)
+@app.put("/pv/position", status_code=200)
 async def move_pv(instruction: PVInstruction, response: Response):
     if instruction.pv_prefix in pv_dict:
         pv = pv_dict.get(instruction.pv_prefix)
         try:
             pv.set(instruction.set_value).wait(timeout=1)
-            return{"200" : "Instruction accepted, moved " + instruction.pv_prefix + " to " + str(instruction.set_value) + "."}
+            return{"200" : "Instruction accepted, positioned " + instruction.pv_prefix + " to " + str(instruction.set_value) + "."}
         except Exception as error:
             print("Error: could not move PV " + instruction.pv_prefix)
             print(error)
