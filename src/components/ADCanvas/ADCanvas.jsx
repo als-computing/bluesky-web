@@ -2,7 +2,9 @@
 //Provides a Canvas element and button to trigger Canvas image display
 
 import { useState, useEffect, useRef } from 'react';
-import { array_64 } from '../data/array_data.js'
+import { array_64 } from '../../data/array_data.js'
+import TextField from '../library/TextField.jsx';
+import Button from '../library/Button.jsx';
 
 //const image = {width: 1024, height: 1024, rawData: array_1024};
 const image = {width: 64, height: 64, rawData: array_64};
@@ -90,20 +92,17 @@ export default function Canvas() {
     return (
         <section className="flex w-full items-center max-w-screen-lg m-auto p-4">
             <form className="flex flex-col">
-                <label className="">
-                    <p className="text-xs">Web Socket URL</p>
-                    <input type="text" value={url} onChange={(e) => setUrl(e.target.value)} className="border-b border-slate-300 border-solid focus:outline-none hover:border-slate-500 focus:border-sky-500 transition-all"/>
-                </label>
-                <label>
-                    <p className="text-xs mt-4">Device Prefix (optional)</p>
-                    <input type="text" value={prefix} onChange={(e) => setPrefix(e.target.value)} className="border-b border-slate-300 border-solid focus:outline-none hover:border-slate-500 focus:border-sky-500 transition-all"/>
-                </label>
+                <TextField text="Web Socket URL" value={url} cb={setUrl} />
+                <TextField text="Device Prefix (optional)" value={prefix} cb={setPrefix} />
+                <Button text="Connect"/>
                 <button className="rounded-lg w-min px-2 py-1 text-white font-medium bg-sky-500 m-auto mt-6">Connect</button>
             </form>
             <canvas className="m-auto" ref={canvasRef} width={256} height={256} />
-            <p>Last Update: {lastUpdate}s</p>
-            <p>Average fps: {averageFPS}</p>
-            <button onClick={toggleWebSocket}> {websocketCommand} </ button>
+            <div>
+                <p>Last Update: {lastUpdate}s</p>
+                <p>Average fps: {averageFPS}</p>
+                <button className="hidden bg-sky-500 text-white w-fit px-2 py-1 rounded-md my-2" onClick={toggleWebSocket}> {websocketCommand} </ button>
+            </div>
         </section>
     )
 }
