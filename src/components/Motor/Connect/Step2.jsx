@@ -46,7 +46,7 @@ export default function Step2( {step, setStep, deviceList, setDeviceList } ) {
     //height is hardcoded to allow for scrolling effect
     if (step === '2') {
         return (
-            <div className="rounded-md h-96 w-1/2 m-auto mt-8 flex flex-col">
+            <div className="rounded-md max-w-md h-96  m-auto mt-8 flex flex-col">
                 <div className='h-5/6 rounded-md border border-slate-300'>
                     <div className="flex h-[10%] justify-center items-center space-x-4  text-lg font-medium text-center bg-gray-100 rounded-t-md">
                         <p className="w-3/12">Prefix*</p> <p className="w-3/12">Nickame</p> <p className="w-3/12">Group</p> <p className="w-1/12"></p>

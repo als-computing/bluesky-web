@@ -1,8 +1,10 @@
 from typing import Union
 
-from fastapi import FastAPI, Response, status, Request
+from fastapi import FastAPI, Response, status, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+import pvws
 
 from ophyd.signal import EpicsSignal
 m7 = EpicsSignal("IOC:m7", name="m7") # initialize a known connection for testing
@@ -33,6 +35,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(pvws.router)
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
@@ -47,14 +51,6 @@ def list_devices( response: Response):
         response.status_code = status.HTTP_404_NOT_FOUND
     return {"404 Error": "No devices found"}
 
-@app.post("/pv/initialize/{prefix}", status_code=201)
-def initialize_pv(prefix, response: Response):
-    if prefix in device_dict:
-        response.status_code = status.HTTP_409_CONFLICT
-        return {"409 Error" : "PV " + prefix + " already exists, duplicate connections not allowed"}
-    else:
-        response.status_code = status.HTTP_404_NOT_FOUND
-    return {"404 Error": "Device " + prefix +" not found"}
 
 #change pv to device
 # git remote add upstream to als compute, then just push to that and not personal
@@ -85,15 +81,15 @@ def initialize_device(prefix, response: Response):
             return {"408 Error" : "Device " + prefix + " is not connected"}
 
         device_dict[prefix] = testSignal
-        return {"201" : "PV " + pv_prefix + " is connected"}
+        return {"201" : "PV " + prefix + " is connected"}
     
 @app.put("/device/position", status_code=200)
-async def move_pv(instruction: PVInstruction, response: Response):
+async def move_device(instruction: DeviceInstruction, response: Response):
     if instruction.pv_prefix in device_dict:
         pv = device_dict.get(instruction.pv_prefix)
         try:
             pv.set(instruction.set_value).wait(timeout=1)
-            return{"200" : "Instruction accepted, positioned " + instruction.pv_prefix + " to " + str(instruction.set_value) + "."}
+            return{"200" : "Instruction accepted, set value of " + instruction.pv_prefix + " to " + str(instruction.set_value) + "."}
         except Exception as error:
             print("Error: could not move device " + instruction.prefix)
             print(error)
@@ -102,3 +98,10 @@ async def move_pv(instruction: PVInstruction, response: Response):
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"404 Error": "Device " + instruction.prefix  + " not found"}
+    
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        data = await websocket.receive_text()
+        await websocket.send_text(f"Message text was: {data}")

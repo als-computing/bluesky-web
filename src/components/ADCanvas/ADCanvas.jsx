@@ -91,11 +91,10 @@ export default function Canvas() {
 
     return (
         <section className="flex w-full items-center max-w-screen-lg m-auto p-4">
-            <form className="flex flex-col">
+            <form className="flex flex-col space-y-2">
                 <TextField text="Web Socket URL" value={url} cb={setUrl} />
                 <TextField text="Device Prefix (optional)" value={prefix} cb={setPrefix} />
                 <Button text="Connect"/>
-                <button className="rounded-lg w-min px-2 py-1 text-white font-medium bg-sky-500 m-auto mt-6">Connect</button>
             </form>
             <canvas className="m-auto" ref={canvasRef} width={256} height={256} />
             <div>

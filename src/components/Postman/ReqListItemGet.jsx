@@ -15,13 +15,16 @@ export default function ReqListItemGet( { setRequestHistoryArray, requestHistory
       const response = await fetch(url);
       const responseJSON = await response.json();
       console.log({responseJSON});
-      console.log(responseJSON[0].url);
-      try {
-        if(responseJSON[0].url) {
-          setImg(responseJSON[0].url);
+      console.log(responseJSON.length);
+      //console.log(responseJSON[0].url);
+      if (responseJSON.length > 0) {
+        try {
+          if("url" in responseJSON[0]) {
+            setImg(responseJSON[0].url);
+          }
+        } catch (e) {
+          console.log(e);
         }
-      } catch (e) {
-        console.log(e);
       }
       const responsePretty = JSON.stringify(responseJSON, null, 2); //the additional args to JSON.stringify() add HTML spacing and tabs for use with printing to the DOM
       setResponse(responsePretty);
