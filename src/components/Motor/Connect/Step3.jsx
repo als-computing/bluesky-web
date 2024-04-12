@@ -21,7 +21,7 @@ let sampleFailMessage = {
 }
 
 
-export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl, connection }) {
+export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl, connection, setDevices, activeDisplay }) {
     const [isConnecting, setIsConnecting] = useState(false);
     const [resultMessage, setResultMessage] = useState('');
     const [status, setStatus] = useState('');
@@ -70,7 +70,8 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
         socket.addEventListener("open", event => {
             isOpened = true;
             console.log("Opened connection in socket to: " + wsUrl);
-            setEventListeners(socket);
+            socket.addEventListener("message", handleWebSocketMessage);
+            //setEventListeners(socket); //to-do remove this line after testing
             connection.current = socket;
             subscribeDevices(socket, deviceList);
             //setStep('4'); //render summary page
@@ -82,12 +83,14 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
     const checkConnectionStatus = () => {
         //verify if the connection has opened or not. Display error message if connection is not made.
         if (isOpened !== true) {
-            setStatus(`WebSocket did not open within ${timeLimit} seconds, please retry`);
+            setStatus(`WebSocket did not open within ${timeLimit} seconds, please check websocket connection and retry`);
             connection.current = null;
+            setTimeout(resetStep3, 4000);
         }
     }
 
-    const setEventListeners = (socket) => {
+    //to-do remove this function after testing
+    const setEventListeners = (socket, cb) => {
         //handle messages sent from the WS for all devices
         //used to confirm that all devices connect
         socket.addEventListener("message", event => {
@@ -98,6 +101,15 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
                 updateSingleDevice(eventData.pv, eventData.value, true);
             }
         })
+    }
+
+    const handleWebSocketMessage = (event) => {
+        console.log("Received Message at: " + Math.round(Date.now() / 1000) + "s"); //TO-DO make this human readable
+            var eventData = JSON.parse(event.data);
+            console.log({eventData});
+            if (eventData.type === 'update') {
+                updateSingleDevice(eventData.pv, eventData.value, true);
+            }
     }
 
     const subscribeDevices = (socket, deviceList) => {
@@ -141,7 +153,7 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
         setStep('4');
     }
 
-    const handleClick = () => {
+    const handleConnectClick = () => {
         setIsConnecting(true);
         initializeConnection(deviceList);
     }
@@ -245,6 +257,29 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
         setDeviceList(newDeviceList);
     }
 
+    const handleFinish = () => {
+        //store the deviceList (array) into a final device object for use in the device table
+        var tempDevices = {};
+        var idCount = 0;
+        for (var device of deviceList) {
+            if (device.prefix !== '') {
+                if (device.prefix in tempDevices) continue; //only store first instance of PV if duplicate PV found
+                let temp = {
+                    id: idCount,
+                    prefix: device.prefix,
+                    nickname: device.nickname,
+                    group: device.group,
+                    isConnected: device.isConnected,
+                    value: device.value
+                }
+                tempDevices[device.prefix] = temp;
+                idCount++;
+            }
+        }
+        setDevices(tempDevices);
+        activeDisplay.current = 'DeviceTable';
+    }
+
     if (step === '3' || step === '4') {
         return (
             <div className="flex flex-col max-w-md justify-center items-center m-auto mt-8">
@@ -261,12 +296,12 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
                         }
                     })}
                 </div>
-                {isConnecting ? status : <Button cb={handleClick} text={"Connect"}/> }
+                {isConnecting ? status : <Button cb={handleConnectClick} text={"Connect"}/> }
                 <p className="my-4 whitespace-pre-wrap">{resultMessage}</p>
-                {step === '3' || resultMessage !== '' ? 
+                {step === '4' || resultMessage !== '' ? 
                     <div className="w-full flex space-between mt-4">
                         <Button cb={resetStep3} text={"⅁ Reset"} styles={"bg-slate-400"} />
-                        <Button cb={() => ''} text={"Finish"} />
+                        <Button cb={handleFinish} text={"Finish"} />
                     </div> 
                 : ''}
             </div>
