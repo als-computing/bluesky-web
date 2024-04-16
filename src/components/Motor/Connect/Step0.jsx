@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice} from './connectionHelper.js';
+import dayjs from 'dayjs';
 
 export default function Step0( { step, setStep, connection, devices, setDevices, activeDisplay, setActiveDisplay } ) {
     
@@ -21,6 +22,7 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
             min: null,
             max: null,
             increment: 1,
+            setValue: '',
             lastUpdate: null
         }
         count++;
@@ -49,7 +51,7 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
         });
 
         socket.addEventListener("message", event => {
-            console.log("Received Message at: " + Math.round(Date.now() / 1000) + "s");
+            console.log("Received Message at: " + dayjs().format('hh:mm:ss a'));
             var eventData = JSON.parse(event.data);
             console.log({eventData});
             if (eventData.type === 'update') {

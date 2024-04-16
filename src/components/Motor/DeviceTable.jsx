@@ -46,46 +46,48 @@ export default function DeviceTable( { connection, devices, setDevices, activeDi
     const [lockoutList, setLockoutList] = useState([]);
 
 
-    const handleIncrementClick = (key, currentValue, increment) => {
-        let newValue = currentValue + increment;
-        //---check if newValue is outside the boundaries of max/min
-            //if (newValue < devices[key].min || newValue > devices[key].max)
-            //  setErrorMessage("Could not increment ${key}, value exceeds min/max limits")
-            //  return
-
-        //----check if the device is currently locked out
-            //if isDeviceLocked(key)
-            //  setErrorMessage("Could not increment ${key}, device is waiting for reply from previous command")
-
-
-        //---record the request in the queue
-            //tempRequest = [key, newValue]
-
-        //lock out the device from cursor selection
-            //setLockoutList([...lockoutList, key] )
-
-        //---send the command to update via websocket
-            //connection.send(key, newValue)
-
-        //--set a timeout function that will unlock the device after a time, regardless of pass or fail
-            //setTimeout(()=> unlockDevice(key), 500)
+    const setDeviceValue = (device, currentValue, newValue) => {
+        if (isValueInBounds(currentValue, device.min, device.max)) {
+            if (isDeviceUnlocked(device, lockoutList)) {
+                setLockoutList([...lockoutList, device.prefix]);
+                try {
+                    connection.current.send(JSON.stringify({type: "write", pv: device.prefix, value: newValue}));
+                } catch (e) {
+                    console.log('Error when attempting to send message to WS in handleIncrementClick with ' + device.prefix);
+                    console.log({e});
+                    return;
+                }
+                setTimeout(() => unlockDevice(device), 500);
+            }
+        }
     }
 
-    const handleSetClick = (key, newValue) => {
 
-    }
-
-    const unlockDevice = (key) => {
-        //attempt to remove key from lockoutList if it's in there
-
-        //To Do - figure out if we want to only remove the first instance, or if it's better to remove
-        //every single instance. We could do this with lockoutList.filter( (item) => value !== key)
-        let index = lockoutList.indexOf(key);
+    const unlockDevice = (device) => {
+        //removes the first instance of the device name from the lockoutlist
+        let index = lockoutList.indexOf(device.prefix);
         if (index !== -1) {
             let tempList = lockoutList.splice(index, 1);
             setLockoutList(tempList);
         }   
     }
+
+    const isValueInBounds = (value, min, max) => {
+        if (value < min) console.log('requested value below minimum');
+        if (value > max) console.log('requested value greater than maximum');
+        return (value >= min && value <= max);
+    }
+
+    const isDeviceUnlocked = (device, lockoutList) => {
+        if (lockoutList.contains(device.prefix)) {
+            console.log('Cannot set value of ' + device.prefix + ' due to lockout');
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    //to-do: set up WS listener on table load that calls unlockDevice(event.data.pv)
 
 
 
@@ -103,21 +105,21 @@ export default function DeviceTable( { connection, devices, setDevices, activeDi
                     </li>
                     {Object.keys(devices).map((key) => {
                         return (
-                        <li key={key} className={`${lockoutList.includes(key) ? 'ponter-events-none' : 'pointer-events-auto'} flex h-[10%] justify-center items-center space-x-4 text-md py-1 border-b border-t border-slate-300 font-medium text-center bg-white rounded-t-md`}>
+                        <li key={key} className={`${lockoutList.includes(key) ? 'ponter-events-none text-slate-400 cursor-not-allowed' : 'pointer-events-auto'} flex h-[10%] justify-center items-center space-x-4 text-md py-1 border-b border-t border-slate-300 font-medium text-center bg-white rounded-t-md`}>
                             <p className="w-2/12">{devices[key].prefix}</p> 
                             <div className="w-2/12 flex justify-between">
-                                <p className="hover:cursor-pointer">&larr;</p>
+                                <p className="hover:cursor-pointer" onClick={() => setDeviceValue(devices[key], devices[key].value, (devices[key].value - devices[key].increment))}>&larr;</p>
                                 <p className="">{devices[key].value} {devices[key].units}</p> 
-                                <p className="hover:cursor-pointer">&rarr;</p>
+                                <p className="hover:cursor-pointer" onClick={() => setDeviceValue(devices[key], devices[key].value, (devices[key].value + devices[key].increment))}>&rarr;</p>
                             </div>
                             <div className="w-2/12 flex justify-center">
-                                <input className="max-w-8" type="number" value={devices[key].increment} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], increment: e.target.value} }) } />
+                                <input className="max-w-8" type="number" value={devices[key].increment} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], increment: e.target.value}})} />
                                 <p className="">{devices[key].units}</p> 
                             </div>
                             <div className="w-3/12 flex justify-center space-x-2">
-                                <input type="number" className="border-b border-black w-4/12"/>
+                                <input type="number" value={devices[key].setValue} className="border-b border-black w-4/12 text-right" onChange={(e) => setDevices({...devices, [key]: { ...devices[key], setValue: e.target.value}})}/>
                                 <p>{devices[key].units}</p>
-                                <Button text="Set" styles="px-[4px] py-[1px] text-sm ml-0"/>
+                                <Button cb={() => setDeviceValue(devices[key], devices[key].value, devices[key].setValue)} text="Set" styles="px-[4px] py-[1px] text-sm ml-0"/>
                             </div>
                             <p className="w-2/12">{devices[key].lastUpdate.format('hh:mm:ss a')}</p>
                         </li>
