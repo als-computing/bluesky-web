@@ -66,7 +66,7 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
         //checks if the WS has opened within the time limit
         setTimeout(checkConnectionStatus, timeLimit*1000);
 
-        //if websocket opens, then call a function to add more event listeners
+        //if websocket opens, add event listener for messages
         socket.addEventListener("open", event => {
             isOpened = true;
             console.log("Opened connection in socket to: " + wsUrl);
@@ -90,7 +90,7 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
     }
 
     //to-do remove this function after testing
-    const setEventListeners = (socket, cb) => {
+/*     const setEventListeners = (socket, cb) => {
         //handle messages sent from the WS for all devices
         //used to confirm that all devices connect
         socket.addEventListener("message", event => {
@@ -101,15 +101,15 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
                 updateSingleDevice(eventData.pv, eventData.value, true);
             }
         })
-    }
+    } */
 
     const handleWebSocketMessage = (event) => {
         console.log("Received Message at: " + Math.round(Date.now() / 1000) + "s"); //TO-DO make this human readable
-            var eventData = JSON.parse(event.data);
-            console.log({eventData});
-            if (eventData.type === 'update') {
-                updateSingleDevice(eventData.pv, eventData.value, true);
-            }
+        var eventData = JSON.parse(event.data);
+        console.log({eventData});
+        if (eventData.type === 'update') {
+            updateSingleDevice(eventData.pv, eventData.value, true);
+        }
     }
 
     const subscribeDevices = (socket, deviceList) => {

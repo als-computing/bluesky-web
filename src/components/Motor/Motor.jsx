@@ -50,15 +50,16 @@ const sampleDevices = {
 }
 export default function Motor() {
     const [wsURL, setWsURL] = useState('');
-    const [devices, setDevices] = useState(sampleDevices); //contains fully connected devices, no empty values 
+    const [devices, setDevices] = useState({}); //contains fully connected devices, no empty values 
+    const [activeDisplay, setActiveDisplay] = useState('Connect');
     const connection = useRef(null); //for websocket
-    const activeDisplay = useRef('DeviceTable')
+    //const activeDisplay = useRef('Connect');
 
     return(
         <section className="block w-full items-center max-w-screen-lg m-auto p-4 rounded-md border border-slate-500">
             Motors
-            <Connect connection={connection} setDevices={setDevices} activeDisplay={activeDisplay} visible={activeDisplay.current === 'Connect' ? true : false}/>
-            <DeviceTable connection={connection} devices={devices} setDevices={setDevices} visible={activeDisplay.current === 'DeviceTable' ? true : false}/>
+            <Connect connection={connection} devices={devices} setDevices={setDevices} activeDisplay={activeDisplay} setActiveDisplay={setActiveDisplay}/>
+            <DeviceTable connection={connection} devices={devices} setDevices={setDevices} activeDisplay={activeDisplay}/>
         </section>
     )
 }

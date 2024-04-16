@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import Button from '../library/Button';
+import dayjs from 'dayjs';
 
-export default function DeviceTable( { connection, devices, setDevices, visible }) { 
+export default function DeviceTable( { connection, devices, setDevices, activeDisplay }) { 
 
     const sampleDevices = {
         'IOC:m1' : {
@@ -78,7 +79,7 @@ export default function DeviceTable( { connection, devices, setDevices, visible 
         //attempt to remove key from lockoutList if it's in there
 
         //To Do - figure out if we want to only remove the first instance, or if it's better to remove
-        //every single instance
+        //every single instance. We could do this with lockoutList.filter( (item) => value !== key)
         let index = lockoutList.indexOf(key);
         if (index !== -1) {
             let tempList = lockoutList.splice(index, 1);
@@ -89,7 +90,7 @@ export default function DeviceTable( { connection, devices, setDevices, visible 
 
 
 
-    if (visible) {
+    if (activeDisplay === 'DeviceTable') {
         return (
             <div>
                 <ul className='h-5/6 rounded-md border border-slate-300's>
@@ -118,7 +119,7 @@ export default function DeviceTable( { connection, devices, setDevices, visible 
                                 <p>{devices[key].units}</p>
                                 <Button text="Set" styles="px-[4px] py-[1px] text-sm ml-0"/>
                             </div>
-                            <p className="w-2/12">{devices[key].lastUpdate}</p>
+                            <p className="w-2/12">{devices[key].lastUpdate.format('hh:mm:ss a')}</p>
                         </li>
                         )
                     })}
