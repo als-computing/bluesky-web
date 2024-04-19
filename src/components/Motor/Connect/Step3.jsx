@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import Button from "../../library/Button";
+import {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice} from './connectionHelper.js';
 
 //sample PVWS message on fully connected PV value change, values shown are after JSON.parse(event.data)
 let sampleMessage = {
@@ -21,31 +22,16 @@ let sampleFailMessage = {
 }
 
 
-export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl, connection, setDevices, setActiveDisplay }) {
+export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl, connection, devices, setDevices, setActiveDisplay }) {
     const [isConnecting, setIsConnecting] = useState(false);
     const [resultMessage, setResultMessage] = useState('');
     const [status, setStatus] = useState('');
 
-    const timeLimit = 2; //maximum time in seconds to wait for initial messages from websocket 
+    const timeLimit = 2; //maximum time in seconds to wait for initial messages from websocket before displaying results
 
     var isOpened = false;
 
-    const closeWebSocket = () => {
-        if (connection.current !== null) {
-            try {
-                console.log("Attempting to close existing websocket connection");
-                connection.current.close();
-                console.log("Existing websocket connection closed");
-            } catch (error) {
-                console.log("Unable to properly close existing websocket connection, still setting connection.current=null")
-                console.log({error});
-            }
-            connection.current = null;
-        } else {
-            console.log("connection.current is null, removing websocket skipped");
-        }
-    }
-
+     // -------------Main Logic ---------------------
     const initializeConnection = (deviceList) => {
         //Ensure wsUrl is not empty
         if (wsUrl === '') {
@@ -53,7 +39,7 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
             return;
         }
 
-        closeWebSocket();
+        closeWebSocket(connection);
 
         try {
             var socket = new WebSocket(wsUrl);
@@ -66,15 +52,13 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
         //checks if the WS has opened within the time limit
         setTimeout(checkConnectionStatus, timeLimit*1000);
 
-        //if websocket opens, add event listener for messages
         socket.addEventListener("open", event => {
             isOpened = true;
+            setDevices(createTempDevices(deviceList)); //initialize React state prior to WS message callback
             console.log("Opened connection in socket to: " + wsUrl);
             socket.addEventListener("message", handleWebSocketMessage);
-            //setEventListeners(socket); //to-do remove this line after testing
             connection.current = socket;
-            subscribeDevices(socket, deviceList);
-            //setStep('4'); //render summary page
+            subscribeDevices(connection, deviceList);
             setTimeout(showResults, timeLimit*1000);
         })
 
@@ -89,30 +73,7 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
         }
     }
 
-    //to-do remove this function after testing
-/*     const setEventListeners = (socket, cb) => {
-        //handle messages sent from the WS for all devices
-        //used to confirm that all devices connect
-        socket.addEventListener("message", event => {
-            console.log("Received Message at: " + Math.round(Date.now() / 1000) + "s");
-            var eventData = JSON.parse(event.data);
-            console.log({eventData});
-            if (eventData.type === 'update') {
-                updateSingleDevice(eventData.pv, eventData.value, true);
-            }
-        })
-    } */
-
-    const handleWebSocketMessage = (event) => {
-        console.log("Received Message at: " + Math.round(Date.now() / 1000) + "s"); //TO-DO make this human readable
-        var eventData = JSON.parse(event.data);
-        console.log({eventData});
-        if (eventData.type === 'update') {
-            updateSingleDevice(eventData.pv, eventData.value, true); //refactor this to use updateDevice from connectionHelper.js
-        }
-    }
-
-    const subscribeDevices = (socket, deviceList) => {
+    const subscribeDevices = (connection, deviceList) => {
         //send a single subscribe message for all devices. 
         //PVWS should immmediately respond with the status of each device
         //This must be called after a message subscription has been added to the socket, otherwise the response will not be received
@@ -125,12 +86,21 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
         connection.current.send(JSON.stringify({type: "subscribe", pvs: pvNames}));
     }
 
+    const handleWebSocketMessage = (event) => {
+        console.log("Received Message at: " + Math.round(Date.now() / 1000) + "s"); //TO-DO make this human readable
+        var eventData = JSON.parse(event.data);
+        console.log({eventData});
+        if (eventData.type === 'update') {
+            updateDevice(eventData, setDevices);
+        }
+    }
+
     const showResults = () => {
         //display message to user if all devices have connected
         var totalConnected = 0;
         var totalDevices = 0;
         var totalNullValues = 0;
-        for (var device of deviceList) {
+        for (var device of devices) {
             if (device.prefix !== '') {
                 totalDevices++;
                 if (device.isConnected) totalConnected++;
@@ -152,113 +122,9 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
         setResultMessage(messageString);
         setStep('4');
     }
-
-    const handleConnectClick = () => {
-        setIsConnecting(true);
-        initializeConnection(deviceList);
-    }
-
-    const updateSingleDevice = (prefix, value=null, isConnected=false) => {
-        let newDeviceList = [...deviceList];
-        for (var device of deviceList) {
-            if (device.prefix === prefix) {
-                if (value === null || value === "NaN") { //PVWS returns value: "NaN" for PVs that were once connected on the existing websocket instance and then disconnected by stopping IOC.
-                    newDeviceList[device.id].value = null;
-                } else {
-                    newDeviceList[device.id].value = value;
-                }
-                newDeviceList[device.id].isConnected = isConnected;
-                break;
-            }
-        }
-        setDeviceList(newDeviceList);
-    }
-
-    function StatusIcon({ device  }) {
-        var type;
-        var connection  = device.isConnected;
-        var value = device.value;
-
-        //Blank
-        //default view before any connections take place
-        if (connection === false && value === null) {
-            return (
-                <div className={`bg-white h-fit px-1 rounded-full border border-slate-500 text-center text-xs mr-2`}>
-                    <p className={`bg-white text-white`}>?</p>
-                </div>
-            )
-        }
-
-        //Checked
-        //device is registered to ws, and its value is returned
-        if (connection === true && value !== null) {
-            return (
-                <div className={`bg-green-500 h-fit px-1 rounded-full border border-slate-500 text-center text-xs mr-2`}>
-                    <p className="text-white font-bold">&#10003;</p>
-                </div>
-            )
-        }
-
-        //Question Mark
-        //device is registered to ws, but no value for the device is returned
-        if (connection === true && value === null) {
-            return (
-                <div className={`bg-yellow-200 h-fit px-1 rounded-full border border-slate-500 text-center text-xs mr-2`}>
-                    <p className="">?</p>
-                </div>
-            )
-        }
-
-    }
-
-    const mockPVWS = () => {
-        //simulate changes to devices based on simulated response from PVWS
-        //used to test the visual display for device list
-        //used to test the error messages and continue button
-
-        //simulate start connection
-        isOpened = true;
-        setIsConnecting(true);
-
-        //set all items to connected and provide values
-        let newDeviceList = [...deviceList];
-        for (var device of deviceList) {
-            if (device.prefix !== '') {
-                newDeviceList[device.id].value = Math.floor(Math.random()*2) > 0 ? Math.floor(Math.random()*10) : null;
-                newDeviceList[device.id].isConnected = true;
-            }
-        }
-        setDeviceList(newDeviceList);
-
-        //simulate waiting for results to display
-        setTimeout(showResults, timeLimit*1000);
-    }
-
-
-
-    const resetStep3 = () => {
-        //reset monitoring variables
-        isOpened = false;
-        setIsConnecting(false);
-        setResultMessage('');
-        setStatus('');
-        setStep('3');
-
-        closeWebSocket();
-
-        //set each device value=null, isConnected=false to reset UI
-        let newDeviceList = [...deviceList];
-        for (var device of deviceList) {
-            if (device.prefix !== '') {
-                newDeviceList[device.id].value = null;
-                newDeviceList[device.id].isConnected = false;
-            }
-        }
-        setDeviceList(newDeviceList);
-    }
-
-    const handleFinish = () => {
-        //store the deviceList (array) into a final device object for use in the device table
+    
+    // ------------- Utility ---------------------
+    const createTempDevices = (deviceList) => {
         var tempDevices = {};
         var idCount = 0;
         for (var device of deviceList) {
@@ -282,8 +148,76 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
                 idCount++;
             }
         }
-        setDevices(tempDevices);
+        return tempDevices;
+    }
+
+    // ------------- UI Components -----------------
+    function StatusIcon({ device  }) {
+        var type;
+        var connection  = device.isConnected;
+        var value = device.value;
+        
+        //Blank
+        //default view before any connections take place
+        if (connection === false && value === null) {
+            return (
+                <div className={`bg-white h-fit px-1 rounded-full border border-slate-500 text-center text-xs mr-2`}>
+                    <p className={`bg-white text-white`}>?</p>
+                </div>
+            )
+        }
+        
+        //Checked
+        //device is registered to ws, and its value is returned
+        if (connection === true && value !== null) {
+            return (
+                <div className={`bg-green-500 h-fit px-1 rounded-full border border-slate-500 text-center text-xs mr-2`}>
+                    <p className="text-white font-bold">&#10003;</p>
+                </div>
+            )
+        }
+        
+        //Question Mark
+        //device is registered to ws, but no value for the device is returned
+        if (connection === true && value === null) {
+            return (
+                <div className={`bg-yellow-200 h-fit px-1 rounded-full border border-slate-500 text-center text-xs mr-2`}>
+                    <p className="">?</p>
+                </div>
+            )
+        }
+        
+    }
+    
+    // ------ Button Click Handler Functions -------
+    const handleConnectClick = () => {
+        setIsConnecting(true);
+        initializeConnection(deviceList); //should we initialize from the list? or from devices and set the state?
+    }
+    
+    const handleFinish = () => {
         setActiveDisplay('DeviceTable');
+    }
+
+    const resetStep3 = () => {
+        //reset monitoring variables
+        isOpened = false;
+        setIsConnecting(false);
+        setResultMessage('');
+        setStatus('');
+        setStep('3');
+        
+        closeWebSocket();
+        
+        //set each device value=null, isConnected=false to reset UI
+        let newDeviceList = [...deviceList];
+        for (var device of deviceList) {
+            if (device.prefix !== '') {
+                newDeviceList[device.id].value = null;
+                newDeviceList[device.id].isConnected = false;
+            }
+        }
+        setDeviceList(newDeviceList);
     }
 
     if (step === '3' || step === '4') {

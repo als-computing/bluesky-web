@@ -76,7 +76,7 @@ export default function Connect( { connection, devices, setDevices, setDisplay, 
                     <Step0 step={step} setStep={setStep} connection={connection} wsUrl={wsUrl} devices={devices} setDevices={setDevices} activeDisplay={activeDisplay} setActiveDisplay={setActiveDisplay}/>
                     <Step1 step={step} setStep={setStep} wsUrl={wsUrl} setWsUrl={setWsUrl}/>
                     <Step2 step={step} setStep={setStep} deviceList={deviceList} setDeviceList={setDeviceList}/>
-                    <Step3 step={step} setStep={setStep} deviceList={deviceList} setDeviceList={setDeviceList} wsUrl={wsUrl} connection={connection} setDevices={setDevices} setActiveDisplay={setActiveDisplay}/>
+                    <Step3 step={step} setStep={setStep} deviceList={deviceList} setDeviceList={setDeviceList} wsUrl={wsUrl} connection={connection} devices={devices} setDevices={setDevices} setActiveDisplay={setActiveDisplay}/>
                 </div>
             </section>
         )
