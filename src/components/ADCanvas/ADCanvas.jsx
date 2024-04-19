@@ -90,7 +90,7 @@ export default function Canvas() {
     }, []);
 
     return (
-        <section className="flex w-full items-center max-w-screen-lg m-auto p-4">
+        <section className="flex w-full items-center max-w-screen-lg m-auto p-4 border border-slate-500 rounded-md my-8">
             <form className="flex flex-col space-y-2">
                 <TextField text="Web Socket URL" value={url} cb={setUrl} />
                 <TextField text="Device Prefix (optional)" value={prefix} cb={setPrefix} />

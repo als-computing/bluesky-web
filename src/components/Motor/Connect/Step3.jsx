@@ -21,7 +21,7 @@ let sampleFailMessage = {
 }
 
 
-export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl, connection, setDevices, activeDisplay }) {
+export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl, connection, setDevices, setActiveDisplay }) {
     const [isConnecting, setIsConnecting] = useState(false);
     const [resultMessage, setResultMessage] = useState('');
     const [status, setStatus] = useState('');
@@ -108,7 +108,7 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
         var eventData = JSON.parse(event.data);
         console.log({eventData});
         if (eventData.type === 'update') {
-            updateSingleDevice(eventData.pv, eventData.value, true);
+            updateSingleDevice(eventData.pv, eventData.value, true); //refactor this to use updateDevice from connectionHelper.js
         }
     }
 
@@ -270,14 +270,20 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
                     nickname: device.nickname,
                     group: device.group,
                     isConnected: device.isConnected,
-                    value: device.value
+                    value: device.value,
+                    units: device.units,
+                    min: device.min,
+                    max: device.max,
+                    increment: device.increment,
+                    setValue: device.setValue,
+                    lastUpdate: device.lastUpdate
                 }
                 tempDevices[device.prefix] = temp;
                 idCount++;
             }
         }
         setDevices(tempDevices);
-        activeDisplay.current = 'DeviceTable';
+        setActiveDisplay('DeviceTable');
     }
 
     if (step === '3' || step === '4') {

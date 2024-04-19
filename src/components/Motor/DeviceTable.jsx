@@ -47,7 +47,11 @@ export default function DeviceTable( { connection, devices, setDevices, activeDi
 
 
     const setDeviceValue = (device, currentValue, newValue) => {
-        if (isValueInBounds(currentValue, device.min, device.max)) {
+        console.log('setDeviceValue()');
+        console.log({devices});
+        console.log('current value = ', currentValue);
+        console.log('newValue = ', newValue);
+        if (isValueInBounds(newValue, device.min, device.max, device.prefix)) {
             if (isDeviceUnlocked(device, lockoutList)) {
                 setLockoutList([...lockoutList, device.prefix]);
                 try {
@@ -57,35 +61,44 @@ export default function DeviceTable( { connection, devices, setDevices, activeDi
                     console.log({e});
                     return;
                 }
-                setTimeout(() => unlockDevice(device), 500);
             }
         }
     }
 
 
-    const unlockDevice = (device) => {
+    const unlockDevice = (prefix) => {
         //removes the first instance of the device name from the lockoutlist
-        let index = lockoutList.indexOf(device.prefix);
+        let index = lockoutList.indexOf(prefix);
         if (index !== -1) {
-            let tempList = lockoutList.splice(index, 1);
+            let tempList = lockoutList.toSpliced(index, 1);
             setLockoutList(tempList);
-        }   
+        } 
     }
 
-    const isValueInBounds = (value, min, max) => {
-        if (value < min) console.log('requested value below minimum');
-        if (value > max) console.log('requested value greater than maximum');
+    const isValueInBounds = (value, min, max, prefix) => {
+        if (value < min) console.log('requested value ', value, 'is below the minimum ', min, ' for ', prefix);
+        if (value > max) console.log('requested value ', value, 'is greater than the maximum ', max, ' for ', prefix);
         return (value >= min && value <= max);
     }
 
     const isDeviceUnlocked = (device, lockoutList) => {
-        if (lockoutList.contains(device.prefix)) {
+        if (lockoutList.includes(device.prefix)) {
             console.log('Cannot set value of ' + device.prefix + ' due to lockout');
             return false;
         } else {
             return true;
         }
     }
+
+    //automatically try to remove the most recent addition to the lockoutList when lockoutList changes
+    //useEffect will occur more times than necessary, but guarantees the device will be unlocked
+    useEffect(() => {
+        if (lockoutList.length !== 0) {
+            setTimeout(() => unlockDevice(lockoutList.slice(-1)[0]), 250);
+        }
+    }, [lockoutList]);
+
+
 
     //to-do: set up WS listener on table load that calls unlockDevice(event.data.pv)
 
@@ -94,8 +107,8 @@ export default function DeviceTable( { connection, devices, setDevices, activeDi
 
     if (activeDisplay === 'DeviceTable') {
         return (
-            <div>
-                <ul className='h-5/6 rounded-md border border-slate-300's>
+            <div className='my-8'>
+                <ul className='h-5/6 rounded-md border border-slate-300'>
                     <li className="flex h-[10%] justify-center items-center space-x-4  text-lg font-medium text-center bg-gray-100 rounded-t-md">
                         <p className="w-2/12">Device</p> 
                         <p className="w-2/12">Position</p> 
@@ -110,14 +123,14 @@ export default function DeviceTable( { connection, devices, setDevices, activeDi
                             <div className="w-2/12 flex justify-between">
                                 <p className="hover:cursor-pointer" onClick={() => setDeviceValue(devices[key], devices[key].value, (devices[key].value - devices[key].increment))}>&larr;</p>
                                 <p className="">{devices[key].value} {devices[key].units}</p> 
-                                <p className="hover:cursor-pointer" onClick={() => setDeviceValue(devices[key], devices[key].value, (devices[key].value + devices[key].increment))}>&rarr;</p>
+                                <p className="hover:cursor-pointer" onClick={() => setDeviceValue(devices[key], devices[key].value, (parseInt(devices[key].value) + parseInt(devices[key].increment)))}>&rarr;</p>
                             </div>
                             <div className="w-2/12 flex justify-center">
-                                <input className="max-w-8" type="number" value={devices[key].increment} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], increment: e.target.value}})} />
+                                <input className="max-w-8" type="number" value={devices[key].increment} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], increment: parseInt(e.target.value)}})} />
                                 <p className="">{devices[key].units}</p> 
                             </div>
                             <div className="w-3/12 flex justify-center space-x-2">
-                                <input type="number" value={devices[key].setValue} className="border-b border-black w-4/12 text-right" onChange={(e) => setDevices({...devices, [key]: { ...devices[key], setValue: e.target.value}})}/>
+                                <input type="number" value={devices[key].setValue} className="border-b border-black w-4/12 text-right" onChange={(e) => setDevices({...devices, [key]: { ...devices[key], setValue: parseInt(e.target.value)}})}/>
                                 <p>{devices[key].units}</p>
                                 <Button cb={() => setDeviceValue(devices[key], devices[key].value, devices[key].setValue)} text="Set" styles="px-[4px] py-[1px] text-sm ml-0"/>
                             </div>
