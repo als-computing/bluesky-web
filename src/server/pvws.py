@@ -32,19 +32,11 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
         while True:
             # This will wait until there is something in the buffer.
             value, timestamp = await buffer.get()
-            #data = {'value' : value,
-            #        'time_stamp': time.time()}
-            #output = json.dumps(data)
-            #flat_data = value.flatten().tobytes()
             rgb_data = np.array(value, dtype=np.uint8)
             flat_data = rgb_data.tobytes()
-            
-            # Send the binary data
+
             await websocket.send_bytes(flat_data)
 
-            #await websocket.send_text(output)
-            #i += 1
-            #if num is not None and i >= num:
-            #    break
     except WebSocketDisconnect:
         await websocket.close()
+
