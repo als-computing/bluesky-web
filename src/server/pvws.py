@@ -1,6 +1,7 @@
 import asyncio
 import json
 import time
+import numpy as np
 
 from ophyd import EpicsSignalRO
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
@@ -21,7 +22,8 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
     def array_cb(value, timestamp, **kwargs):
         buffer.put_nowait((value, timestamp))
 
-    array_signal = EpicsSignalRO("IOC:m1")
+    #array_signal = EpicsSignalRO("IOC:m1")
+    array_signal = EpicsSignalRO("13SIM1:image1:ArrayData")
     array_signal.subscribe(array_cb)
     buffer.put_nowait((array_signal.get(), time.time()))
 
@@ -30,12 +32,11 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
         while True:
             # This will wait until there is something in the buffer.
             value, timestamp = await buffer.get()
-            data = {'value' : value,
-                    'time_stamp': time.time()}
-            output = json.dumps(data)
-            await websocket.send_text(output)
-            #i += 1
-            #if num is not None and i >= num:
-            #    break
+            rgb_data = np.array(value, dtype=np.uint8)
+            flat_data = rgb_data.tobytes()
+
+            await websocket.send_bytes(flat_data)
+
     except WebSocketDisconnect:
         await websocket.close()
+

@@ -56,8 +56,7 @@ export default function Motor() {
     //const activeDisplay = useRef('Connect');
 
     return(
-        <section className="block w-full items-center max-w-screen-lg m-auto p-4 rounded-md border border-slate-500">
-            Motors
+        <section className="block w-full items-center max-w-screen-lg m-auto p-4 rounded-md border border-slate-500 my-8">
             <Connect connection={connection} devices={devices} setDevices={setDevices} activeDisplay={activeDisplay} setActiveDisplay={setActiveDisplay}/>
             <DeviceTable connection={connection} devices={devices} setDevices={setDevices} activeDisplay={activeDisplay}/>
         </section>

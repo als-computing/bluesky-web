@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice} from './connectionHelper.js';
 import dayjs from 'dayjs';
 
@@ -7,7 +7,9 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
     const _envUrl = process.env.REACT_APP_PVWS_URL;
     const wsUrl = _envUrl;
 
-    const motorSimDeviceList = ['IOC:m1', 'IOC:m1Offset', 'IOC:m1Resolution', 'IOC:m1Direction'];
+
+    //const motorSimDeviceList = ['IOC:m1', 'IOC:m1Offset', 'IOC:m1Resolution', 'IOC:m1Direction'];
+    const motorSimDeviceList = ['IOC:m1', 'IOC:m2', 'IOC:m3', 'IOC:m4'];
     var tempDevices = {};
     var count = 0;
     for (var prefix of motorSimDeviceList) {
@@ -50,12 +52,13 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
             connection.current.send(JSON.stringify({type: "subscribe", pvs: motorSimDeviceList}));
         });
 
+        //everytime this is called, we get a closure from the original 'devices'
         socket.addEventListener("message", event => {
             console.log("Received Message at: " + dayjs().format('hh:mm:ss a'));
             var eventData = JSON.parse(event.data);
             console.log({eventData});
             if (eventData.type === 'update') {
-                updateDevice(eventData, devices, setDevices);
+                updateDevice(eventData, setDevices);
             }
         })
 
@@ -70,9 +73,13 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
     }
 
     useEffect(() => {
-        console.log('useEffect Step0');
         setDevices(tempDevices);
     }, []);
+
+    useEffect(() => {
+        console.log('In useEffect')
+        console.log({devices});
+    }, [devices]);
 
 
     if (step === '0') {

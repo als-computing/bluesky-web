@@ -21,7 +21,13 @@ export default function Connect( { connection, devices, setDevices, setDisplay, 
             nickname: '',
             group: '',
             isConnected: false,
-            value: null
+            value: null,
+            units: null,
+            min: null,
+            max: null,
+            increment: 1,
+            setValue: '',
+            lastUpdate: null
         }
         blankDeviceList.push(blankDevice);
         blankDeviceList[i].id = i; //set an id so we can set keys in map()
@@ -64,13 +70,13 @@ export default function Connect( { connection, devices, setDevices, setDisplay, 
 
     if (activeDisplay === 'Connect') {
         return (
-            <section className="flex justify-center rounded-md border border-slate-500 max-w-screen-lg m-auto px-6">
+            <section className="flex justify-center  max-w-screen-lg m-auto px-6">
                 <div className="w-full max-w-xl m-auto block py-4">
                     <Navbar step={step} setStep={setStep}/>
                     <Step0 step={step} setStep={setStep} connection={connection} wsUrl={wsUrl} devices={devices} setDevices={setDevices} activeDisplay={activeDisplay} setActiveDisplay={setActiveDisplay}/>
-                    <Step1 step={step} setStep={setStep} />
+                    <Step1 step={step} setStep={setStep} wsUrl={wsUrl} setWsUrl={setWsUrl}/>
                     <Step2 step={step} setStep={setStep} deviceList={deviceList} setDeviceList={setDeviceList}/>
-                    <Step3 step={step} setStep={setStep} deviceList={deviceList} setDeviceList={setDeviceList} wsUrl={wsUrl} connection={connection} setDevices={setDevices} activeDisplay={activeDisplay}/>
+                    <Step3 step={step} setStep={setStep} deviceList={deviceList} setDeviceList={setDeviceList} wsUrl={wsUrl} connection={connection} devices={devices} setDevices={setDevices} setActiveDisplay={setActiveDisplay}/>
                 </div>
             </section>
         )

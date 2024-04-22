@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 import pvws
+import pvsim
 
 from ophyd.signal import EpicsSignal
 m7 = EpicsSignal("IOC:m7", name="m7") # initialize a known connection for testing
@@ -35,7 +36,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(pvws.router)
+#app.include_router(pvws.router) #turn this off if not connected to EPICS
+app.include_router(pvsim.router)
+
 
 @app.get("/")
 def read_root():

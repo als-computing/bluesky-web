@@ -96,29 +96,44 @@ const updateSingleDevice = (prefix, deviceList, setDeviceList, value=null, isCon
     setDeviceList(newDeviceList);
 }
 
-const updateDevice = (e, devices, setDevices) => {
-    const prefix = e.pv;
-    var tempDevice = devices[prefix];
-    if ("value" in e) { //PV is or was previously connected to WS
-        if("units" in e) { //First connection response sends units, must initialize
-            tempDevice.min = e.min;
-            tempDevice.max = e.max;
-            tempDevice.lastUpdate = dayjs();
-            tempDevice.units = e.units;
-        }
-        if (e.value === "NaN") { //PV is no longer connected to WS
-            tempDevice.isConnected = false;
-            tempDevice.value = null;
-        } else { //PV is receiving regular update, has been previously connected
-            tempDevice.isConnected = true;
-            tempDevice.value = e.value;
-        }
-    } else { //PV has not returned a value
-        tempDevice.isConnected = false;
-        tempDevice.lastUpdate = dayjs();
-    }
 
-    setDevices({...devices, [prefix]: tempDevice})
+const updateDevice = (e, setDevices) => {
+
+    setDevices(devices => {
+        console.log('updateDevice()');
+        console.log(JSON.parse(JSON.stringify(devices)));
+        const prefix = e.pv;
+        var tempDevice = devices[prefix];
+        console.log(tempDevice.value);
+        if ("value" in e) { //PV is or was previously connected to WS
+            if("units" in e) { //First connection response sends units, must initialize
+                tempDevice.min = e.min;
+                tempDevice.max = e.max;
+                tempDevice.lastUpdate = dayjs();
+                tempDevice.units = e.units;
+            }
+            if (e.value === "NaN") { //PV is no longer connected to WS
+                tempDevice.isConnected = false;
+                tempDevice.value = null;
+            } else { //PV is receiving regular update, has been previously connected
+                console.log('tempValue = ', tempDevice.value, ', e.value = ', e.value);
+                if (tempDevice.value === e.value) {
+                    console.log('values are equal, do nothing');
+                } else {
+                    tempDevice.isConnected = true;
+                    tempDevice.value = e.value;
+                    tempDevice.lastUpdate = dayjs();
+                    console.log({tempDevice});  
+                }
+            }
+        } else { //PV has not returned a value
+            tempDevice.isConnected = false;
+            tempDevice.lastUpdate = dayjs();
+        }
+        console.log('calling setDevices');
+        console.log({devices});
+        return {...devices, [prefix]: tempDevice};
+    })
 
 }
 
