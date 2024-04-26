@@ -1,0 +1,13 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "8081:80"
+  pvws:
+    build: ./pvws/docker
+    ports:
+      - "8080:8080"
+  server:
+    build: ./server
+    ports:
+      - "8000:8000"
