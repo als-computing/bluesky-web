@@ -1,26 +1,29 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
-/.pnp
-.pnp.js
+frontend/node_modules
+frontend/.pnp
+frontend/.pnp.js
 
 # testing
-/coverage
+frontend/coverage
 
 # production
-/build
+frontend/build
 
 # misc
 .DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+frontend/.DS_Store
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-src/server/__pycache__/main.cpython-311.pyc
-src/server/__pycache__
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+server/__pycache__/main.cpython-311.pyc
+server/__pycache__
 
+pvws/

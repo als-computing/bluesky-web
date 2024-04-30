@@ -124,19 +124,19 @@ export default function DeviceTable( { connection, devices, setDevices, activeDi
                     </li>
                     {Object.keys(devices).map((key) => {
                         return (
-                        <li key={key} className={`${lockoutList.includes(key) ? 'ponter-events-none text-slate-400 cursor-not-allowed' : 'pointer-events-auto'} ${devices[key].isConnected ? '' : '*:cursor-not-allowed text-red-400'} flex h-[10%] justify-center items-center space-x-4 text-md py-1 border-b border-t border-slate-300 font-medium text-center bg-white rounded-t-md`}>
+                        <li key={key} className={`${lockoutList.includes(key) ? 'ponter-events-none text-slate-400 cursor-not-allowed' : 'pointer-events-auto'} ${devices[key].isConnected ? '' : 'cursor-not-allowed text-red-400'} flex h-[10%] justify-center items-center space-x-4 text-md py-1 border-b border-t border-slate-300 font-medium text-center bg-white rounded-t-md`}>
                             <p name="Device" className="w-2/12 break-words">{devices[key].prefix}</p> 
-                            <div name="Positions" className="w-2/12 flex justify-between">
+                            <div name="Positions" className={`${devices[key].isConnected ? '' : 'pointer-events-none'} w-2/12 flex justify-between`}>
                                 <p className={`${devices[key].isConnected ? 'hover:cursor-pointer hover:text-sky-700' : ''}`} onClick={() => setDeviceValue(devices[key], devices[key].value, (devices[key].value - devices[key].increment))}>&larr;</p>
                                 <p className="">{devices[key].isConnected ? devices[key].value.toPrecision(4) : 'N/A'} {devices[key].isConnected ? devices[key].units.substring(0,3) : ''}</p> 
                                 <p className={`${devices[key].isConnected ? 'hover:cursor-pointer hover:text-sky-700' : ''}`} onClick={() => setDeviceValue(devices[key], devices[key].value, (parseInt(devices[key].value) + parseInt(devices[key].increment)))}>&rarr;</p>
                             </div>
-                            <div name="Jog Increment" className="w-2/12 flex justify-center">
+                            <div name="Jog Increment" className={`${devices[key].isConnected ? '' : 'pointer-events-none'} w-2/12 flex justify-center`}>
                                 <input className="max-w-8" type="number" value={devices[key].increment} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], increment: parseInt(e.target.value)}})} />
                                 <p className="">{ devices.isConnected ? devices[key].units.substring(0,3) : ''}</p> 
                             </div>
-                            <div name="Set Position" className="w-3/12 flex justify-center space-x-2">
-                                <input type="number" value={devices[key].setValue} className="border-b border-black w-4/12 text-right" onKeyDown={(e) =>handleKeyPress(e, key)} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], setValue: parseInt(e.target.value)}})}/>
+                            <div name="Set Position" className={`${devices[key].isConnected ? '' : 'pointer-events-none'} w-3/12 flex justify-center space-x-2`}>
+                                <input type="number" value={devices[key].setValue} className={`border-b border-black w-4/12 text-right`} onKeyDown={(e) =>handleKeyPress(e, key)} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], setValue: parseInt(e.target.value)}})}/>
                                 <p>{devices[key].isConnected ? devices[key].units.substring(0,3) : ''}</p>
                                 <Button cb={() => setDeviceValue(devices[key], devices[key].value, devices[key].setValue)} text="Set" styles="px-[4px] py-[1px] text-sm ml-0"/>
                             </div>
