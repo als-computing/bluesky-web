@@ -12,6 +12,8 @@ import PNGStream from './components/PNGStream/PNGStream.jsx';
 import { array_64 } from './data/array_data.js'
 import { generateImgData } from './components/WebGL/imgDataGenerator.js';
 import { useState } from 'react';
+import Header from './components/Header/Header.jsx';
+import Sidebar from './components/Sidebar/Sidebar.jsx';
 
 function App() {
 
@@ -32,13 +34,22 @@ function App() {
 //<WebGLCanvas width={width} height={height} data={new Uint8Array(array_64)} />
 
   return (
-    <main className="App bg-white min-h-screen w-full p-12">
-      <Routes>
-        <Route path="/" element={<Home /> } />
-        <Route path="/camera" element={<WebSocketImage url={urlSim} width={width} height={height}/>} />
-        <Route path="/devices" element={<Motor />} />
-        <Route path="/api" element={<Postman />} />
-      </Routes>      
+    <main className="App bg-white min-h-screen w-full px-12 max-w-screen-2xl m-auto">
+      <Header />
+      <div className="flex justify-center">
+        <div className="w-1/6">
+          <Sidebar /> 
+        </div>
+        <div className="w-4/6">
+          <Routes>
+            <Route path="/" element={<Home /> } />
+            <Route path="/camera" element={<WebSocketImage url={urlSim} width={width} height={height}/>} />
+            <Route path="/devices" element={<Motor />} />
+            <Route path="/api" element={<Postman />} />
+          </Routes>      
+        </div>
+        <div className="w-1/6"></div>
+      </div>
     </main>
   );
 }
