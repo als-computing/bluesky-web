@@ -9,7 +9,7 @@ export default function Home() {
     
     return (
         <section>
-            <WebSocketImage url={urlReal} width={width} height={height}/>
+            <WebSocketImage url={urlSim} width={width} height={height}/>
             <Motor />
             <Postman />
         </section>

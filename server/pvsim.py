@@ -22,7 +22,7 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             # Generate random image data
-            height, width = 64, 64  # Define the dimensions of the image
+            height, width = 256, 256  # Define the dimensions of the image
             rgb_data = np.random.randint(0, 256, (height, width, 3), dtype=np.uint8)
             # Prepare data to be sent, flatten the array and convert to bytes
             flat_data = rgb_data.flatten().tobytes()

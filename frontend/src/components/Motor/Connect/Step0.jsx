@@ -2,15 +2,86 @@ import { useState, useEffect, useRef } from 'react';
 import {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice} from './connectionHelper.js';
 import dayjs from 'dayjs';
 
-export default function Step0( { step, setStep, connection, devices, setDevices, activeDisplay, setActiveDisplay } ) {
+export default function Step0( { step, setStep, connection, devices, setDevices, activeDisplay, setActiveDisplay} ) {
     
     const _envUrl = process.env.REACT_APP_PVWS_URL;
     const wsUrl = _envUrl;
 
+    const autoDeviceList = {
+        bl531: [        
+            'bl531_esp300:m101_pitch_mm', 
+            'bl531_esp300:m101_bend_um', 
+            'bl531_xps1:mono_angle_deg', 
+            'bl531_xps1:mono_height_mm', 
+            'bl531_xps2:beamstop_x_mm', 
+            'bl531_xps2:beamstop_y_mm', 
+            'DMC02:E', 
+            'DMC02:F', 
+            'DMC02:G',
+            'DMC02:H',
+            'DMC01:A',
+            'DMC01:B',
+            'DMC01:C',
+            'DMC01:D'],
+        motorMotorSim: [
+            'IOC:m1',
+            'IOC:m2',
+            'IOC:m3',
+            'IOC:m4'
+        ],
+        adSimDetector: [
+            '13SIM1:cam1:AcquireTime',
+            '13SIM1:cam1:AcquirePeriod',
+            '13SIM1:cam1:Gain',
+            '13SIM1:cam1:GainRed',
+            '13SIM1:cam1:GainGreen',
+            '13SIM1:cam1:GainBlue',
+            '13SIM1:cam1:AcquireTime_RBV',
+            '13SIM1:cam1:AcquirePeriod_RBV',
+            '13SIM1:cam1:Gain_RBV',
+        ]
+    }
+
+    const icons = {
+        fastForward : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10 m-auto transition-colors duration-100 group-hover:text-blue-600">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z" />
+                      </svg>,
+        tools : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10 m-auto transition-colors duration-100 group-hover:text-blue-600">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
+                </svg>
+    };
+
+    const options =[
+        {
+            title: 'motorMotorSim',
+            description: 'Connect to (4) PVs from the EPICS motorMotorSim IOC.',
+            icon: icons.fastForward,
+            callback: () => {startAutomaticSetup(autoDeviceList.motorMotorSim)}
+        },
+        {
+            title: 'ADSimDetector',
+            description: 'Connect to (12) PVs from the EPICS ADSimDetector IOC.',
+            icon: icons.fastForward,
+            callback: () => {startAutomaticSetup(autoDeviceList.adSimDetector)}
+        },
+        {
+            title: 'BL5.3.1',
+            description: 'Connect to (14) motor devices installed at BL 5.3.1 including beamstop and monochromator. Note that the computer running PVWS must be connected to the BL 5.3.1 subnet with the EPICS address list configured.',
+            icon: icons.fastForward,
+            callback: () => {startAutomaticSetup(autoDeviceList.adSimDetector)}
+        },
+        {
+            title: 'Custom Setup',
+            description: 'Provides custom setup options including websocket URL and devices. Additional devices may be connected after custom setup is complete.',
+            icon: icons.tools,
+            callback: () => startCustomSetup()
+        }
+    ]
+
 
     //const motorSimDeviceList = ['IOC:m1', 'IOC:m1Offset', 'IOC:m1Resolution', 'IOC:m1Direction'];
-    //const motorSimDeviceList = ['IOC:m1', 'IOC:m2', 'IOC:m3', 'IOC:m4'];
-    const motorSimDeviceList = [
+    const motorSimDeviceList = ['IOC:m1', 'IOC:m2', 'IOC:m3', 'IOC:m4'];
+    const bl531Devices = [
         'bl531_esp300:m101_pitch_mm', 
         'bl531_esp300:m101_bend_um', 
         'bl531_xps1:mono_angle_deg', 
@@ -26,32 +97,38 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
         'DMC01:C',
         'DMC01:D'
     ];
-    var tempDevices = {};
-    var count = 0;
-    for (var prefix of motorSimDeviceList) {
-        tempDevices[prefix] = {
-            id: count,
-            prefix: prefix,
-            nickname: '',
-            group: 'sim',
-            isConnected: false,
-            value: null,
-            units: null,
-            min: null,
-            max: null,
-            increment: 1,
-            setValue: '',
-            lastUpdate: null
-        }
-        count++;
-    }
-
+    
     const startCustomSetup = () => {
         setStep('1');
     }
-    
 
-    const startAutomaticSetup = () => {
+    const initializeDeviceList = (devices) => {
+        //accepts an array of PVs
+        var tempDevices = {};
+        var count = 0;
+        for (var prefix of devices) {
+            tempDevices[prefix] = {
+                id: count,
+                prefix: prefix,
+                nickname: '',
+                group: 'sim',
+                isConnected: false,
+                value: null,
+                units: null,
+                min: null,
+                max: null,
+                increment: 1,
+                setValue: '',
+                lastUpdate: null
+            }
+            count++;
+        }
+        //set the final device state variable
+        setDevices(tempDevices);
+    }
+    
+    
+    const startAutomaticSetup = (devices) => {
         setStep('auto');
         closeWebSocket(connection);
         try {
@@ -61,11 +138,13 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
             console.log(error);
             return;
         }
+        
+        initializeDeviceList(devices)
 
         socket.addEventListener("open", event => {
             console.log("Opened connection in socket to: " + wsUrl);
             connection.current = socket;
-            connection.current.send(JSON.stringify({type: "subscribe", pvs: motorSimDeviceList}));
+            connection.current.send(JSON.stringify({type: "subscribe", pvs: devices}));
         });
 
         socket.addEventListener("message", event => {
@@ -87,30 +166,22 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
         //if fail, go back to current page
     }
 
-    useEffect(() => {
-        setDevices(tempDevices);
-    }, []);
-
-    useEffect(() => {
-    }, [devices]);
-
 
     if (step === '0') {
         return (
-            <div className="flex justify-center space-x-12 w-full">
-                <div onClick={startAutomaticSetup} className="w-1/2 border border-slate-400 rounded-md p-4 shadow-lg bg-blue-50 hover:cursor-pointer hover:shadow-inner hover:text-slate-700 group">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10 m-auto transition-colors duration-100 group-hover:text-blue-600">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z" />
-                    </svg>
-                    <h2 className="text-center font-medium text-lg underline">Automatic Setup</h2>
-                    <p>Creates a connection to PV Web Socket using a default URL with a subscription to a set of motors from motorMotorSim. Additional devices may be connected after setup is complete.</p>
-                </div>
-                <div onClick={startCustomSetup} className="w-1/2 border border-slate-400 rounded-md p-4 shadow-lg bg-blue-50 hover:cursor-pointer hover:shadow-inner hover:text-slate-700 group">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10 m-auto transition-colors duration-100 group-hover:text-blue-600">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
-                    </svg>
-                    <h2 className="text-center font-medium text-lg underline">Custom Setup</h2>
-                    <p>Provides custom setup options including websocket URL and devices. Additional devices may be connected after custom setup is complete.</p>
+            <div>
+                <h2 className="text-2xl">Device Setup</h2>
+                <p className="py-4">Select an option to begin the connection process.</p>
+                <div className="flex w-full justify-between flex-wrap">
+                    {options.map((item) => {
+                        return (
+                            <div draggable={true} key={item.title} onClick={item.callback} className="w-64 my-8 border border-slate-400 rounded-md p-4 min-h-60 shadow-lg bg-blue-50 hover:cursor-pointer hover:shadow-inner hover:text-slate-700 group">
+                                {item.icon}
+                                <h2 className="text-center font-medium text-lg underline">{item.title}</h2>
+                                <p>{item.description}</p>
+                            </div>
+                        )
+                    })}
                 </div>
             </div>
         )
