@@ -1,14 +1,17 @@
-import Motor from "../Motor/Motor";
-import WebSocketImage from "../WebGL/WebSocketImage";
-import Postman from "../Postman/Postman";
+import WebSocketImage from "../components/WebGL/WebSocketImage";
+import Motor from "../components/Motor/Motor";
+import Postman from "../components/Postman/Postman";
+import ControllerInterface from "../components/ControllerInterface/ControllerInterface";
+
 export default function Home() {
     const width = 256;
     const height = 256;
     const urlSim = 'ws://localhost:8000/pvsim'; //blob
     const urlReal = 'ws://localhost:8000/pvws/pv'; //blob
-    
+
     return (
         <section>
+            <ControllerInterface />
             <WebSocketImage url={urlSim} width={width} height={height}/>
             <Motor />
             <Postman />

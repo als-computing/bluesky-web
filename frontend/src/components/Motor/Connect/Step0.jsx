@@ -1,46 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice} from './connectionHelper.js';
 import dayjs from 'dayjs';
+import { autoDeviceList } from '../../../data/device_names.js';
 
 export default function Step0( { step, setStep, connection, devices, setDevices, activeDisplay, setActiveDisplay} ) {
     
     const _envUrl = process.env.REACT_APP_PVWS_URL;
     const wsUrl = _envUrl;
-
-    const autoDeviceList = {
-        bl531: [        
-            'bl531_esp300:m101_pitch_mm', 
-            'bl531_esp300:m101_bend_um', 
-            'bl531_xps1:mono_angle_deg', 
-            'bl531_xps1:mono_height_mm', 
-            'bl531_xps2:beamstop_x_mm', 
-            'bl531_xps2:beamstop_y_mm', 
-            'DMC02:E', 
-            'DMC02:F', 
-            'DMC02:G',
-            'DMC02:H',
-            'DMC01:A',
-            'DMC01:B',
-            'DMC01:C',
-            'DMC01:D'],
-        motorMotorSim: [
-            'IOC:m1',
-            'IOC:m2',
-            'IOC:m3',
-            'IOC:m4'
-        ],
-        adSimDetector: [
-            '13SIM1:cam1:AcquireTime',
-            '13SIM1:cam1:AcquirePeriod',
-            '13SIM1:cam1:Gain',
-            '13SIM1:cam1:GainRed',
-            '13SIM1:cam1:GainGreen',
-            '13SIM1:cam1:GainBlue',
-            '13SIM1:cam1:AcquireTime_RBV',
-            '13SIM1:cam1:AcquirePeriod_RBV',
-            '13SIM1:cam1:Gain_RBV',
-        ]
-    }
 
     const icons = {
         fastForward : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10 m-auto transition-colors duration-100 group-hover:text-blue-600">
