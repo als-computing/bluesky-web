@@ -96,7 +96,7 @@ export default function Step2( {step, setStep, deviceList, setDeviceList, setDev
                 </div>
                 <p className="pl-4">*Required</p>
                 <p className="pl-4 h-8 text-red-500">{warning}</p>
-                <Button cb={handleClick} text="Continue" />
+                <Button cb={handleClick} text="Continue" styles="m-auto"/>
             </div>
         )
     }
