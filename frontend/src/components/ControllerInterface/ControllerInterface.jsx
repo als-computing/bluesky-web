@@ -136,25 +136,25 @@ export default function ControllerInterface() {
                         {controllerList.map((key) => {
                             if (Object.keys(devices).length > 0) { //prevents error due to devices not being empty during testing 
                                 return (
-                                    <li className="flex flex-col border rounded-sm w-60 h-60 list-none my-4 mx-4">
-                                        <div name="Title Heading" className="h-1/6 border flex items-start">
-                                            <div name="Lock Device" className="w-1/6 flex justify-center"><div className="cursor-pointer w-5 flex items-start">{icons.unlocked}</div></div>
-                                            <div name="Connection Status" className="w-1/6 flex justify-end py-2 w-6">{icons.lightning}</div>
-                                            <div name="Prefix or Nickname" className="w-3/6 text-left py-2"><p>{devices[key].prefix}</p></div>
-                                            <div name="Close Box" className="w-1/6 flex justify-center h-auto"><div className="border cursor-pointer w-5">{icons.minus}</div></div>
+                                    <li className="flex flex-col border rounded-sm w-60 h-60 list-none m-4 p-1">
+                                        <div name="Title Heading" className="h-1/6  flex items-start">
+                                            <div name="Lock Device" className="w-1/6 flex justify-start"><div className="cursor-pointer w-5 flex items-start">{icons.unlocked}</div></div>
+                                            <div name="Connection Status" className="w-1/6 flex justify-end py-3"><div className="w-5 text-amber-500">{icons.lightning}</div></div>
+                                            <div name="Prefix or Nickname" className="w-3/6 text-left py-3"><p>{ devices[key].nickname ? devices[key].nickname : devices[key].prefix}</p></div>
+                                            <div name="Close Box" className="w-1/6 flex justify-end h-auto"><div className="border cursor-pointer w-5">{icons.minus}</div></div>
                                         </div>
-                                        <div name="Current Value" className="h-1/12 border flex justify-center"><p>{devices[key].value}</p><p>{devices[key].units}</p></div>
-                                        <div name="Jog Heading" className="h-1/12 border">Jog</div>
-                                        <div name="Jog Buttons" className="h-1/6 border flex justify-center items-center space-x-2">
+                                        <div name="Current Value" className="h-1/6  flex justify-center items-center space-x-1 text-lg"><p>{devices[key].value}</p><p>{devices[key].units}</p></div>
+                                        <div name="Jog Heading" className="h-1/6  flex justify-center items-end"> <p>Jog</p></div>
+                                        <div name="Jog Buttons" className="h-1/6  flex justify-center items-start space-x-2">
                                             <div name="Jog Left Button" className="flex justify-center">{icons.leftArrow}</div>
                                             <div name="Jog Value" className="flex justify-center">{devices[key].increment}</div>
                                             <div name="Jog Right Button" className="flex justify-center">{icons.rightArrow}</div>
                                         </div>
-                                        <div name="Set Heading" className="h-1/12 border"><p>Set Absolute Value</p></div>
-                                        <div name="Set Buttons / Input" className="h-1/6 border flex justify-center items-center">
+                                        <div name="Set Heading" className="h-1/6 flex justify-center items-end"><p>Set Absolute Value</p></div>
+                                        <div name="Set Buttons / Input" className="h-1/6  flex justify-center items-start">
                                             <input type="number" value={devices[key].setValue} className={`border-b border-black w-4/12 text-right`} onKeyDown={(e) =>handleKeyPress(e, key)} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], setValue: parseInt(e.target.value)}})}/>
-                                            <p className="pr-2">{devices[key].units}</p>
-                                            <Button cb={() => setDeviceValue(devices[key], devices[key].value, devices[key].setValue)} text="Set" styles="px-[4px] py-[1px] text-sm"/>
+                                            <p className="px-2">{devices[key].units}</p>
+                                            <Button cb={() => setDeviceValue(devices[key], devices[key].value, devices[key].setValue)} text="Set" styles="px-[6px] py-[1px] text-sm"/>
                                         </div>
                                     </li>
                                 )
