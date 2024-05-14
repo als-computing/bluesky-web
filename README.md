@@ -76,7 +76,28 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
+## Running Docker Containers Separately
 
+The different services may be run in separate docker containers (as opposed to using the docker-compose.yml file to run all at once).
+
+Start the Python server in a container:
+
+cd server
+docker build -t python-server .
+docker run -dp 8080:8080 python-server
+
+To run the python server and expose a port to use Jupyter Notebook (for direct Bluesky testing):
+
+cd server
+docker build -t python-jupyter .
+docker run -it -p 8888:8888 python-jupyter /bin/bash
+
+(in Container Terminal)
+jupyter lab --ip='0.0.0.0' --port=8888 --allow-root --no-browser --ServerApp.token='' --ServerApp.password=''
+
+Now in a browser you can navigate to localhost:8888/lab
+
+Start PVWS in a container:
 
 ## Learn More
 

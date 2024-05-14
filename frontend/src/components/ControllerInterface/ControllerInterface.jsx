@@ -126,6 +126,23 @@ export default function ControllerInterface() {
         }
     }
 
+    const handlePopOutClick = (key) => {
+        //accepts a string representing the device key associated with the devices object
+        var tempArray;
+        console.log(controllerList);
+        if (controllerList.includes(key)) {
+            console.log('contains')
+            var index = controllerList.indexOf(key);
+            tempArray = controllerList.toSpliced(index, 1);
+        } else {
+            console.log('does not contain')
+            tempArray = controllerList.slice();
+            tempArray.push(key);
+        }
+        console.log(tempArray)
+        setControllerList(tempArray);
+    }
+
     return (
         <section className="w-full border border-solid border-slate-500 rounded-md my-4">
             <h2>Controller Interface A</h2>
@@ -136,19 +153,21 @@ export default function ControllerInterface() {
                         {controllerList.map((key) => {
                             if (Object.keys(devices).length > 0) { //prevents error due to devices not being empty during testing 
                                 return (
-                                    <li className="flex flex-col border rounded-sm w-60 h-60 list-none m-4 p-1">
+                                    <li key={devices[key].id} className="flex flex-col border rounded-sm w-60 h-60 list-none m-4 p-1">
                                         <div name="Title Heading" className="h-1/6  flex items-start">
                                             <div name="Lock Device" className="w-1/6 flex justify-start"><div className="cursor-pointer w-5 flex items-start">{icons.unlocked}</div></div>
-                                            <div name="Connection Status" className="w-1/6 flex justify-end py-3"><div className="w-5 text-amber-500">{icons.lightning}</div></div>
-                                            <div name="Prefix or Nickname" className="w-3/6 text-left py-3"><p>{ devices[key].nickname ? devices[key].nickname : devices[key].prefix}</p></div>
+                                            <div name="Name and Connection Status" className="w-4/6 flex justify-center py-3">
+                                                <div className="w-5 text-amber-500">{icons.lightning}</div>
+                                                <p>{ devices[key].nickname ? devices[key].nickname : devices[key].prefix}</p>
+                                            </div>
                                             <div name="Close Box" className="w-1/6 flex justify-end h-auto"><div className="border cursor-pointer w-5">{icons.minus}</div></div>
                                         </div>
                                         <div name="Current Value" className="h-1/6  flex justify-center items-center space-x-1 text-lg"><p>{devices[key].value}</p><p>{devices[key].units}</p></div>
                                         <div name="Jog Heading" className="h-1/6  flex justify-center items-end"> <p>Jog</p></div>
                                         <div name="Jog Buttons" className="h-1/6  flex justify-center items-start space-x-2">
-                                            <div name="Jog Left Button" className="flex justify-center">{icons.leftArrow}</div>
-                                            <div name="Jog Value" className="flex justify-center">{devices[key].increment}</div>
-                                            <div name="Jog Right Button" className="flex justify-center">{icons.rightArrow}</div>
+                                            <div name="Jog Left Button" className="flex justify-center cursor-pointer">{icons.leftArrow}</div>
+                                            <input name="Jog Value" className="max-w-8 text-center border-b border-slate-500" type="number" value={devices[key].increment} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], increment: parseInt(e.target.value)}})} />
+                                            <div name="Jog Right Button" className="flex justify-center cursor-pointer">{icons.rightArrow}</div>
                                         </div>
                                         <div name="Set Heading" className="h-1/6 flex justify-center items-end"><p>Set Absolute Value</p></div>
                                         <div name="Set Buttons / Input" className="h-1/6  flex justify-center items-start">
@@ -167,7 +186,7 @@ export default function ControllerInterface() {
                     {Object.keys(devices).map((key) => {
                         return (
                             <li className="flex border border-slate-500 list-none px-2 space-x-1" key={key}>
-                                <div className="w-1/12 cursor-pointer">
+                                <div className="w-1/12 cursor-pointer" onClick={() => handlePopOutClick(key)}>
                                     {icons.leftArrowBox}  
                                 </div>
                                 <div className="w-5/12 flex">
@@ -175,7 +194,7 @@ export default function ControllerInterface() {
                                     {devices[key].prefix}
                                 </div>
                                 <div className="w-4/12 border">
-                                    <p>{devices[key].value}</p>
+                                    <p className="text-right">{devices[key].value}</p>
                                 </div>
                                 <div className="w-1/12">
                                     <p>{devices[key].units}</p>
