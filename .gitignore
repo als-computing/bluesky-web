@@ -29,3 +29,8 @@ server/__pycache__
 pvws/
 
 epics-docker/
+
+#Jupyter Lab
+server/.ipynb_checkpoints/
+server/Untitled.ipynb
+server/Untitled1.ipynb

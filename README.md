@@ -40,7 +40,7 @@ To stop the containers
 docker compose stop
 ```
 ## Start EPICS
-If an EPICS IOC is not already running and accessible, then follow these instructions to run EPICS in a container. The image used for this container contains EPICS base 7 and synApps.
+If an EPICS IOC is not already running and accessible from the computer running the application, then follow these instructions to run EPICS in a container. The image used for this container contains EPICS base 7, synApps, and ADSimDetector.
 
 First clone down the repo
 ```
@@ -49,34 +49,14 @@ git clone https://github.com/prjemian/epics-docker.git
 Within the repo are starting scripts used to run the [`prjemian/synapps`](https://hub.docker.com/r/prjemian/synapps) image. It is not required to use these startup scripts to run the image, however the scripts provide utilities such as starting and stopping IOCs which is convenient for testing purposes. 
 
 ### Linux start script
-To start the container on a linux machine, no additional configuration should be required so long as the Docker executable is within /usr/bin/docker.
+To start the container on a Linux machine, no additional configuration should be required so long as the Docker executable is within /usr/bin/docker.
 ```
 ./epics-docker/resources/iocmgr.sh start GP ocean
 ```
 This commands starts the GP IOC with prefix "ocean."
 
-### Mac start script
-To start the container on a Mac using the iocmgr.sh file, a modification is required for the DOCKER variable.
+For more information on using the EPICS image, including instructions for Mac, see the [EPICS Container IOC setup](#epics-container-ioc-setup) section.
 
-At line 21 of epics-docker/resources/iocmgr.sh
-
-Replace
-``` batchfile
-# epics-docker/resources/iocmgr.sh
-# Line 21 
-DOCKER=/usr/bin/docker
-```
-with
-```
-# epics-docker/resources/iocmgr.sh
-# Line 21
-DOCKER=/usr/local/bin/docker
-```
-
-Then run the shell script
-```
-./epics-docker/resources/iocmgr.sh start GP ocean
-```
 # Developer Setup
 The React frontend and Python server can be run outside of containers for development ease. To allow for full functionality of the frontend, PV Web Socket should be running in its container. Additionally either the host computer or another computer on the LAN should be running EPICS. Instructions for running EPICS in a container are also provided.
 
@@ -166,47 +146,66 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 # EPICS Container IOC setup
 The [`prjemian/synapps`](https://hub.docker.com/r/prjemian/synapps) image contains EPICS and a few custom IOCs that can be run with provided scripts. Because it comes with synApps installed, it is also fairly simple to run additional IOCs from the container via an interactive terminal.
 
-The following instructions are provided as a general example for how the epics docker container can be utilized and developed in.
+The following instructions are provided as a general example for how the epics docker container can be utilized and developed in. They show the steps for running the motorMotorSim IOC.
 
-These instructions run the default motorMotorSim IOC. It assumes that the host computer is a Linux (Mac requires some additional configuration not included here).
 
-1) Start and enter the container by utilizing the iocmgr.sh script
+1) Start and enter the EPICS container
+
+Linux Only (using premade starting scripts):
 ```
-./resources/iocmgr.sh start GP test1
+git clone https://github.com/prjemian/epics-docker.git
+./epics-docker/resources/iocmgr.sh start GP test1
 docker exec -it ioctest1 sh
+```
+
+Mac or Linux (using image only):
+```
+docker run --name epics-synapps -p 5064:5064/tcp -p 5064:5064/udp -p 5065:5065/tcp -p 5065:5065/udp -d prjemian/synapps:latest
+docker exec -it epics-synapps /bin/bash
+```
+2) (All following steps are inside the container) Navigate to the motor module directory
+```
 screen
-```
-2) Clone down the most recent motorMotorSim git repository. This is technically optional since the image already has an older version of motorMotorSim that still works.
-```
 cd /opt/synApps/support/motor-R7-2-2/modules
+```
+3) (Optional) Download the updated motorMotorSim repo. The most recent version contains different PVs than that provided in the image.
+```
 mv motorMotorSim/ motorMotorSimOld/
 git clone https://github.com/epics-motor/motorMotorSim.git
+make
 ```
 
-3) Edit the configuration files so that the IOC is built during Make commands
+4) Edit the configuration files so that the IOC is built during Make commands
 ```
 echo "BUILD_IOCS = YES" > motorMotorSim/configure/CONFIG_SITE.release
 ```
 
-4) Run Make from /opt/synApps/support/motor-R7-2-2/modules
-
+5) Run Make in the motorSimIOC directory to create the IOC.
 ```
+cd motorMotorSim/iocs/motorSimIOC
 make
 ```
 
-5) Run the motorMotorSim IOC
+6) Start the motorMotorSim IOC
 ```
 cd /opt/synApps/support/motor-R7-2-2/modules/motorMotorSim/iocs/motorSimIOC/iocBoot/iocMotorSim
 ../../bin/linux-x86_64/motorSim st.cmd
 ```
 
 ## Mac specific instructions
-On Mac OS, PV Web Socket running in a container will not connect to EPICS devices due to a difference in networking commands between Linux and Mac. This means that PV WS will not work in its container on a Mac OS without additional configuration (not provided here). The frontend and python server can run on Mac while the PV WS container runs on a linux machine. Alternatively, PV WS should work on Mac if run directly outside of a container (untested).
+Linux machines running Docker can utilize "--network host" to easily map the network ports in a container to that of the host machine. This allows container services to talk to EPICS easily. The Mac version of Docker does not have this network host mode. Therefore some additional configuration is typically required when running any service trying to communicate with EPICS inside a container on Mac.
+### EPICS Container Mac
+To run the EPICS container on a Mac, the ports used for [channel access](https://epics.anl.gov/docs/CAproto.html) need to be explicitly mapped when running the container. By default, these are ports 5064 and 5065 with both UDP and TCP protocol. The ports can be manually configured within the running container if desired.
 
-If the developer wants to have the system running on Mac, then a connection to a Linux machine running PVWS in container can be made. This will require knowing the IP address of the linux machine, which can be set inside an environment variable. The below instruction is intended for this approach only.
+For example purposes, the following command can be used to run the [`prjemian/synapps`](https://hub.docker.com/r/prjemian/synapps) image with default Channel Access port mapping.
 
-### `touch frontend/.env`
-Create a .env file and store the URL for the machine running PV Websocket. See the frontend/.env-example for reference.
+```
+docker run -p 5064:5064/tcp -p 5064:5064/udp -p 5065:5065/tcp -p 5065:5065/udp -it prjemian/synapps:latest
+```
+The command maps the 5064 and 5065 ports so that the IOC within the container can be reached from outside. This has been tested on an M2 Mac with Channel Access.
+
+### PV Web Socket
+PVWS uses "--network host" mode in its dockerfiles, so it will only work on a Linux without additional configuration. On Mac, the bridge mode needs to be used with ports mapped similarly to the example shown above. Using PVWS on Mac in a docker container has not been tested.
 
 
 
