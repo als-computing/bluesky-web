@@ -15,6 +15,7 @@ Contents
     - [Python Server in Container](#python-server-in-container)
   - [React Frontend](#react-frontend)
     - [React Development Scripts](#react-development-scripts)
+- [EPICS Container IOC setup](#epics-container-ioc-setup)
 
 # User Setup
 To run the web app the dependencies need to be downloaded. A docker-compose file it used to run the required services. If EPICS is not already running, then an optional container may be used to run EPICS.
@@ -162,8 +163,42 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-## EPICS
+# EPICS Container IOC setup
+The [`prjemian/synapps`](https://hub.docker.com/r/prjemian/synapps) image contains EPICS and a few custom IOCs that can be run with provided scripts. Because it comes with synApps installed, it is also fairly simple to run additional IOCs from the container via an interactive terminal.
 
+The following instructions are provided as a general example for how the epics docker container can be utilized and developed in.
+
+These instructions run the default motorMotorSim IOC. It assumes that the host computer is a Linux (Mac requires some additional configuration not included here).
+
+1) Start and enter the container by utilizing the iocmgr.sh script
+```
+./resources/iocmgr.sh start GP test1
+docker exec -it ioctest1 sh
+screen
+```
+2) Clone down the most recent motorMotorSim git repository. This is technically optional since the image already has an older version of motorMotorSim that still works.
+```
+cd /opt/synApps/support/motor-R7-2-2/modules
+mv motorMotorSim/ motorMotorSimOld/
+git clone https://github.com/epics-motor/motorMotorSim.git
+```
+
+3) Edit the configuration files so that the IOC is built during Make commands
+```
+echo "BUILD_IOCS = YES" > motorMotorSim/configure/CONFIG_SITE.release
+```
+
+4) Run Make from /opt/synApps/support/motor-R7-2-2/modules
+
+```
+make
+```
+
+5) Run the motorMotorSim IOC
+```
+cd /opt/synApps/support/motor-R7-2-2/modules/motorMotorSim/iocs/motorSimIOC/iocBoot/iocMotorSim
+../../bin/linux-x86_64/motorSim st.cmd
+```
 
 ## Mac specific instructions
 On Mac OS, PV Web Socket running in a container will not connect to EPICS devices due to a difference in networking commands between Linux and Mac. This means that PV WS will not work in its container on a Mac OS without additional configuration (not provided here). The frontend and python server can run on Mac while the PV WS container runs on a linux machine. Alternatively, PV WS should work on Mac if run directly outside of a container (untested).
