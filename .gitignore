@@ -27,3 +27,5 @@ server/__pycache__/main.cpython-311.pyc
 server/__pycache__
 
 pvws/
+
+epics-docker/
