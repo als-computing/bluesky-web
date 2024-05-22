@@ -1,3 +1,4 @@
+#Linux only
 services:
   frontend:
     build: ./frontend
@@ -5,9 +6,7 @@ services:
       - "8081:80"
   pvws:
     build: ./pvws/docker
-    ports:
-      - "8080:8080"
+    network_mode: host
   server:
     build: ./server
-    ports:
-      - "8000:8000"
+    network_mode: host

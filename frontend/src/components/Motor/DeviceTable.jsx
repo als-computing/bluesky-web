@@ -46,11 +46,9 @@ export default function DeviceTable( { connection, devices, setDevices, activeDi
     const [lockoutList, setLockoutList] = useState([]);
 
 
+
+    // ------------------------ To Do: Put these functions into a helper file and combine them with ControllerInterface.jsx as needed --------------------------
     const setDeviceValue = (device, currentValue, newValue) => {
-        //console.log('setDeviceValue()');
-        //console.log({devices});
-        //console.log('current value = ', currentValue);
-        //console.log('newValue = ', newValue);
         if (isValueInBounds(newValue, device.min, device.max, device.prefix)) {
             if (isDeviceUnlocked(device, lockoutList)) {
                 setLockoutList([...lockoutList, device.prefix]);
@@ -114,6 +112,7 @@ export default function DeviceTable( { connection, devices, setDevices, activeDi
     if (activeDisplay === 'DeviceTable') {
         return (
             <div className='my-8'>
+                <h2 className="text-2xl pb-4 text-center">Device Table</h2>
                 <ul className='h-5/6 rounded-md border border-slate-300'>
                     <li className="flex h-[10%] justify-center items-center space-x-4  text-lg font-medium text-center bg-gray-100 rounded-t-md">
                         <p className="w-2/12">Device</p> 

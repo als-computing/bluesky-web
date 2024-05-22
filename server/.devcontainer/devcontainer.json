@@ -16,7 +16,7 @@
 	"forwardPorts": [8000, 8000],
 
 	// Uncomment the next line to run commands after the container is created.
-	"postCreateCommand": "python3 main.py",
+	"postCreateCommand": "python3 main.py"
 
 	// Configure tool-specific properties.
 	// "customizations": {},

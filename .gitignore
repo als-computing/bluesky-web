@@ -27,3 +27,10 @@ server/__pycache__/main.cpython-311.pyc
 server/__pycache__
 
 pvws/
+
+epics-docker/
+
+#Jupyter Lab
+server/.ipynb_checkpoints/
+server/Untitled.ipynb
+server/Untitled1.ipynb

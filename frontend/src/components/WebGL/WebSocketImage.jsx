@@ -215,7 +215,8 @@ const WebSocketImage = ({ url, width, height }) => {
 
     return (
         <div className="flex flex-col justify-center items-center max-w-screen-lg m-auto border border-slate-500 rounded-md space-y-4 py-8">
-            <h2 className="text-xl font-medium">WebGL Canvas</h2>
+            <h2 className="text-xl font-medium">ADSimDetector</h2>
+            <p>{url}</p>
             <canvas ref={canvasRef} width={width} height={height} style={{ width: '256px', height: '256px' }} />
             <p>Average fps: {fps}</p>
             {socketStatus === 'closed' ? <Button text="start" cb={startWebSocket}/> : <Button text="stop" cb={closeWebSocket}/>}

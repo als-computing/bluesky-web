@@ -1,0 +1,26 @@
+#Mac or Linux
+services:
+  epics:
+    image: prjemian/synapps:latest
+    platform: linux/amd64
+    networks:
+      - epicsnet
+    command: /bin/bash
+    tty: true
+    stdin_open: true
+  pvws:
+    build: ./pvws/docker
+    ports:
+      - "8080:8080"
+    networks:
+      - epicsnet
+  server:
+    build: ./server
+    ports:
+      - "8000:8000"
+    networks:
+      - epicsnet
+
+networks:
+  epicsnet:
+    driver: bridge
