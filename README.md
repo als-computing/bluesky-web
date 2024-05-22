@@ -1,41 +1,51 @@
 # Ophyd API
-A Bluesky web interface built with React, Python FastAPI, Bluesky, OPHYD, PV Web Socket. This application utilizes Docker and is intended to be ran on a Linux machine.
+A Bluesky web interface built with React, Python FastAPI, Bluesky, OPHYD, PV Web Socket.
 
-Contents
+
+<div style="width: fit-content; border-style:solid; padding-right:40px; padding-top: 20px; padding-bottom: 20px; border-radius: 5px; margin-bottom:20px;">
+
+<h2 style="margin: auto; text-align:center; border-bottom: none">Contents</h2>
 
 - [User Setup](#user-setup)
-  - [Required: Clone PV Web Scoket](#clone-pv-web-socket)
+  - [Required: Install PV Web Scoket](#isntall-pv-web-socket)
   - [Required: Run Application](#run-application)
-  - [Optional: Start EPICS](#start-epics)
-    - [Linux](#linux-start-script)
-    - [Mac](#mac-start-script)
+  - [Optional: Run EPICS-Docker](#run-epics-docker)
+    - [Use Image Directly](#use-image-directly)
+    - [Use EPICS-docker start script](#use-epics-docker-start-scripts)
 - [Developer Setup](#developer-setup)
   - [PV Web Socket](#pv-web-socket)
   - [Python Server](#python-server)
     - [Python Server in Container](#python-server-in-container)
   - [React Frontend](#react-frontend)
     - [React Development Scripts](#react-development-scripts)
-- [EPICS Container IOC setup](#epics-container-ioc-setup)
+- [EPICS-Docker IOC setup](#epics-docker-ioc-setup)
+    - [Running motorMotorSim IOC](#running-motormotorsim-ioc)
+    - [Running custom GP IOC](#running-custom-gp-ioc)
+- [Mac Developer Notes](#mac-developer-notes)
+
+</div>
 
 # User Setup
 A docker-compose file is used to run the required services together. For full functionality, the host computer should be running an EPICS IOC or connected to one through the local network. If an existing EPICS IOC is not running, then use the script that starts EPICS.
 
-## Clone PV Web Socket
+## Install PV Web Socket
 From the root directory, clone the following repository which is used to provide live PV updates.
 
 ```
 git clone https://github.com/ornl-epics/pvws.git
 ```
 
-Now edit the environment variables in pvws/docker/setenv.sh
+Now edit the environment variables in `pvws/docker/setenv.sh`
 
 At a minimum, uncomment PV_WRITE_SUPPORT and set to true as shown below.
 ```
+## ----- pvws/docker/setenv.sh  ----- ##
+
 # Web Socket Settings
 #export PV_DEFAULT_TYPE=ca
 #export PV_THROTTLE_MS=1000
 #export PV_ARRAY_THROTTLE_MS=10000
-export PV_WRITE_SUPPORT=true
+export PV_WRITE_SUPPORT=true # <------ This must be set to true
 
 # Channel Access Settings
 #export EPICS_CA_ADDR_LIST=localhost
@@ -51,17 +61,19 @@ export PV_WRITE_SUPPORT=true
 
 If you already have a running instance of EPICS on a computer and use custom EPICS environment variables, then edit the other environment variables for PVWS as required. 
 
+More information on simulated PV's that can be subscribed to by PVWS can be found [`here`](https://control-system-studio.readthedocs.io/en/latest/core/pv/doc/index.html)
+
 ## Run Application
-Two different scripts are provided that will start the application in docker containers. The first script starts the main services (frontend, python server, PV Web Socket). The second script will start the same services and also run a container with EPICS. If you already having EPICS running and accessible from the host computer, use the first script.
+Two different scripts are provided that will start the application in docker containers. The first script starts the main services (frontend, python server, PV Web Socket). The second script will start the same services and also run a container with EPICS. 
 
-Note that these scripts
+If you already have EPICS running and want to access your own IOCs, use the first script. Otherwise the second script can be used to start a "default" EPICS environment that still works with the application.
 
-`Run Application`
+<mark>Run Application (Linux Only)</mark>
 ```
 docker-compose up -d --build
 ```
 \
-`Run Application + EPICS`
+<mark>Run Application + EPICS (Mac or Linux)</mark>
 ```
 docker-compose -f docker-compose.start-epics.yml -d --build
 ```
@@ -69,35 +81,49 @@ Navigate to port 8081 in a web browser to view the application
 
 http://localhost:8081/
 
-To stop the containers
+\
+<mark>Stop Application</mark>
 ```
 docker-compose stop
 ```
 
-## Start EPICS
-If an EPICS IOC is not already running and accessible from the computer running the application, then follow these instructions to run EPICS in a container. The image used for this container contains EPICS base 7.0.5, synApps 6.2.1, and Area Detector 3.11.
+## Run EPICS-Docker
+To run EPICS in a container by itself, the [`prjemian/synapps`](https://hub.docker.com/r/prjemian/synapps) image can be used. This image contains EPICS base 7.0.5, synApps 6.2.1, and Area Detector 3.11. Using EPICS in a container eliminates the time investment for installing the various libraries and modules to achieve a working EPICS setup. The docker-compose.start-epics.yml file runs this image alongside the application, but it may also be useful to run EPICS separately as shown below.
 
-First clone down the repo
+See the [EPICS-Docker IOC setup](#epics-docker-ioc-setup) section for examples on starting IOCs from within the container.
+
+### Use Image Directly
+The following commands will start the prjemian/synapps image in a container. No IOC's will be started, but the user can start them by issuing commands in the container terminal.
+
+<mark>Run EPICS-Docker (Linux Only)</mark>
+```
+docker run --name epics-synapps --network host -d prjemian/synapps:latest
+docker exec -it epics-synapps /bin/bash
+```
+\
+<mark>Run EPICS-Docker (Mac or Linux)</mark>
+```
+docker run --name epics-synapps -p 5064:5064/tcp -p 5064:5064/udp -p 5065:5065/tcp -p 5065:5065/udp -d prjemian/synapps:latest
+docker exec -it epics-synapps /bin/bash
+```
+
+### Use EPICS-docker start scripts
+
+First clone down the repo for epics-docker.
 ```
 git clone https://github.com/prjemian/epics-docker.git
 ```
-Within the repo are starting scripts used to run the [`prjemian/synapps`](https://hub.docker.com/r/prjemian/synapps) image. It is not required to use these startup scripts to run the image, however the scripts provide utilities such as starting and stopping IOCs which is convenient for testing purposes. 
+Within the repo are starting scripts used to run the [`prjemian/synapps`](https://hub.docker.com/r/prjemian/synapps) image which can automatically start custom IOCs. It is not required to use these startup scripts to run the image, however the scripts provide utilities such as starting and stopping IOCs which is convenient for testing purposes. 
 
-### Linux start script
-To start the EPICS container on a Linux machine, no additional configuration should be required so long as the Docker executable is within /usr/bin/docker.
+To use the following script on a Linux machine, no additional configuration should be required so long as the Docker executable is within /usr/bin/docker.
+
+<mark>Run EPICS-Docker with GP IOC (Linux Only)</mark>
 ```
 ./epics-docker/resources/iocmgr.sh start GP ocean
 ```
 This command automatically starts the GP IOC in the container with prefix "ocean."
 
-For more information on using the EPICS image, including instructions for Mac, see the [EPICS Container IOC setup](#epics-container-ioc-setup) section.
 
-### Mac start script
-The EPICS container has only been tested successfully on Mac by manually mapping the ports and utilizing the image without the startup scripts.
-```
-docker run --name epics-synapps -p 5064:5064/tcp -p 5064:5064/udp -p 5065:5065/tcp -p 5065:5065/udp -d prjemian/synapps:latest
-docker exec -it epics-synapps /bin/bash
-```
 
 # Developer Setup
 The React frontend and Python server can be run outside of containers for development ease. To allow for full functionality of the frontend, PV Web Socket should be running in its container. Additionally either the host computer or another computer on the LAN should be running EPICS. Instructions for running EPICS in a container are also provided.
@@ -185,7 +211,7 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-# EPICS Container IOC setup
+# EPICS-Docker IOC setup
 The [`prjemian/synapps`](https://hub.docker.com/r/prjemian/synapps) image contains EPICS and a few custom IOCs that can be run with provided scripts. Because it comes with synApps installed, it is also fairly simple to run additional IOCs from the container via an interactive terminal.
 
 ## Running motorMotorSim IOC
@@ -194,17 +220,17 @@ The following instructions are provided as a general example for how the epics d
 
 1) Start and enter the EPICS container
 
-Linux Only (using premade starting scripts):
+`Run EPICS-Docker (Mac or Linux)`
+```
+docker run --name epics-synapps -p 5064:5064/tcp -p 5064:5064/udp -p 5065:5065/tcp -p 5065:5065/udp -d prjemian/synapps:latest
+docker exec -it epics-synapps /bin/bash
+```
+\
+`Run EPICS-Docker with startup scripts (Linux Only)`
 ```
 git clone https://github.com/prjemian/epics-docker.git
 ./epics-docker/resources/iocmgr.sh start GP test1
 docker exec -it ioctest1 sh
-```
-
-Mac or Linux (using image only):
-```
-docker run --name epics-synapps -p 5064:5064/tcp -p 5064:5064/udp -p 5065:5065/tcp -p 5065:5065/udp -d prjemian/synapps:latest
-docker exec -it epics-synapps /bin/bash
 ```
 2) (All following steps are inside the container) Navigate to the motor module directory
 ```
@@ -235,23 +261,23 @@ cd /opt/synApps/support/motor-R7-2-2/modules/motorMotorSim/iocs/motorSimIOC/iocB
 ../../bin/linux-x86_64/motorSim st.cmd
 ```
 
-7) Check the PV names (from within the EPICS service)
+7) Check the PV names (from within the EPICS terminal)
 ```
 epics> dbl
 ```
 
 ## Running custom GP IOC
-In the EPICS container, issue the commands to start GP. This command does not currently produce the correct IOC on Mac.
+In the EPICS-docker container terminal, issue the commands to start GP. This command has been tested on Linux only.
 
 ```
 cd $IOCGP
 ../../bin/linux-x86_64/gp st.cmd.Linux
 ```
 
-## Mac specific instructions
-Linux machines running Docker can utilize "--network host" to easily map the network ports in a container to that of the host machine. This allows container services to talk to EPICS easily. The Mac version of Docker does not have this network host mode. Therefore some additional configuration is typically required when running any service trying to communicate with EPICS inside a container on Mac.
+# Mac Developer Notes
+Linux machines running Docker can utilize "--network host" to map the network ports in a container to that of the host machine. This allows container services to talk to EPICS. The Mac version of Docker does not have this network host mode. Therefore some additional configuration is typically required when running any service trying to communicate with EPICS inside a container on Mac.
 
-### EPICS Container Mac
+## EPICS Container Mac
 To run the EPICS container on a Mac while providing access outside the container, the ports used for [channel access](https://epics.anl.gov/docs/CAproto.html) need to be explicitly mapped when running the container. By default, these are ports 5064 and 5065 with both UDP and TCP protocol. The ports can be manually configured within the running container if desired.
 
 For example purposes, the following command can be used to run the [`prjemian/synapps`](https://hub.docker.com/r/prjemian/synapps) image with default Channel Access port mapping.
@@ -262,12 +288,12 @@ docker run -p 5064:5064/tcp -p 5064:5064/udp -p 5065:5065/tcp -p 5065:5065/udp -
 The above command maps the 5064 and 5065 ports so that the IOC within the container can be reached from outside. This has been tested on an M2 Mac with Channel Access.
 
 
-### PV Web Socket
+## PV Web Socket
 PVWS uses "--network host" mode in its dockerfiles, so it will only work on a Linux without additional configuration. For a Mac running PVWS in Docker, the dockerfile can be modified to use the bridge mode and map port 8080. This allows use of the simulated PVs in PVWS, but does not provide the ability for PVWS to reach actual EPICS IOC's running on the host computer. To run PVWS in Docker with access to EPICS, see the next section which details how to set up a bridge network between multiple containers.
 
 More information on simulated PV's that can be subscribed to by PVWS can be found [`here`](https://control-system-studio.readthedocs.io/en/latest/core/pv/doc/index.html)
 
-### Running EPICS, PVWS, and Python Server together
+## Running EPICS, PVWS, and Python Server together
 A convenient method for developing the React App on Mac is to start everything except for the frontend in containers. This allows the use of the live server that comes with Create React App, while still having full EPICS functionality.
 
 ```
@@ -279,3 +305,16 @@ docker-compose -f docker-compose.start-epics.no-react.yml up --build
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
+<mark>hello</mark>
+
+
+
+<style>
+mark {
+    color: white;
+    background-color: #37374a;
+    border-radius: 2px;
+    padding: 7px 10px;
+    text-shadow: black 1px 1px 2px;
+}
+ </style>
