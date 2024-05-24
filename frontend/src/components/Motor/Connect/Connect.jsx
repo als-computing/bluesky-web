@@ -5,7 +5,7 @@ import Step1 from './Step1.jsx';
 import Step2 from './Step2.jsx';
 import Step3 from './Step3.jsx';
 
-import {getPVWSUrl} from './connectionHelper.js';
+import {getPVWSUrl} from '../../../utilities/connectionHelper.js';
 
 
 export default function Connect( { connection, devices, setDevices, setDisplay, activeDisplay, setActiveDisplay  }) {

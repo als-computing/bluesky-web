@@ -3,7 +3,7 @@ import Button from '../library/Button';
 import dayjs from 'dayjs';
 import { tailwindIcons as icons } from '../../assets/icons';
 
-export default function DeviceTable( { connection, devices, setDevices, activeDisplay }) { 
+export default function DeviceTable( { connection, devices, setDevices, activeDisplay='DeviceTable' }) { 
 
     const sampleDevices = {
         'IOC:m1' : {

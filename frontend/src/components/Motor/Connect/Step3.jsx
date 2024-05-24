@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import Button from "../../library/Button";
-import {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice} from './connectionHelper.js';
+import {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice} from '../../../utilities/connectionHelper.js';
 
 //sample PVWS message on fully connected PV value change, values shown are after JSON.parse(event.data)
 let sampleMessage = {

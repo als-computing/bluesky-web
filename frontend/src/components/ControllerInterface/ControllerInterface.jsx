@@ -1,5 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { autoDeviceList } from "../../data/device_names";
+import { startAutomaticSetup } from '../../utilities/connectionHelper';
+import { setDeviceValue, unlockDevice } from '../../utilities/controllerHelper';
+
 import Button from '../library/Button';
 
 
@@ -29,97 +32,32 @@ const icons = {
                 </svg>
 }
 
-
-export default function ControllerInterface() {
-    //---------------------------TO DO: remove this after initial testing is done and pass in state as props ----------------------------------------------
+export default function ControllerInterface( {defaultControllerList=[]} ) {
     const [ devices, setDevices ] = useState({});
+    const [ lockoutList, setLockoutList ] = useState([]);
+    const [ controllerList, setControllerList ] = useState(defaultControllerList); //initialize the devices that will be displayed in the controllers section
+    const connection = useRef(null);
     
 
-    const initializeDeviceList = (devices) => {
-        //accepts an array of PVs as strings, creates the object structure for devices and sets the state
-        var tempDevices = {};
-        var count = 0;
-        for (var device of devices) {
-            tempDevices[device.prefix] = {
-                id: count,
-                prefix: device.prefix,
-                nickname: device.nickname,
-                group: device.group,
-                isConnected: true,
-                value: 0,
-                units: "mm",
-                min: null,
-                max: null,
-                increment: device.increment,
-                setValue: '',
-                lastUpdate: null
-            }
-            count++;
-        }
-
-        //make some manual adjustments
-
-        //set the final device state variable
-        setDevices(tempDevices);
-    }
-
+    useEffect(() => {
+        startAutomaticSetup(autoDeviceList.motorMotorSim, setDevices, connection);
+    }, []);
 
     useEffect(() => {
-        initializeDeviceList(autoDeviceList.motorMotorSim);
-    }, [])
-
-    // -------------------------End list of functions/variables to be removed after refactored so that props are passed in with real values -------------------------
-
-
+        if (lockoutList.length !== 0) {
+            setTimeout(() => unlockDevice(lockoutList.slice(-1)[0], lockoutList, setLockoutList), 250);
+        }
+    }, [lockoutList]);
 
 
 
-    const [lockoutList, setLockoutList] = useState([]);
-    const [ controllerList, setControllerList ] = useState(['IOC:m1', 'IOC:m2', 'IOC:m3']); //initialize the devices that will be displayed in the controllers section
+
+
     // const [ controllerList, setControllerList ] = useState(Object.keys(devices).slice(2)); //TO DO: use this line after refactored so devices is passed in as props
 
     const handleKeyPress = (e, key) => {
         if (e.key === "Enter") {
-            setDeviceValue(devices[key], devices[key].value, devices[key].setValue)
-        }
-    }
-
-    const setDeviceValue = (device, currentValue, newValue) => {
-        if (isValueInBounds(newValue, device.min, device.max, device.prefix)) {
-            if (isDeviceUnlocked(device, lockoutList)) {
-                setLockoutList([...lockoutList, device.prefix]);
-                try {
-                    //connection.current.send(JSON.stringify({type: "write", pv: device.prefix, value: newValue}));
-                } catch (e) {
-                    console.log('Error when attempting to send message to WS in handleIncrementClick with ' + device.prefix);
-                    console.log({e});
-                    return;
-                }
-            }
-        }
-    }
-
-    const unlockDevice = (prefix) => {
-        //removes the first instance of the device name from the lockoutlist
-        let index = lockoutList.indexOf(prefix);
-        if (index !== -1) {
-            let tempList = lockoutList.toSpliced(index, 1);
-            setLockoutList(tempList);
-        } 
-    }
-
-    const isValueInBounds = (value, min, max, prefix) => {
-        if (value < min) console.log('requested value ', value, 'is below the minimum ', min, ' for ', prefix);
-        if (value > max) console.log('requested value ', value, 'is greater than the maximum ', max, ' for ', prefix);
-        return (value >= min && value <= max);
-    }
-
-    const isDeviceUnlocked = (device, lockoutList) => {
-        if (lockoutList.includes(device.prefix)) {
-            console.log('Cannot set value of ' + device.prefix + ' due to lockout');
-            return false;
-        } else {
-            return true;
+            setDeviceValue(devices[key], devices[key].value, devices[key].setValue, connection, lockoutList, setLockoutList);
         }
     }
 
@@ -141,12 +79,12 @@ export default function ControllerInterface() {
     }
 
     return (
-        <section className="w-full border border-solid border-slate-500 rounded-md my-4">
+        <section className="w-full border border-solid border-slate-500 rounded-md my-4 max-h-screen">
             <h2>Controller Interface A</h2>
-            <section className="w-full flex">
+            <section className="w-full h-full max-h-full flex">
                 <div className="w-2/3 text-center border">
                     <h2>Controllers</h2>
-                    <div className="flex flex-wrap justify-center">
+                    <div name="" className="flex flex-wrap justify-center">
                         {controllerList.map((key) => {
                             if (Object.keys(devices).length > 0) { //prevents error due to devices not being empty during testing 
                                 return (
@@ -162,15 +100,25 @@ export default function ControllerInterface() {
                                         <div name="Current Value" className="h-1/6  flex justify-center items-center space-x-1 text-lg"><p>{devices[key].value}</p><p>{devices[key].units}</p></div>
                                         <div name="Jog Heading" className="h-1/6  flex justify-center items-end"> <p>Jog</p></div>
                                         <div name="Jog Buttons" className="h-1/6  flex justify-center items-start space-x-2">
-                                            <div name="Jog Left Button" className="flex justify-center cursor-pointer">{icons.leftArrow}</div>
+                                            <div 
+                                                name="Jog Left Button" 
+                                                className="flex justify-center cursor-pointer" 
+                                                onClick={() => setDeviceValue(devices[key], devices[key].value, (parseFloat(devices[key].value) - parseFloat(devices[key].increment)), connection, lockoutList, setLockoutList)}>
+                                                    {icons.leftArrow}
+                                            </div>
                                             <input name="Jog Value" className="max-w-8 text-center border-b border-slate-500" type="number" value={devices[key].increment} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], increment: parseInt(e.target.value)}})} />
-                                            <div name="Jog Right Button" className="flex justify-center cursor-pointer">{icons.rightArrow}</div>
+                                            <div 
+                                                name="Jog Right Button" 
+                                                className="flex justify-center cursor-pointer" 
+                                                onClick={() => setDeviceValue(devices[key], devices[key].value, (parseFloat(devices[key].value) + parseFloat(devices[key].increment)), connection, lockoutList, setLockoutList)}>
+                                                    {icons.rightArrow}
+                                            </div>
                                         </div>
                                         <div name="Set Heading" className="h-1/6 flex justify-center items-end"><p>Set Absolute Value</p></div>
                                         <div name="Set Buttons / Input" className="h-1/6  flex justify-center items-start">
                                             <input type="number" value={devices[key].setValue} className={`border-b border-black w-4/12 text-right`} onKeyDown={(e) =>handleKeyPress(e, key)} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], setValue: parseInt(e.target.value)}})}/>
                                             <p className="px-2">{devices[key].units}</p>
-                                            <Button cb={() => setDeviceValue(devices[key], devices[key].value, devices[key].setValue)} text="Set" styles="px-[6px] py-[1px] text-sm"/>
+                                            <Button cb={() => setDeviceValue(devices[key], devices[key].value, devices[key].setValue, connection, lockoutList, setLockoutList)} text="Set" styles="px-[6px] py-[1px] text-sm"/>
                                         </div>
                                     </li>
                                 )
@@ -178,27 +126,29 @@ export default function ControllerInterface() {
                         })}
                     </div>
                 </div>
-                <div className="w-1/3 text-center border flex flex-col space-y-2">
+                <div className="w-1/3 text-center border flex flex-col h-screen max-h-[50%] space-y-2 overflow-hidden">
                     <h2>Device List</h2>
-                    {Object.keys(devices).map((key) => {
-                        return (
-                            <li className="flex border border-slate-500 list-none px-2 space-x-1" key={key}>
-                                <div className="w-1/12 cursor-pointer" onClick={() => handlePopOutClick(key)}>
-                                    {icons.leftArrowBox}  
-                                </div>
-                                <div className="w-5/12 flex">
-                                    <div className="w-6">{icons.lightning}</div>
-                                    {devices[key].prefix}
-                                </div>
-                                <div className="w-4/12 border">
-                                    <p className="text-right">{devices[key].value}</p>
-                                </div>
-                                <div className="w-1/12">
-                                    <p>{devices[key].units}</p>
-                                </div>
-                            </li>
-                        )
-                    })}
+                    <ul name="PV List" className="overflow-y-auto max-h-full h-full">
+                        {Object.keys(devices).map((key) => {
+                            return (
+                                <li className="flex border border-slate-500 list-none px-2 space-x-1" key={key}>
+                                    <div className="w-1/12 cursor-pointer" onClick={() => handlePopOutClick(key)}>
+                                        {icons.leftArrowBox}  
+                                    </div>
+                                    <div className="w-5/12 flex">
+                                        <div className="w-6">{icons.lightning}</div>
+                                        {devices[key].prefix}
+                                    </div>
+                                    <div className="w-4/12 border">
+                                        <p className="text-right">{devices[key].value}</p>
+                                    </div>
+                                    <div className="w-1/12">
+                                        <p>{devices[key].units}</p>
+                                    </div>
+                                </li>
+                            )
+                        })}
+                    </ul>
                 </div>
             </section>
         </section>

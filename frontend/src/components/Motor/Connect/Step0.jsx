@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice, getPVWSUrl} from './connectionHelper.js';
+import {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice, getPVWSUrl, initializeDeviceList, startAutomaticSetup} from '../../../utilities/connectionHelper.js';
 import dayjs from 'dayjs';
 import { autoDeviceList } from '../../../data/device_names.js';
 
@@ -20,19 +20,19 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
             title: 'motorMotorSim',
             description: 'Connect to (4) PVs from the EPICS motorMotorSim IOC.',
             icon: icons.fastForward,
-            callback: () => {startAutomaticSetup(autoDeviceList.motorMotorSim)}
+            callback: () => {startAutomaticSetup(autoDeviceList.motorMotorSim, setDevices, connection, setStep, setActiveDisplay)}
         },
         {
             title: 'ADSimDetector',
             description: 'Connect to (12) PVs from the EPICS ADSimDetector IOC.',
             icon: icons.fastForward,
-            callback: () => {startAutomaticSetup(autoDeviceList.adSimDetector)}
+            callback: () => {startAutomaticSetup(autoDeviceList.adSimDetector, setDevices, connection, setStep, setActiveDisplay)}
         },
         {
             title: 'BL5.3.1',
             description: 'Connect to (14) motor devices installed at BL 5.3.1 including beamstop and monochromator. Note that the computer running PVWS must be connected to the BL 5.3.1 subnet with the EPICS address list configured.',
             icon: icons.fastForward,
-            callback: () => {startAutomaticSetup(autoDeviceList.bl531)}
+            callback: () => {startAutomaticSetup(autoDeviceList.bl531, setDevices, connection, setStep, setActiveDisplay)}
         },
         {
             title: 'Custom Setup',
@@ -66,33 +66,8 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
         setStep('1');
     }
 
-    const initializeDeviceList = (devices) => {
-        //accepts an array of PVs
-        var tempDevices = {};
-        var count = 0;
-        for (var device of devices) {
-            tempDevices[device.prefix] = {
-                id: count,
-                prefix: device.prefix,
-                nickname: device.nickname,
-                group: device.group,
-                isConnected: false,
-                value: null,
-                units: null,
-                min: null,
-                max: null,
-                increment: device.increment,
-                setValue: '',
-                lastUpdate: null
-            }
-            count++;
-        }
-        //set the final device state variable
-        setDevices(tempDevices);
-    }
     
-    
-    const startAutomaticSetup = (devices) => {
+    const startAutomaticSetupOld = (devices) => {
         setStep('auto');
         closeWebSocket(connection);
         try {
@@ -103,7 +78,7 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
             return;
         }
         
-        initializeDeviceList(devices)
+        initializeDeviceList(devices, setDevices);
 
         socket.addEventListener("open", event => {
             console.log("Opened connection in socket to: " + wsUrl);
