@@ -37,7 +37,7 @@ export default function Step1({ step, setStep, wsUrl, setWsUrl }) {
                     </div>
                     <div className={`h-px bg-slate-700 w-5/12 transition-transform duration-500 ${toggle==='Default' ? "translate-x-0" : "translate-x-[136%]"}`}></div>
                 </div>
-                <TextField text={"Websocket URL"} value={wsUrl} cb={setWsUrl} styles={`w-72 transition-opacity duration-500 ${toggle==='Default' ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"} pointer-events-none`}/>
+                <TextField text={"Websocket URL"} value={wsUrl} cb={setWsUrl} styles={`w-80 transition-opacity duration-500 ${toggle==='Default' ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"} pointer-events-none`}/>
                 <p className="text-red-500 mt-2">{warning}</p>
                 <Button cb={handleContinueClick} text="Continue" />
             </div>

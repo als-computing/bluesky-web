@@ -1,4 +1,6 @@
 #Mac or Linux
+
+## to do: volume mount the frontend files to a container, put in docker.dev. in frontend that just calls npm start
 services:
   epics:
     image: prjemian/synapps:latest
@@ -18,6 +20,7 @@ services:
     build: ./server
     ports:
       - "8000:8000"
+      - "8888:8888"
     networks:
       - epicsnet
 

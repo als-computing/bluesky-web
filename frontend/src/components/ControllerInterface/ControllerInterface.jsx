@@ -27,9 +27,6 @@ const icons = {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
                     </g>
                 </svg>
-  
-  
-    
 }
 
 
@@ -42,18 +39,18 @@ export default function ControllerInterface() {
         //accepts an array of PVs as strings, creates the object structure for devices and sets the state
         var tempDevices = {};
         var count = 0;
-        for (var prefix of devices) {
-            tempDevices[prefix] = {
+        for (var device of devices) {
+            tempDevices[device.prefix] = {
                 id: count,
-                prefix: prefix,
-                nickname: '',
-                group: 'sim',
+                prefix: device.prefix,
+                nickname: device.nickname,
+                group: device.group,
                 isConnected: true,
                 value: 0,
                 units: "mm",
                 min: null,
                 max: null,
-                increment: 1,
+                increment: device.increment,
                 setValue: '',
                 lastUpdate: null
             }

@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+
 const closeWebSocket = (connection) => {
     if (connection.current !== null) {
         try {
@@ -129,4 +130,20 @@ const updateDevice = (e, setDevices) => {
 
 }
 
-export {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice};
+const getPVWSUrl = () => {
+    //if no env variable is set, then assume that the React App is on the same workstation as PVWS
+        //having an env variable would be for developers running React on a separate WS from the servers
+    const currentWebsiteIP = window.location.hostname;
+    const pathname = "/pvws/pv";
+    const port = ":8080";
+    var wsUrl;
+    if (process.env.REACT_APP_PVWS_URL) {
+        wsUrl = process.env.REACT_APP_PVWS_URL;
+    } else {
+        wsUrl = "ws://" + currentWebsiteIP + port + pathname;
+    }
+
+    return wsUrl;
+}
+
+export {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice, getPVWSUrl};

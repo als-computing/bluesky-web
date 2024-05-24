@@ -1,13 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice} from './connectionHelper.js';
+import {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice, getPVWSUrl} from './connectionHelper.js';
 import dayjs from 'dayjs';
 import { autoDeviceList } from '../../../data/device_names.js';
 
-export default function Step0( { step, setStep, connection, devices, setDevices, activeDisplay, setActiveDisplay} ) {
-    
-    const _envUrl = process.env.REACT_APP_PVWS_URL;
-    const wsUrl = _envUrl;
+export default function Step0( { step, setStep, connection, devices, setDevices, activeDisplay, setActiveDisplay, wsUrl} ) {
 
+    
     const icons = {
         fastForward : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10 m-auto transition-colors duration-100 group-hover:text-blue-600">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z" />
@@ -34,7 +32,7 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
             title: 'BL5.3.1',
             description: 'Connect to (14) motor devices installed at BL 5.3.1 including beamstop and monochromator. Note that the computer running PVWS must be connected to the BL 5.3.1 subnet with the EPICS address list configured.',
             icon: icons.fastForward,
-            callback: () => {startAutomaticSetup(autoDeviceList.adSimDetector)}
+            callback: () => {startAutomaticSetup(autoDeviceList.bl531)}
         },
         {
             title: 'Custom Setup',
@@ -72,18 +70,18 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
         //accepts an array of PVs
         var tempDevices = {};
         var count = 0;
-        for (var prefix of devices) {
-            tempDevices[prefix] = {
+        for (var device of devices) {
+            tempDevices[device.prefix] = {
                 id: count,
-                prefix: prefix,
-                nickname: '',
-                group: 'sim',
+                prefix: device.prefix,
+                nickname: device.nickname,
+                group: device.group,
                 isConnected: false,
                 value: null,
                 units: null,
                 min: null,
                 max: null,
-                increment: 1,
+                increment: device.increment,
                 setValue: '',
                 lastUpdate: null
             }
@@ -110,7 +108,9 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
         socket.addEventListener("open", event => {
             console.log("Opened connection in socket to: " + wsUrl);
             connection.current = socket;
-            connection.current.send(JSON.stringify({type: "subscribe", pvs: devices}));
+            const devicePrefixArray = devices.map((device) => device.prefix);
+            //the "subscribe" command type for PVWS takes a single string prefix or an array of prefix strings
+            connection.current.send(JSON.stringify({type: "subscribe", pvs: devicePrefixArray}));
         });
 
         socket.addEventListener("message", event => {

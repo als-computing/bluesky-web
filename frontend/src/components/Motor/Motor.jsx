@@ -49,7 +49,7 @@ const sampleDevices = {
     }
 }
 export default function Motor() {
-    const [wsURL, setWsURL] = useState('');
+    //const [wsURL, setWsURL] = useState('');
     const [devices, setDevices] = useState({}); //contains fully connected devices, no empty values 
     const [activeDisplay, setActiveDisplay] = useState('Connect');
     const connection = useRef(null); //for websocket
