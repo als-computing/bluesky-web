@@ -5,6 +5,7 @@ import Home from './pages/Home.jsx';
 import Camera from './pages/Camera.jsx';
 import Devices from './pages/Devices.jsx';
 import Api from './pages/Api.jsx';
+import BL601 from './pages/BL601.jsx';
 
 
 
@@ -19,7 +20,7 @@ function App() {
       <Header />
       <div className="flex justify-center">
         <div className="w-1/6">
-          <Sidebar /> 
+          <Sidebar />
         </div>
         <div className="w-4/6">
           <Routes>
@@ -27,6 +28,7 @@ function App() {
             <Route path="/camera" element={<Camera />} />
             <Route path="/devices" element={<Devices />} />
             <Route path="/api" element={<Api />} />
+            <Route path="/beamlines/BL601" element={<BL601 />} />
           </Routes>      
         </div>
         <div className="w-1/6"></div>

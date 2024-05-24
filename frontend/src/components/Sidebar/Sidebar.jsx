@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 export default function Sidebar() {
     const [activeLink, setActiveLink] = useState('/');
 
-    const Navigate = (item) => { //must be capitilized due to the useNavigate call inside
+/*     const Navigate = (item) => { //must be capitilized due to the useNavigate call inside
         setActiveLink(item.text);
         useNavigate(item.href);
-    }
+    } */
 
     const navigate = useNavigate();
 
@@ -20,9 +20,7 @@ export default function Sidebar() {
         document_char_bar: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25M9 16.5v.75m3-3v3M15 12v5.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>,
     }
 
-    useEffect(() => {
-        navigate(activeLink);
-    }, [activeLink]);
+
 
     const directoryList = [
         {text: 'Home', href: '/', icon: icons.home},
@@ -34,7 +32,7 @@ export default function Sidebar() {
         <div className="flex flex-col space-y-2 max-w-36">
             {directoryList.map((item) => {
                 return (
-                    <div key={item.text} className={`flex space-x-3 rounded-lg px-2 py-1 hover:cursor-pointer hover:drop-shadow  ${item.href === activeLink ? "bg-sky-200" : 'hover:bg-sky-50'}`} onClick={()=> setActiveLink(item.href)}>
+                    <div key={item.text} className={`flex space-x-3 rounded-lg px-2 py-1 hover:cursor-pointer hover:drop-shadow  ${item.href === activeLink ? "bg-sky-200" : 'hover:bg-sky-50'}`} onClick={()=> {setActiveLink(item.href); navigate(item.href)}}>
                         {item.icon}
                         <p>{item.text}</p>
                     </div>
