@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+
 const closeWebSocket = (connection) => {
     if (connection.current !== null) {
         try {
@@ -129,4 +130,87 @@ const updateDevice = (e, setDevices) => {
 
 }
 
-export {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice};
+const getPVWSUrl = () => {
+    //if no env variable is set, then assume that the React App is on the same workstation as PVWS
+        //having an env variable would be for developers running React on a separate WS from the servers
+    const currentWebsiteIP = window.location.hostname;
+    const pathname = "/pvws/pv";
+    const port = ":8080";
+    var wsUrl;
+    if (process.env.REACT_APP_PVWS_URL) {
+        wsUrl = process.env.REACT_APP_PVWS_URL;
+    } else {
+        wsUrl = "ws://" + currentWebsiteIP + port + pathname;
+    }
+
+    return wsUrl;
+}
+
+const initializeDeviceList = (devices, setDevices) => {
+    //accepts an array of PV objects and sets the full object device state
+    var tempDevices = {};
+    var count = 0;
+    for (var device of devices) {
+        tempDevices[device.prefix] = {
+            id: count,
+            prefix: device.prefix,
+            nickname: device.nickname,
+            group: device.group,
+            isConnected: false,
+            value: null,
+            units: null,
+            min: null,
+            max: null,
+            increment: device.increment,
+            setValue: '',
+            lastUpdate: null
+        }
+        count++;
+    }
+    //set the final device state variable
+    setDevices(tempDevices);
+}
+
+const startAutomaticSetup = (devices=[], setDevices=()=>{}, connection={}, setStep=()=>{}, setActiveDisplay=()=>{}, wsUrl=getPVWSUrl()) => {
+    setStep('auto');
+    closeWebSocket(connection);
+    try {
+        var socket = new WebSocket(wsUrl);
+        console.log("defined socket");
+    } catch (error) {
+        console.log(error);
+        return;
+    }
+    
+    initializeDeviceList(devices, setDevices);
+
+    socket.addEventListener("open", event => {
+        console.log("Opened connection in socket to: " + wsUrl);
+        connection.current = socket;
+        const devicePrefixArray = devices.map((device) => device.prefix);
+        //the "subscribe" command type for PVWS takes a single string prefix or an array of prefix strings
+        connection.current.send(JSON.stringify({type: "subscribe", pvs: devicePrefixArray}));
+    });
+
+    socket.addEventListener("message", event => {
+        console.log("Received Message at: " + dayjs().format('hh:mm:ss a'));
+        var eventData = JSON.parse(event.data);
+        console.log({eventData});
+        if (eventData.type === 'update') {
+            updateDevice(eventData, setDevices);
+        }
+    })
+
+    setTimeout( function() {
+        setActiveDisplay('DeviceTable');
+        setStep('0');
+    }, 1000);
+
+    //if success, show device table
+
+    //if fail, go back to current page
+}
+
+
+
+export {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice, getPVWSUrl, initializeDeviceList, startAutomaticSetup};

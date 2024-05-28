@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import Button from '../library/Button';
 import dayjs from 'dayjs';
+import { tailwindIcons as icons } from '../../assets/icons';
 
-export default function DeviceTable( { connection, devices, setDevices, activeDisplay }) { 
+export default function DeviceTable( { connection, devices, setDevices, activeDisplay='DeviceTable' }) { 
 
     const sampleDevices = {
         'IOC:m1' : {
@@ -45,13 +46,11 @@ export default function DeviceTable( { connection, devices, setDevices, activeDi
 
     const [lockoutList, setLockoutList] = useState([]);
 
-
-
     // ------------------------ To Do: Put these functions into a helper file and combine them with ControllerInterface.jsx as needed --------------------------
     const setDeviceValue = (device, currentValue, newValue) => {
         if (isValueInBounds(newValue, device.min, device.max, device.prefix)) {
             if (isDeviceUnlocked(device, lockoutList)) {
-                setLockoutList([...lockoutList, device.prefix]);
+                setLockoutList([...lockoutList, device.prefix]); //prevent user from double clicking in short time period
                 try {
                     connection.current.send(JSON.stringify({type: "write", pv: device.prefix, value: newValue}));
                 } catch (e) {
@@ -111,38 +110,62 @@ export default function DeviceTable( { connection, devices, setDevices, activeDi
 
     if (activeDisplay === 'DeviceTable') {
         return (
-            <div className='my-8'>
+            <div className='my-8 max-h-[80vh]'>
                 <h2 className="text-2xl pb-4 text-center">Device Table</h2>
+
                 <ul className='h-5/6 rounded-md border border-slate-300'>
                     <li className="flex h-[10%] justify-center items-center space-x-4  text-lg font-medium text-center bg-gray-100 rounded-t-md">
-                        <p className="w-2/12">Device</p> 
+                        <p className="w-3/12">Device</p> 
                         <p className="w-2/12">Position</p> 
-                        <p className="w-2/12">Jog Increment</p> 
-                        <p className="w-3/12">Set Position</p> 
+                        <p className="w-2/12">Jog</p> 
+                        <p className="w-2/12">Set Position</p> 
                         <p className="w-2/12">Last Update</p>
                     </li>
-                    {Object.keys(devices).map((key) => {
-                        return (
-                        <li key={key} className={`${lockoutList.includes(key) ? 'ponter-events-none text-slate-400 cursor-not-allowed' : 'pointer-events-auto'} ${devices[key].isConnected ? '' : 'cursor-not-allowed text-red-400'} flex h-[10%] justify-center items-center space-x-4 text-md py-1 border-b border-t border-slate-300 font-medium text-center bg-white rounded-t-md`}>
-                            <p name="Device" className="w-2/12 break-words">{devices[key].prefix}</p> 
-                            <div name="Positions" className={`${devices[key].isConnected ? '' : 'pointer-events-none'} w-2/12 flex justify-between`}>
-                                <p className={`${devices[key].isConnected ? 'hover:cursor-pointer hover:text-sky-700' : ''}`} onClick={() => setDeviceValue(devices[key], devices[key].value, (devices[key].value - devices[key].increment))}>&larr;</p>
-                                <p className="">{devices[key].isConnected ? devices[key].value.toPrecision(4) : 'N/A'} {devices[key].isConnected ? devices[key].units.substring(0,3) : ''}</p> 
-                                <p className={`${devices[key].isConnected ? 'hover:cursor-pointer hover:text-sky-700' : ''}`} onClick={() => setDeviceValue(devices[key], devices[key].value, (parseInt(devices[key].value) + parseInt(devices[key].increment)))}>&rarr;</p>
-                            </div>
-                            <div name="Jog Increment" className={`${devices[key].isConnected ? '' : 'pointer-events-none'} w-2/12 flex justify-center`}>
-                                <input className="max-w-8" type="number" value={devices[key].increment} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], increment: parseInt(e.target.value)}})} />
-                                <p className="">{ devices.isConnected ? devices[key].units.substring(0,3) : ''}</p> 
-                            </div>
-                            <div name="Set Position" className={`${devices[key].isConnected ? '' : 'pointer-events-none'} w-3/12 flex justify-center space-x-2`}>
-                                <input type="number" value={devices[key].setValue} className={`border-b border-black w-4/12 text-right`} onKeyDown={(e) =>handleKeyPress(e, key)} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], setValue: parseInt(e.target.value)}})}/>
-                                <p>{devices[key].isConnected ? devices[key].units.substring(0,3) : ''}</p>
-                                <Button cb={() => setDeviceValue(devices[key], devices[key].value, devices[key].setValue)} text="Set" styles="px-[4px] py-[1px] text-sm ml-0"/>
-                            </div>
-                            <p name="Last Update" className="w-2/12">{ devices[key].lastUpdate !== null ? devices[key].lastUpdate.format('hh:mm:ss a') : 'N/A'}</p>
-                        </li>
-                        )
-                    })}
+
+                    <div className="overflow-auto max-h-96 h-full">
+                        {Object.keys(devices).map((key) => {
+                            return (
+                            <li key={key} className={`${lockoutList.includes(key) ? 'ponter-events-none text-slate-400 cursor-not-allowed' : 'pointer-events-auto'} ${devices[key].isConnected ? '' : 'cursor-not-allowed text-red-400'} flex h-[10%] justify-center items-center space-x-4 text-md py-1 border-b border-t border-slate-300 font-medium text-center bg-white rounded-t-md`}>
+                                <p name="Device" className="w-3/12 break-words text-nowrap overscroll-x-auto overflow-scroll">{devices[key].prefix}</p> 
+                                <div name="Positions" className={`${devices[key].isConnected ? '' : 'pointer-events-none'} w-2/12 flex justify-center`}>
+                                    <p className="">{devices[key].isConnected ? parseFloat(devices[key].value.toPrecision(4)) : 'N/A'} {devices[key].isConnected ? devices[key].units.substring(0,3) : ''}</p> 
+                                </div>
+                                <div name="Jog" className={`${devices[key].isConnected ? '' : 'pointer-events-none'} w-2/12 flex justify-between`}>
+                                    <div name="Jog Button Left" className={`${devices[key].isConnected ? 'hover:cursor-pointer hover:text-sky-700' : ''}`} onClick={() => setDeviceValue(devices[key], devices[key].value, (parseFloat(devices[key].value) - parseFloat(devices[key].increment)))} >{icons.leftArrow}</div>
+                                    <div className="flex justify-center">
+                                        <input 
+                                            type="number" 
+                                            value={devices[key].increment} 
+                                            className="max-w-12 text-right pr-1 border rounded-sm" 
+                                            step="0.01" 
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                setDevices({...devices, [key]: { ...devices[key], increment: value ? parseFloat(value) : ''}})} 
+                                            } 
+                                        />
+                                        <p className="ml-1">{ devices[key].isConnected ? devices[key].units.substring(0,3) : ''}</p> 
+                                    </div>
+                                    <div name="Job Button Right" className={`${devices[key].isConnected ? 'hover:cursor-pointer hover:text-sky-700' : ''}`} onClick={() => setDeviceValue(devices[key], devices[key].value, (parseFloat(devices[key].value) + parseFloat(devices[key].increment)))}>{icons.rightArrow}</div>        
+                                </div>
+                                <div name="Set Position" className={`${devices[key].isConnected ? '' : 'pointer-events-none'} w-2/12 flex justify-center space-x-2`}>
+                                    <input 
+                                        type="number" 
+                                        value={devices[key].setValue} 
+                                        className={`border-b border-black w-4/12 text-right`} 
+                                        onKeyDown={(e) =>handleKeyPress(e, key)} 
+                                        onChange={(e) => {
+                                            const value = e.target.value; 
+                                            setDevices({...devices, [key]: { ...devices[key], setValue: value ? parseFloat(value) : ''}})}
+                                        }
+                                    />
+                                    <p>{devices[key].isConnected ? devices[key].units.substring(0,3) : ''}</p>
+                                    <Button cb={() => setDeviceValue(devices[key], devices[key].value, devices[key].setValue)} text="Set" styles="px-[4px] py-[1px] text-sm ml-0"/>
+                                </div>
+                                <p name="Last Update" className="w-2/12">{ devices[key].lastUpdate !== null ? devices[key].lastUpdate.format('hh:mm:ss a') : 'N/A'}</p>
+                            </li>
+                            )
+                        })}
+                    </div>
                 </ul>
             </div>
         )

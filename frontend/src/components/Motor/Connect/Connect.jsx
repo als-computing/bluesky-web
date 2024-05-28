@@ -5,12 +5,12 @@ import Step1 from './Step1.jsx';
 import Step2 from './Step2.jsx';
 import Step3 from './Step3.jsx';
 
-const _envUrl = process.env.REACT_APP_PVWS_URL;
+import {getPVWSUrl} from '../../../utilities/connectionHelper.js';
 
 
 export default function Connect( { connection, devices, setDevices, setDisplay, activeDisplay, setActiveDisplay  }) {
     const [step, setStep] = useState('0');
-    const [wsUrl, setWsUrl] = useState(_envUrl);
+    const [wsUrl, setWsUrl] = useState(getPVWSUrl());
 
     //For Step 3 Device List Initialization
     var blankDeviceList = [];
