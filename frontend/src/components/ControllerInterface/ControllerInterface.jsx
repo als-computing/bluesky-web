@@ -10,6 +10,9 @@ const icons = {
     leftArrowBox: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
                     </svg>,
+    rightArrowBox: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25" />
+            </svg>,  
     lightning: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-auto h-auto">
                     <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
                 </svg>,
@@ -29,18 +32,34 @@ const icons = {
                     <g transform="scale(-1, 1) translate(-24, 0)">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
                     </g>
-                </svg>
+                </svg>,
+    downArrow: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 48 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-8">
+    <path strokeLinecap="round" strokeLinejoin="round" d="m9 5.25 15 15 15-15m-30 6 15 15 15-15" />
+  </svg>,
+    upArrow: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 48 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-8">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 18.75l15-15 15 15" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75l15-15 15 15" />
+  </svg>
+  
+  
+
+  
+    
 }
 
 export default function ControllerInterface( {defaultControllerList=[]} ) {
     const [ devices, setDevices ] = useState({});
     const [ lockoutList, setLockoutList ] = useState([]);
     const [ controllerList, setControllerList ] = useState(defaultControllerList); //initialize the devices that will be displayed in the controllers section
+    const [ isUpArrowVisible, setIsUpArrowVisible ] = useState(false);
+    const [ isDownArrowVisible, setIsDownArrowVisible ] = useState(false);
+
     const connection = useRef(null);
     
 
     useEffect(() => {
         startAutomaticSetup(autoDeviceList.motorMotorSim, setDevices, connection);
+        setTimeout(handleScroll, 250); //ensure the bottom arrow for the PV list comes up if scrolling is required
     }, []);
 
     useEffect(() => {
@@ -78,10 +97,42 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
         setControllerList(tempArray);
     }
 
+    const handleScroll = () => {
+
+        var upArrow = document.getElementById("upArrow");
+        var downArrow = document.getElementById("downArrow");
+
+        var pvList = document.getElementById("pvList");
+        if (pvList.hasChildNodes()) {
+            //check if the first child is above the UP arrows
+            var firstChild = pvList.firstChild;
+            if (firstChild.getBoundingClientRect().top < upArrow.getBoundingClientRect().top) {
+                if (isUpArrowVisible !== true) { 
+                    setIsUpArrowVisible(true);
+                }
+            } else if (isUpArrowVisible !== false) {
+                setIsUpArrowVisible(false);
+            }
+
+            //check if the last child is below the DOWN arrows
+            var lastChild = pvList.lastChild;
+            if (lastChild.getBoundingClientRect().top > downArrow.getBoundingClientRect().bottom) {
+                if (isDownArrowVisible !== true) {
+                    setIsDownArrowVisible(true);
+                }
+            } else if (isDownArrowVisible !== false) {
+                setIsDownArrowVisible(false);
+            }
+        }
+        
+
+
+    }
+
     return (
-        <section className="w-full border border-solid border-slate-500 rounded-md my-4 max-h-screen">
-            <h2>Controller Interface A</h2>
-            <section className="w-full h-full max-h-full flex">
+        <section className="w-full border border-solid border-slate-500 rounded-md my-4 h-[80vh] max-h-[750px] flex flex-col overflow-hidden">
+            <h2 className="h-8 text-lg">Controller Interface A</h2>
+            <section className="w-full h-full flex">
                 <div className="w-2/3 text-center border">
                     <h2>Controllers</h2>
                     <div name="" className="flex flex-wrap justify-center">
@@ -90,9 +141,9 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
                                 return (
                                     <li key={devices[key].id} className="flex flex-col border rounded-sm w-60 h-60 list-none m-4 p-1">
                                         <div name="Title Heading" className="h-1/6  flex items-start">
-                                            <div name="Lock Device" className="w-1/6 flex justify-start"><div className="cursor-pointer w-5 flex items-start">{icons.unlocked}</div></div>
+                                            <div name="Lock Device" className="w-1/6 flex justify-start hover:animate-bounce"><div className="cursor-pointer w-5 flex items-start">{icons.unlocked}</div></div>
                                             <div name="Name and Connection Status" className="w-4/6 flex justify-center py-3">
-                                                <div className="w-5 text-amber-500">{icons.lightning}</div>
+                                                <div className={`w-5  ${devices[key].isConnected ? 'text-amber-500 animate-pulse' : 'text-slate-700'}`}>{icons.lightning}</div>
                                                 <p>{ devices[key].nickname ? devices[key].nickname : devices[key].prefix}</p>
                                             </div>
                                             <div name="Close Box" className="w-1/6 flex justify-end h-auto"><div className="border cursor-pointer w-5">{icons.minus}</div></div>
@@ -102,23 +153,23 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
                                         <div name="Jog Buttons" className="h-1/6  flex justify-center items-start space-x-2">
                                             <div 
                                                 name="Jog Left Button" 
-                                                className="flex justify-center cursor-pointer" 
+                                                className="flex justify-center cursor-pointer hover:text-sky-800" 
                                                 onClick={() => setDeviceValue(devices[key], devices[key].value, (parseFloat(devices[key].value) - parseFloat(devices[key].increment)), connection, lockoutList, setLockoutList)}>
                                                     {icons.leftArrow}
                                             </div>
-                                            <input name="Jog Value" className="max-w-8 text-center border-b border-slate-500" type="number" value={devices[key].increment} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], increment: parseInt(e.target.value)}})} />
+                                            <input name="Jog Value" className="max-w-16 text-center border-b border-slate-500" type="number" value={devices[key].increment} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], increment: parseFloat(e.target.value)}})} />
                                             <div 
                                                 name="Jog Right Button" 
-                                                className="flex justify-center cursor-pointer" 
+                                                className="flex justify-center cursor-pointer hover:text-sky-800" 
                                                 onClick={() => setDeviceValue(devices[key], devices[key].value, (parseFloat(devices[key].value) + parseFloat(devices[key].increment)), connection, lockoutList, setLockoutList)}>
                                                     {icons.rightArrow}
                                             </div>
                                         </div>
                                         <div name="Set Heading" className="h-1/6 flex justify-center items-end"><p>Set Absolute Value</p></div>
                                         <div name="Set Buttons / Input" className="h-1/6  flex justify-center items-start">
-                                            <input type="number" value={devices[key].setValue} className={`border-b border-black w-4/12 text-right`} onKeyDown={(e) =>handleKeyPress(e, key)} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], setValue: parseInt(e.target.value)}})}/>
+                                            <input type="number" value={devices[key].setValue} className={`border-b border-black w-4/12 text-right`} onKeyDown={(e) =>handleKeyPress(e, key)} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], setValue: parseFloat(e.target.value)}})}/>
                                             <p className="px-2">{devices[key].units}</p>
-                                            <Button cb={() => setDeviceValue(devices[key], devices[key].value, devices[key].setValue, connection, lockoutList, setLockoutList)} text="Set" styles="px-[6px] py-[1px] text-sm"/>
+                                            <Button cb={() => setDeviceValue(devices[key], devices[key].value, devices[key].setValue, connection, lockoutList, setLockoutList)} text="Set" styles="px-[6px] py-[1px] text-sm hover:drop-shadow-md hover:bg-sky-600"/>
                                         </div>
                                     </li>
                                 )
@@ -126,29 +177,34 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
                         })}
                     </div>
                 </div>
-                <div className="w-1/3 text-center border flex flex-col h-screen max-h-[50%] space-y-2 overflow-hidden">
-                    <h2>Device List</h2>
-                    <ul name="PV List" className="overflow-y-auto max-h-full h-full">
-                        {Object.keys(devices).map((key) => {
-                            return (
-                                <li className="flex border border-slate-500 list-none px-2 space-x-1" key={key}>
-                                    <div className="w-1/12 cursor-pointer" onClick={() => handlePopOutClick(key)}>
-                                        {icons.leftArrowBox}  
-                                    </div>
-                                    <div className="w-5/12 flex">
-                                        <div className="w-6">{icons.lightning}</div>
-                                        {devices[key].prefix}
-                                    </div>
-                                    <div className="w-4/12 border">
-                                        <p className="text-right">{devices[key].value}</p>
-                                    </div>
-                                    <div className="w-1/12">
-                                        <p>{devices[key].units}</p>
-                                    </div>
-                                </li>
-                            )
-                        })}
-                    </ul>
+                <div className="w-1/3 text-center border h-full">
+                    <h2 className="h-8">Device List</h2>
+
+                    <div className="h-[calc(100%-2rem)] relative" id="pvlistContainer">
+                        <div id="upArrow" className={`absolute top-0 w-full h-auto flex justify-center bg-[#ffffff99] transition-all duration-700 z-50 ${isUpArrowVisible ? 'opacity-100' : 'z-0 opacity-0'}`}>{icons.upArrow}</div>
+                        <div id="downArrow" className={`absolute bottom-0 w-full flex justify-center bg-[#ffffff99] transition-all duration-700 z-50 ${isDownArrowVisible ? 'opacity-100' : 'z-0 opacity-0'}`}>{icons.downArrow}</div>
+                        <ul name="PV List" id="pvList" className="absolute top-0 overflow-y-auto h-full w-full z-20" onScroll={handleScroll}>
+                            {Object.keys(devices).map((key) => {
+                                return (
+                                    <li className={`flex border border-slate-500 list-none px-2 space-x-1 ${devices[key].isConnected ? 'text-inherit' : 'text-red-500'}`} key={key}>
+                                        <div className="w-1/12 cursor-pointer" onClick={() => handlePopOutClick(key)}>
+                                            {controllerList.includes(key) ? icons.rightArrowBox : icons.leftArrowBox}  
+                                        </div>
+                                        <div className="w-1/2 flex">
+                                            <div className="w-6">{icons.lightning}</div>
+                                            <p className="w-full overflow-x-auto">{devices[key].prefix}</p>
+                                        </div>
+                                        <div className="w-3/12 border ">
+                                            <p className="text-right w-full overflow-x-auto">{devices[key].value}</p>
+                                        </div>
+                                        <div className="w-1/12">
+                                            <p>{devices[key].isConnected ? devices[key].units.substring(0,3) : ''}</p>
+                                        </div>
+                                    </li>
+                                )
+                            })}
+                        </ul>
+                    </div>
                 </div>
             </section>
         </section>
