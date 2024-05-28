@@ -108,7 +108,11 @@ const updateDevice = (e, setDevices) => {
                 tempDevice.min = e.min;
                 tempDevice.max = e.max;
                 tempDevice.lastUpdate = dayjs();
-                tempDevice.units = e.units;
+                if (e.units === null || e.units === "null") {
+                    tempDevice.units = "N/A";
+                } else {
+                    tempDevice.units = e.units;
+                }
             }
             if (e.value === "NaN") { //PV is no longer connected to WS
                 tempDevice.isConnected = false;
