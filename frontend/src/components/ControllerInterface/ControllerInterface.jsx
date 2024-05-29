@@ -161,19 +161,21 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
                                         <div name="Current Value" className="h-1/6  flex justify-center items-center space-x-1 text-lg"><p>{devices[key].value}</p><p>{devices[key].units}</p></div>
                                         <div name="Jog Heading" className="h-1/6  flex justify-center items-end"> <p>Jog</p></div>
                                         <div name="Jog Buttons" className={`h-1/6  flex justify-center items-start space-x-2`}>
-                                            <div 
+                                            <button
+                                                disabled={lockedControllerList.includes(key)} 
                                                 name="Jog Left Button" 
                                                 className={`flex justify-center  ${lockedControllerList.includes(key) ? 'cursor-not-allowed text-slate-400' : 'cursor-pointer hover:text-sky-800'}`} 
                                                 onClick={() => setDeviceValue(devices[key], devices[key].value, (parseFloat(devices[key].value) - parseFloat(devices[key].increment)), connection, lockoutList, setLockoutList)}>
                                                     {icons.leftArrow}
-                                            </div>
+                                            </button>
                                             <input name="Jog Value" className="max-w-16 text-center border-b border-slate-500 bg-inherit" type="number" value={devices[key].increment} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], increment: parseFloat(e.target.value)}})} />
-                                            <div 
+                                            <button
+                                                disabled={lockedControllerList.includes(key)}
                                                 name="Jog Right Button" 
                                                 className={`flex justify-center  ${lockedControllerList.includes(key) ? 'cursor-not-allowed text-slate-400' : 'cursor-pointer hover:text-sky-800'}`} 
                                                 onClick={() => setDeviceValue(devices[key], devices[key].value, (parseFloat(devices[key].value) + parseFloat(devices[key].increment)), connection, lockoutList, setLockoutList)}>
                                                     {icons.rightArrow}
-                                            </div>
+                                            </button>
                                         </div>
                                         <div name="Set Heading" className="h-1/6 flex justify-center items-end"><p>Set Absolute Value</p></div>
                                         <div name="Set Buttons / Input" className="h-1/6  flex justify-center items-start">
@@ -183,6 +185,7 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
                                                 cb={() => setDeviceValue(devices[key], devices[key].value, devices[key].setValue, connection, lockoutList, setLockoutList)} 
                                                 text="Set" 
                                                 styles={`px-[6px] py-[1px] text-sm  ${lockedControllerList.includes(key) ? 'cursor-not-allowed bg-slate-400' : 'cursor-pointer hover:bg-sky-600 hover:drop-shadow-md'}`}
+                                                disabled={lockedControllerList.includes(key)}
                                             />
                                         </div>
                                     </li>
