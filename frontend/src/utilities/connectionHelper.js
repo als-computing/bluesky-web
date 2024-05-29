@@ -98,7 +98,7 @@ const updateSingleDevice = (prefix, deviceList, setDeviceList, value=null, isCon
 }
 
 
-const updateDevice = (e, setDevices) => {
+const updateDevice = (e, setDevices, setUpdatedDeviceKey=()=>{}) => {
 
     setDevices(devices => {
         const prefix = e.pv;
@@ -123,6 +123,8 @@ const updateDevice = (e, setDevices) => {
                     tempDevice.isConnected = true;
                     tempDevice.value = e.value;
                     tempDevice.lastUpdate = dayjs();
+                    setUpdatedDeviceKey(prefix); //used to trigger CSS event on device
+                    setTimeout(()=> setUpdatedDeviceKey(''), 1000); //wipe key so successive updates on same device trigger CSS
                 }
             }
         } else { //PV has not returned a value
@@ -175,10 +177,11 @@ const initializeDeviceList = (devices, setDevices) => {
     setDevices(tempDevices);
 }
 
-const startAutomaticSetup = (devices=[], setDevices=()=>{}, connection={}, setStep=()=>{}, setActiveDisplay=()=>{}, wsUrl=getPVWSUrl()) => {
+const startAutomaticSetup = ({devices=[], setDevices=()=>{}, connection={}, setStep=()=>{}, setActiveDisplay=()=>{}, wsUrl=getPVWSUrl(), setUpdatedDeviceKey=()=>{}}={}) => {
     setStep('auto');
     closeWebSocket(connection);
     try {
+        console.log(wsUrl);
         var socket = new WebSocket(wsUrl);
         console.log("defined socket");
     } catch (error) {
@@ -201,7 +204,7 @@ const startAutomaticSetup = (devices=[], setDevices=()=>{}, connection={}, setSt
         var eventData = JSON.parse(event.data);
         console.log({eventData});
         if (eventData.type === 'update') {
-            updateDevice(eventData, setDevices);
+            updateDevice(eventData, setDevices, setUpdatedDeviceKey);
         }
     })
 

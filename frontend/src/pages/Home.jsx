@@ -11,7 +11,7 @@ export default function Home() {
 
     return (
         <section>
-            <ControllerInterface />
+            <ControllerInterface defaultControllerList={['IOC:m1', 'IOC:m2', 'IOC:m3']}/>
             <WebSocketImage url={urlSim} width={width} height={height}/>
             <Motor />
             <Postman />
