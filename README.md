@@ -29,7 +29,7 @@ A Bluesky web interface built with React, Python FastAPI, Bluesky, OPHYD, PV Web
 A docker-compose file is used to run the required services together. For full functionality, the host computer should be running an EPICS IOC or connected to one through the local network. If an existing EPICS IOC is not running, then use the script that starts EPICS.
 
 ## Install PV Web Socket
-From the root directory, clone the following repository which is used to provide live PV updates.
+From the top level repo directory, clone the following repository which is used to provide live PV updates.
 
 ```
 git clone https://github.com/ornl-epics/pvws.git
