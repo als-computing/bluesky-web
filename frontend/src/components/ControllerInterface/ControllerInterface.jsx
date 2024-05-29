@@ -53,7 +53,6 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
     const [ lockedControllerList, setLockedControllerList ] = useState([]); //for manually preventing user interaction, set by the user on individual controller modules
     const [ controllerList, setControllerList ] = useState(defaultControllerList); //initialize the devices that will be displayed in the controllers section
     const [ updatedDeviceKey, setUpdatedDeviceKey] = useState(''); //used to trigger a flashing effect on devices that just received an update
-    const [ flashToggle, setFlashToggle ] = useState(false);
     const [ isUpArrowVisible, setIsUpArrowVisible ] = useState(false);
     const [ isDownArrowVisible, setIsDownArrowVisible ] = useState(false);
 
@@ -66,8 +65,6 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
             setDevices,
             connection,
             setUpdatedDeviceKey,
-            setFlashToggle,
-            flashToggle
         });
         setTimeout(handleScroll, 250); //ensure the bottom arrow for the PV list comes up if scrolling is required
     }, []);

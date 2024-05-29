@@ -3,7 +3,7 @@ import Button from '../library/Button';
 import dayjs from 'dayjs';
 import { tailwindIcons as icons } from '../../assets/icons';
 
-export default function DeviceTable( { connection, devices, setDevices, activeDisplay='DeviceTable' }) { 
+export default function DeviceTable( { connection, devices, setDevices, activeDisplay='DeviceTable', updatedDeviceKey='' }) { 
 
     const sampleDevices = {
         'IOC:m1' : {
@@ -125,7 +125,7 @@ export default function DeviceTable( { connection, devices, setDevices, activeDi
                     <div className="overflow-auto max-h-96 h-full">
                         {Object.keys(devices).map((key) => {
                             return (
-                            <li key={key} className={`${lockoutList.includes(key) ? 'ponter-events-none text-slate-400 cursor-not-allowed' : 'pointer-events-auto'} ${devices[key].isConnected ? '' : 'cursor-not-allowed text-red-400'} flex h-[10%] justify-center items-center space-x-4 text-md py-1 border-b border-t border-slate-300 font-medium text-center bg-white rounded-t-md`}>
+                            <li key={key} className={`${lockoutList.includes(key) ? 'ponter-events-none text-slate-400 cursor-not-allowed' : 'pointer-events-auto'} ${devices[key].isConnected ? '' : 'cursor-not-allowed text-red-400'} ${updatedDeviceKey === key ? `animate-flash` : ''} flex h-[10%] justify-center items-center space-x-4 text-md py-1 border-b border-t border-slate-300 font-medium text-center bg-white rounded-t-md`}>
                                 <p name="Device" className="w-3/12 break-words text-nowrap overscroll-x-auto overflow-scroll">{devices[key].prefix}</p> 
                                 <div name="Positions" className={`${devices[key].isConnected ? '' : 'pointer-events-none'} w-2/12 flex justify-center`}>
                                     <p className="">{devices[key].isConnected ? parseFloat(devices[key].value.toPrecision(4)) : 'N/A'} {devices[key].isConnected ? devices[key].units.substring(0,3) : ''}</p> 

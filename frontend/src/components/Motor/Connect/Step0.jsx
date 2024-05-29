@@ -3,7 +3,7 @@ import {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSo
 import dayjs from 'dayjs';
 import { autoDeviceList } from '../../../data/device_names.js';
 
-export default function Step0( { step, setStep, connection, devices, setDevices, activeDisplay, setActiveDisplay, wsUrl} ) {
+export default function Step0( { step, setStep, connection, devices, setDevices, activeDisplay, setActiveDisplay, wsUrl, setUpdatedDeviceKey} ) {
 
     
     const icons = {
@@ -20,19 +20,19 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
             title: 'motorMotorSim',
             description: 'Connect to (4) PVs from the EPICS motorMotorSim IOC.',
             icon: icons.fastForward,
-            callback: () => {startAutomaticSetup(autoDeviceList.motorMotorSim, setDevices, connection, setStep, setActiveDisplay)}
+            callback: () => {startAutomaticSetup({devices: autoDeviceList.motorMotorSim, setDevices, connection, setStep, setActiveDisplay, setUpdatedDeviceKey})}
         },
         {
             title: 'ADSimDetector',
             description: 'Connect to (12) PVs from the EPICS ADSimDetector IOC.',
             icon: icons.fastForward,
-            callback: () => {startAutomaticSetup(autoDeviceList.adSimDetector, setDevices, connection, setStep, setActiveDisplay)}
+            callback: () => {startAutomaticSetup({devices: autoDeviceList.adSimDetector, setDevices, connection, setStep, setActiveDisplay, setUpdatedDeviceKey})}
         },
         {
             title: 'BL5.3.1',
             description: 'Connect to (14) motor devices installed at BL 5.3.1 including beamstop and monochromator. Note that the computer running PVWS must be connected to the BL 5.3.1 subnet with the EPICS address list configured.',
             icon: icons.fastForward,
-            callback: () => {startAutomaticSetup(autoDeviceList.bl531, setDevices, connection, setStep, setActiveDisplay)}
+            callback: () => {startAutomaticSetup({devices: autoDeviceList.bl531, setDevices, connection, setStep, setActiveDisplay, setUpdatedDeviceKey})}
         },
         {
             title: 'Custom Setup',

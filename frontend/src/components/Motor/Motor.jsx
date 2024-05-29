@@ -52,13 +52,14 @@ export default function Motor() {
     //const [wsURL, setWsURL] = useState('');
     const [devices, setDevices] = useState({}); //contains fully connected devices, no empty values 
     const [activeDisplay, setActiveDisplay] = useState('Connect');
+    const [ updatedDeviceKey, setUpdatedDeviceKey ] = useState('');
     const connection = useRef(null); //for websocket
     //const activeDisplay = useRef('Connect');
 
     return(
         <section className="block w-full items-center max-w-screen-lg m-auto p-4 rounded-md border border-slate-500 my-8">
-            <Connect connection={connection} devices={devices} setDevices={setDevices} activeDisplay={activeDisplay} setActiveDisplay={setActiveDisplay}/>
-            <DeviceTable connection={connection} devices={devices} setDevices={setDevices} activeDisplay={activeDisplay}/>
+            <Connect connection={connection} devices={devices} setDevices={setDevices} activeDisplay={activeDisplay} setActiveDisplay={setActiveDisplay} setUpdatedDeviceKey={setUpdatedDeviceKey}/>
+            <DeviceTable connection={connection} devices={devices} setDevices={setDevices} activeDisplay={activeDisplay} updatedDeviceKey={updatedDeviceKey}/>
         </section>
     )
 }
