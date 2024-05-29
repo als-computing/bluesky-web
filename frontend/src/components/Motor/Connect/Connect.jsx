@@ -8,7 +8,7 @@ import Step3 from './Step3.jsx';
 import {getPVWSUrl} from '../../../utilities/connectionHelper.js';
 
 
-export default function Connect( { connection, devices, setDevices, setDisplay, activeDisplay, setActiveDisplay  }) {
+export default function Connect( { connection, devices, setDevices, setDisplay, activeDisplay, setActiveDisplay, setUpdatedDeviceKey  }) {
     const [step, setStep] = useState('0');
     const [wsUrl, setWsUrl] = useState(getPVWSUrl());
 
@@ -74,7 +74,7 @@ export default function Connect( { connection, devices, setDevices, setDisplay, 
             <section className="flex justify-center  max-w-screen-lg m-auto px-6">
                 <div className="w-full max-w-xl m-auto block py-4">
                     <Navbar step={step} setStep={setStep}/>
-                    <Step0 step={step} setStep={setStep} connection={connection} wsUrl={wsUrl} devices={devices} setDevices={setDevices} activeDisplay={activeDisplay} setActiveDisplay={setActiveDisplay}/>
+                    <Step0 step={step} setStep={setStep} connection={connection} wsUrl={wsUrl} devices={devices} setDevices={setDevices} activeDisplay={activeDisplay} setActiveDisplay={setActiveDisplay} setUpdatedDeviceKey={setUpdatedDeviceKey}/>
                     <Step1 step={step} setStep={setStep} wsUrl={wsUrl} setWsUrl={setWsUrl}/>
                     <Step2 step={step} setStep={setStep} deviceList={deviceList} setDeviceList={setDeviceList} setDevices={setDevices}/>
                     <Step3 step={step} setStep={setStep} deviceList={deviceList} setDeviceList={setDeviceList} wsUrl={wsUrl} connection={connection} devices={devices} setDevices={setDevices} setActiveDisplay={setActiveDisplay}/>

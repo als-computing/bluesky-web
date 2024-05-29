@@ -52,6 +52,7 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
     const [ lockoutList, setLockoutList ] = useState([]); //for preventing double clicks
     const [ lockedControllerList, setLockedControllerList ] = useState([]); //for manually preventing user interaction, set by the user on individual controller modules
     const [ controllerList, setControllerList ] = useState(defaultControllerList); //initialize the devices that will be displayed in the controllers section
+    const [ updatedDeviceKey, setUpdatedDeviceKey] = useState(''); //used to trigger a flashing effect on devices that just received an update
     const [ isUpArrowVisible, setIsUpArrowVisible ] = useState(false);
     const [ isDownArrowVisible, setIsDownArrowVisible ] = useState(false);
 
@@ -59,7 +60,12 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
     
 
     useEffect(() => {
-        startAutomaticSetup(autoDeviceList.motorMotorSim, setDevices, connection);
+        startAutomaticSetup({
+            devices: autoDeviceList.motorMotorSim,
+            setDevices,
+            connection,
+            setUpdatedDeviceKey,
+        });
         setTimeout(handleScroll, 250); //ensure the bottom arrow for the PV list comes up if scrolling is required
     }, []);
 
@@ -116,7 +122,7 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
         if (pvList.hasChildNodes()) {
             //check if the first child is above the UP arrows
             var firstChild = pvList.firstChild;
-            if (firstChild.getBoundingClientRect().top < upArrow.getBoundingClientRect().top) {
+            if ((firstChild.getBoundingClientRect().top + 8) < upArrow.getBoundingClientRect().top) {
                 if (isUpArrowVisible !== true) { 
                     setIsUpArrowVisible(true);
                 }
@@ -149,7 +155,7 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
                         {controllerList.map((key) => {
                             if (Object.keys(devices).length > 0) { //prevents error due to devices not being empty during testing 
                                 return (
-                                    <li key={devices[key].id} className={`flex flex-col border rounded-md w-60 h-60 list-none m-4 p-1 shadow-sm ${lockedControllerList.includes(key) ? 'bg-slate-100' : 'bg-white'}`}>
+                                    <li key={devices[key].id} className={` flex flex-col border rounded-md w-60 h-60 list-none m-4 p-1 shadow-sm ${lockedControllerList.includes(key) ? 'bg-slate-100' : 'bg-white'} ${updatedDeviceKey === key ? `animate-flash` : ''}`}>
                                         <div name="Title Heading" className="h-1/6  flex items-start">
                                             <div name="Lock Device" className="w-1/6 flex justify-start hover:animate-pulse" onClick={() => handleLockClick(key)}><div className="cursor-pointer w-5 flex items-start">{ lockedControllerList.includes(key) ? icons.locked : icons.unlocked}</div></div>
                                             <div name="Name and Connection Status" className="w-4/6 flex justify-center py-3">
@@ -198,9 +204,9 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
                     <h2 className="h-8 text-sky-900 text-lg">Device List</h2>
 
                     <div className="h-[calc(100%-5rem)] relative pb-4" id="pvlistContainer">
-                        <div id="upArrow" className={`absolute top-0 w-full h-auto flex justify-center bg-[#ffffff99] transition-all duration-700 z-50 ${isUpArrowVisible ? 'opacity-100' : 'z-0 opacity-0'}`}>{icons.upArrow}</div>
-                        <div id="downArrow" className={`absolute bottom-0 w-full flex justify-center bg-[#ffffff99] transition-all duration-700 z-50 ${isDownArrowVisible ? 'opacity-100' : 'z-0 opacity-0'}`}>{icons.downArrow}</div>
-                        <ul name="PV List" id="pvList" className="absolute top-0 overflow-y-auto h-full w-full z-20" onScroll={handleScroll}>
+                        <div id="upArrow" className={`absolute top-0 w-full h-auto flex justify-center bg-[#ffffff99] transition-all duration-700  ${isUpArrowVisible ? 'opacity-100 z-50' : 'z-0 opacity-0'}`}>{icons.upArrow}</div>
+                        <div id="downArrow" className={`absolute bottom-0 w-full flex justify-center bg-[#ffffff99] transition-all duration-700  ${isDownArrowVisible ? 'opacity-100 z-50' : 'z-0 opacity-0'}`}>{icons.downArrow}</div>
+                        <ul name="PV List" id="pvList" className="absolute top-2 overflow-y-auto h-full w-full z-20" onScroll={handleScroll}>
                             {Object.keys(devices).map((key) => {
                                 return (
                                     <li className={`flex  list-none px-2 ${devices[key].isConnected ? 'text-inherit' : 'text-red-500'}`} key={key}>
@@ -209,7 +215,7 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
                                                 {controllerList.includes(key) ? icons.rightArrowBox : icons.leftArrowBox}  
                                             </div>
                                         </div>
-                                        <div className="border-slate-500 border w-11/12 flex py-1">
+                                        <div className={`border-slate-500 border w-11/12 flex py-1 ${updatedDeviceKey === key ? `animate-flash` : ''}`}>
                                             <div className="w-7/12 flex items-center pl-1">
                                                 <div className={`w-4 ${devices[key].isConnected ? 'text-amber-500 animate-pulse' : 'text-slate-700'}`}>{icons.lightning}</div>
                                                 <p className="w-full text-left overflow-x-auto">{devices[key].prefix}</p>
