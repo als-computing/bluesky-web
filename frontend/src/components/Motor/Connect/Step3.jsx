@@ -240,7 +240,7 @@ export default function Step3({ step, setStep, deviceList, setDeviceList, wsUrl,
                 {isConnecting ? status : <Button cb={handleConnectClick} text={"Connect"}/> }
                 <p className="my-4 whitespace-pre-wrap">{resultMessage}</p>
                 {step === '4' || resultMessage !== '' ? 
-                    <div className="w-full flex space-between mt-4">
+                    <div className="w-full flex justify-around mt-4">
                         <Button cb={resetStep3} text={"⅁ Reset"} styles={"bg-slate-400"} />
                         <Button cb={handleFinish} text={"Finish"} />
                     </div> 

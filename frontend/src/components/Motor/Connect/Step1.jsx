@@ -3,13 +3,14 @@ import { useState } from 'react';
 import TextField from "../../library/TextField";
 import Button from '../../library/Button';
 
-const _envUrl = process.env.REACT_APP_PVWS_URL;
-
 export default function Step1({ step, setStep, wsUrl, setWsUrl }) {
     const [warning, setWarning] = useState('');
     const [toggle, setToggle] = useState('Default');
 
+    const originalUrl = wsUrl;
+
     const handleContinueClick = () => {
+        console.log({wsUrl});
         if (wsUrl.length === 0) {
             setWarning('Please enter in URL to proceed'); 
         } else if (!wsUrl.startsWith("ws://")) {
@@ -22,8 +23,9 @@ export default function Step1({ step, setStep, wsUrl, setWsUrl }) {
 
     const handleDefaultClick = () => {
         //reset wsUrl to match the env var
-        setWsUrl(_envUrl);
+        setWsUrl(originalUrl);
         setToggle('Default');
+        console.log({wsUrl});
     }
     
     if (step === '1') {
