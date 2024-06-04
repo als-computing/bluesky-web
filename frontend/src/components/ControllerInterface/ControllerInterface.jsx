@@ -164,7 +164,7 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
                                             </div>
                                             <div name="Close Box" className="w-1/6 flex justify-end h-auto"><div className="border cursor-pointer w-5" onClick={() => handlePopOutClick(key)}>{icons.minus}</div></div>
                                         </div>
-                                        <div name="Current Value" className="h-1/6  flex justify-center items-center space-x-1 text-lg"><p>{devices[key].value}</p><p>{devices[key].units}</p></div>
+                                        <div name="Current Value" className="h-1/6  flex justify-center items-center space-x-1 text-lg"><p>{devices[key].isConnected ? parseFloat(devices[key].value.toPrecision(4)) : 'N/A'}</p></div>
                                         <div name="Jog Heading" className="h-1/6  flex justify-center items-end"> <p>Jog</p></div>
                                         <div name="Jog Buttons" className={`h-1/6  flex justify-center items-start space-x-2`}>
                                             <button
@@ -221,7 +221,7 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
                                                 <p className="w-full text-left overflow-x-auto">{devices[key].prefix}</p>
                                             </div>
                                             <div className="w-3/12">
-                                                <p className="text-right w-full overflow-x-auto">{devices[key].value}</p>
+                                                <p className="text-right w-full overflow-x-auto">{devices[key].isConnected ? parseFloat(devices[key].value.toPrecision(4)) : 'N/A'}</p>
                                             </div>
                                             <div className="w-2/12">
                                                 <p className="text-center">{devices[key].isConnected ? devices[key].units.substring(0,3) : ''}</p>

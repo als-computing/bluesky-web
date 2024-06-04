@@ -1,11 +1,12 @@
 from typing import Union
 
-from fastapi import FastAPI, Response, status, Request, WebSocket
+from fastapi import FastAPI, Response, status, Request, WebSocket, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 import pvws
 import pvsim
+import queue_server
 
 try:
     from ophyd.signal import EpicsSignal
@@ -43,6 +44,7 @@ app.add_middleware(
 
 #app.include_router(pvws.router) #turn this off if not connected to EPICS
 app.include_router(pvsim.router)
+app.include_router(queue_server.router)
 
 
 @app.get("/")
@@ -60,8 +62,6 @@ def list_devices( response: Response):
     return {"404 Error": "No devices found"}
 
 
-#change pv to device
-# git remote add upstream to als compute, then just push to that and not personal
 @app.get("/devices/{prefix}/position", status_code=200) #make plural for resources, better to keep resource more clear for what it returns
 def read_device(prefix, response: Response):
     if prefix in device_dict:
@@ -106,6 +106,7 @@ async def move_device(instruction: DeviceInstruction, response: Response):
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"404 Error": "Device " + instruction.prefix  + " not found"}
+    
     
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
