@@ -204,9 +204,9 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
                     <h2 className="h-8 text-sky-900 text-lg">Device List</h2>
 
                     <div className="h-[calc(100%-5rem)] relative pb-4" id="pvlistContainer">
-                        <div id="upArrow" className={`absolute top-0 w-full h-auto flex justify-center bg-[#ffffff99] transition-all duration-700  ${isUpArrowVisible ? 'opacity-100 z-50' : 'z-0 opacity-0'}`}>{icons.upArrow}</div>
+                        <div id="upArrow" className={`absolute top-4 w-full h-auto flex justify-center bg-[#ffffff99] transition-all duration-700  ${isUpArrowVisible ? 'opacity-100 z-50' : 'z-0 opacity-0'}`}>{icons.upArrow}</div>
                         <div id="downArrow" className={`absolute bottom-0 w-full flex justify-center bg-[#ffffff99] transition-all duration-700  ${isDownArrowVisible ? 'opacity-100 z-50' : 'z-0 opacity-0'}`}>{icons.downArrow}</div>
-                        <ul name="PV List" id="pvList" className="absolute top-2 overflow-y-auto h-full w-full z-20" onScroll={handleScroll}>
+                        <ul name="PV List" id="pvList" className="absolute top-4 overflow-y-auto h-[calc(100%-1rem)] w-full z-20" onScroll={handleScroll}>
                             {Object.keys(devices).map((key) => {
                                 return (
                                     <li className={`flex  list-none px-2 ${devices[key].isConnected ? 'text-inherit' : 'text-red-500'}`} key={key}>
