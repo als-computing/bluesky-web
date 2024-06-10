@@ -138,13 +138,45 @@ const updateDevice = (e, setDevices, setUpdatedDeviceKey=()=>{}) => {
 
 const getPVWSUrl = () => {
     //if no env variable is set, then assume that the React App is on the same workstation as PVWS
-        //having an env variable would be for developers running React on a separate WS from the servers
+        //having an env variable would be for developers running React on a separate workstation from PVWS
     const currentWebsiteIP = window.location.hostname;
     const pathname = "/pvws/pv";
     const port = ":8080";
     var wsUrl;
     if (process.env.REACT_APP_PVWS_URL) {
         wsUrl = process.env.REACT_APP_PVWS_URL;
+    } else {
+        wsUrl = "ws://" + currentWebsiteIP + port + pathname;
+    }
+
+    return wsUrl;
+}
+
+const getFastAPIUrl = () => {
+    //if no env variable is set, then assume that the React App is on the same workstation as the fastAPI server
+        //having an env variable would be for developers running React on a separate workstation from fastAPI
+    const currentWebsiteIP = window.location.hostname;
+    const pathname = "/";
+    const port = ":8000";
+    var httpUrl;
+    if (process.env.REACT_APP_FASTAPI_URL) {
+        httpUrl = process.env.REACT_APP_FASTAPI_URL;
+    } else {
+        httpUrl = "http://" + currentWebsiteIP + port + pathname;
+    }
+
+    return httpUrl;
+}
+
+const getQSConsoleUrl = () => {
+    //if no env variable is set, then assume that the React App is on the same workstation as the fastAPI server
+        //having an env variable would be for developers running React on a separate workstation from fastAPI
+    const currentWebsiteIP = window.location.hostname;
+    const pathname = "/queue_server";
+    const port = ":8000";
+    var wsUrl;
+    if (process.env.REACT_APP_QS_CONSOLE_URL) {
+        wsUrl = process.env.REACT_APP_QS_CONSOLE_URL;
     } else {
         wsUrl = "ws://" + currentWebsiteIP + port + pathname;
     }
