@@ -36,6 +36,10 @@ var autoDeviceList = { //TO DO: put this into the data folder and import it
 };
 
 var autoDeviceList = {
+    //anything ending in ai-ai is analoge signal, we should put into a strip chart
+    //have ability for grouping the same units on the same chart via click and drop
+    //be able to adjust the window of time shown on horizontal access, (for example 24 hrs) show as minutes or seconds
+    //when we hit stop, and then hit resume, we should not delete the existing data. we want to still see it
     bl601: [
         {
             prefix: 'BL6013:MonoEnergyUDP',

@@ -47,7 +47,7 @@ const icons = {
     
 }
 
-export default function ControllerInterface( {defaultControllerList=[]} ) {
+export default function ControllerInterface( {defaultControllerList=[], deviceList=autoDeviceList.motorMotorSim} ) {
     const [ devices, setDevices ] = useState({});
     const [ lockoutList, setLockoutList ] = useState([]); //for preventing double clicks
     const [ lockedControllerList, setLockedControllerList ] = useState([]); //for manually preventing user interaction, set by the user on individual controller modules
@@ -61,7 +61,7 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
 
     useEffect(() => {
         startAutomaticSetup({
-            devices: autoDeviceList.motorMotorSim,
+            devices: deviceList,
             setDevices,
             connection,
             setUpdatedDeviceKey,
