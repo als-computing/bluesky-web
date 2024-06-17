@@ -68,13 +68,15 @@ Two different scripts are provided that will start the application in docker con
 
 If you already have EPICS running and want to access your own IOCs, use the first script. Otherwise the second script can be used to start a "default" EPICS environment that still works with the application.
 
-<mark>Run Application (Linux Only)</mark>
+<mark>Run Application (Linux Only)</mark> \
 ```
+#ophyd-api/
 docker-compose up -d --build
 ```
 \
 <mark>Run Application + EPICS (Mac or Linux)</mark>
 ```
+#ophyd-api/
 docker-compose -f docker-compose.start-epics.yml -d --build
 ```
 Navigate to port 8081 in a web browser to view the application
@@ -84,6 +86,7 @@ http://localhost:8081/
 \
 <mark>Stop Application</mark>
 ```
+#ophyd-api/
 docker-compose stop
 ```
 
