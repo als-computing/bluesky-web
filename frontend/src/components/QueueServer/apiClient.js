@@ -19,29 +19,34 @@ const getQServerKey = () => {
 
 const qServerKey = getQServerKey();
 
-const handleQueueDataResponse =(res, setQueueData, queueDataRef, setRunningItem, runningItemRef) => {
+/* const handleQueueDataResponse =(res, setQueueData, queueDataRef, setRunningItem, runningItemRef, setIsREToggleOn) => {
     //checks if UI update should occur and sends data to callback
     try {
         if (res.success === true) {
             if (JSON.stringify(res.items) !== JSON.stringify(queueDataRef.current)) { //we could also compare the plan_queue_uid which will change when the plan changes
-                console.log('different queue data, updating');
+                //console.log('different queue data, updating');
                 setQueueData(res.items);
             } else {
-                console.log('same queue data, do nothing');
+                //console.log('same queue data, do nothing');
             }
             if (JSON.stringify(res.running_item) !== JSON.stringify(runningItemRef.current)) {
-                console.log('different running item, updating');
+                //console.log('different running item, updating');
                 setRunningItem(res.running_item);
+                if (Object.keys(res.running_item).length > 0) {
+                    setIsREToggleOn(true);
+                } else {
+                    setIsREToggleOn(false);
+                }
             } else {
-                console.log('same running item, do nothing');
+                //console.log('same running item, do nothing');
             }
         }
     } catch(error) {
         console.log({error});
     }
-}
+} */
 
-const getQueue = async (setQueueData, queueDataRef, setRunningItem, runningItemRef, mock=false) => {
+/* const getQueue = async (setQueueData, queueDataRef, setRunningItem, runningItemRef, setIsREToggleOn, mock=false) => {
     if (mock) {
         setQueueData(mockQueueData);
         return;
@@ -52,7 +57,24 @@ const getQueue = async (setQueueData, queueDataRef, setRunningItem, runningItemR
                 'Authorization' : 'ApiKey ' + qServerKey
             }}
         );
-        handleQueueDataResponse(response.data, setQueueData, queueDataRef, setRunningItem, runningItemRef);
+        handleQueueDataResponse(response.data, setQueueData, queueDataRef, setRunningItem, runningItemRef, setIsREToggleOn);
+    } catch (error) {
+        console.error('Error fetching queue:', error);
+    }
+}; */
+
+const getQueue = async (cb, mock=false) => {
+    if (mock) {
+        cb(mockQueueData);
+        return;
+    }
+    try {
+        const response = await axios.get('http://localhost:60610/api/queue/get', 
+            {headers : {
+                'Authorization' : 'ApiKey ' + qServerKey
+            }}
+        );
+        cb(response.data);
     } catch (error) {
         console.error('Error fetching queue:', error);
     }
@@ -117,6 +139,8 @@ const startRE = async () => {
         console.error('Error starting RE:', error);
         return 'failed';
     }
-}
+};
+
+
 
 export { getQueue, getStatus, getPlansAllowed, getDevicesAllowed, startRE };

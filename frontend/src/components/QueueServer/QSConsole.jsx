@@ -17,15 +17,15 @@ export default function QSConsole({ title=true, description = true, processConso
     const messageContainerRef = useRef(null);
 
     const handleWebSocketMessage = (event) => {
-        console.log('received message from ws');
+        //console.log('received message from ws');
         //this function receives the websocket message and displays it to the client
         var eventData = JSON.parse(event.data);
-        console.log({eventData});
+        //console.log({eventData});
         if ("msg" in eventData) {
 
             //update the console with the messages, add new message to existing
             setWsMessages((messages) => { 
-                console.log({messages});
+                //console.log({messages});
                 if (eventData.msg === "\n") return messages;
 
                 var id = 0;
@@ -50,8 +50,8 @@ export default function QSConsole({ title=true, description = true, processConso
                         mainText = eventData.msg;
                     }
                 }
-                console.log({bracketText});
-                console.log({mainText});
+                //console.log({bracketText});
+                //console.log({mainText});
                 processConsoleMessage(mainText.trim()); //check keywords, update other React state if matches found
                 var newMessage = {mainText: mainText, bracketText: bracketText, time: timeStamp, id: id};
             

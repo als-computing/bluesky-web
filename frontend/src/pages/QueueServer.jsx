@@ -68,7 +68,7 @@ export default function QueueServer() {
     const runEngineToggleRef = useRef(isREToggleOn);
     const [ runningItem, setRunningItem ] = useState({});
     const runningItemRef = useRef(runningItem);
-    const queueDataInterval = 10000; //milliseconds interval for polling GET requests
+    const queueDataInterval = 1000; //milliseconds interval for polling GET requests
 
     //update ref when queueData changes
     useEffect(() => {
@@ -83,24 +83,12 @@ export default function QueueServer() {
         runEngineToggleRef.current = isREToggleOn;
     }, [isREToggleOn]);
     
-    const addItem = () => {
-        //a mock function for UI purposes
-        setQueueData([...queueData, queueData[0]]);
-    }
 
-    const handleStatusMessage = (msg) => {
-        if (msg.re_state === "running") {
-            //check if workerStatus icon needs to have color changed
 
-            //check if running_item_uid differs from active item
-                //if different, pull from queueData
-                    //if not in queueData, call getQueue()
-
-        }
-    }
-
+    //not currently used
     const getStatusCallback = (data) => {
         // if RE worker is not running, set toggle off
+        console.log({data});
         if (data.re_state !== "running") {
             console.log("re is not running, check if toggle is on");
             console.log(runEngineToggleRef.current);
@@ -115,19 +103,51 @@ export default function QueueServer() {
                 setIsREToggleOn(true);
             }
         }
+    };
+
+    const handleQueueDataResponse =(res) => {
+        //checks if UI update should occur and sends data to callback
+        try {
+            if (res.success === true) {
+                if (JSON.stringify(res.items) !== JSON.stringify(queueDataRef.current)) { //we could also compare the plan_queue_uid which will change when the plan changes
+                    //console.log('different queue data, updating');
+                    setQueueData(res.items);
+                } else {
+                    //console.log('same queue data, do nothing');
+                }
+                if (JSON.stringify(res.running_item) !== JSON.stringify(runningItemRef.current)) {
+                    //console.log('different running item, updating');
+                    setRunningItem(res.running_item);
+                    if (Object.keys(res.running_item).length > 0) {
+                        setIsREToggleOn(true);
+                    } else {
+                        setIsREToggleOn(false);
+                    }
+                } else {
+                    //console.log('same running item, do nothing');
+                }
+            }
+        } catch(error) {
+            console.log({error});
+        }
     }
     
     useEffect(() => {
         //get current queue
-        getQueue(setQueueData, queueDataRef); //we need to send in a handler for a running item
+        //getQueue(setQueueData, queueDataRef, setRunningItem, runningItemRef); //we need to send in a handler for a running item
+        getQueue(handleQueueDataResponse);
         //start polling
-        setInterval(()=> getQueue(setQueueData, queueDataRef, setRunningItem, runningItemRef), queueDataInterval);
+        setInterval(()=> getQueue(handleQueueDataResponse), queueDataInterval);
     }, []);
 
     const processConsoleMessage = (msg) => {
-        console.log({msg});
+        //using the console log to trigger get requests has some issues with stale state, even with useRef
+        //This can be further evaluated, but we should potentially get rid of the ref for the toggle button which had issues.
+        //The get/status api endpoint seems to not provide the most recent running status when called immediately after the console triggers it
+        return;
+        //console.log({msg});
         //function processess each Queue Server console message to trigger immediate state and UI updates
-        if (msg.startsWith("Queue is empty") || msg.startsWith("Starting queue")) {
+        if (msg.startsWith("Queue is empty") || msg.startsWith("Starting the plan")) {
             //update RE worker
             getStatus(getStatusCallback);
         }
@@ -139,7 +159,7 @@ export default function QueueServer() {
 
         if (msg.startsWith("Item added: success=True")) {
             //get request on queue items
-            getQueue(setQueueData, queueDataRef);
+            getQueue(setQueueData, queueDataRef, setRunningItem, runningItemRef);
         }
     }
     const handleREMessage = (msg) => {
@@ -161,7 +181,7 @@ export default function QueueServer() {
                 </div>
                 <QSConsole title={false} description={false} processConsoleMessage={processConsoleMessage}/>
             </main>
-            <button onClick={addItem}>Add item</button>
+            <button >Add item</button>
         </Fragment>
     )
 }
