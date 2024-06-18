@@ -61,13 +61,14 @@ const sampleQueueData = [
 ];
 
 export default function QueueServer() {
+    const [ workerStatus, setWorkerStatus ] = useState('');
     const [ queueData, setQueueData ] = useState([]);
     const queueDataRef = useRef(queueData);
-    const [ workerStatus, setWorkerStatus ] = useState('');
-    const queueDataInterval = 10000; //milliseconds interval for polling GET requests
     const [ isREToggleOn, setIsREToggleOn ] = useState(false);
+    const runEngineToggleRef = useRef(isREToggleOn);
     const [ runningItem, setRunningItem ] = useState({});
     const runningItemRef = useRef(runningItem);
+    const queueDataInterval = 10000; //milliseconds interval for polling GET requests
 
     //update ref when queueData changes
     useEffect(() => {
@@ -77,6 +78,10 @@ export default function QueueServer() {
     useEffect(() => {
         runningItemRef.current = runningItem;
     }, [runningItem]);
+
+    useEffect(() => {
+        runEngineToggleRef.current = isREToggleOn;
+    }, [isREToggleOn]);
     
     const addItem = () => {
         //a mock function for UI purposes
@@ -93,6 +98,24 @@ export default function QueueServer() {
 
         }
     }
+
+    const getStatusCallback = (data) => {
+        // if RE worker is not running, set toggle off
+        if (data.re_state !== "running") {
+            console.log("re is not running, check if toggle is on");
+            console.log(runEngineToggleRef.current);
+            if (runEngineToggleRef.current) {
+                console.log("toggle was on, now turn off toggle");
+                setIsREToggleOn(false);
+            }
+        } else {
+            console.log("re state is running. check if toggle is on");
+            if (!runEngineToggleRef.current) {
+                console.log("toggle was off, now turning on");
+                setIsREToggleOn(true);
+            }
+        }
+    }
     
     useEffect(() => {
         //get current queue
@@ -102,14 +125,16 @@ export default function QueueServer() {
     }, []);
 
     const processConsoleMessage = (msg) => {
+        console.log({msg});
         //function processess each Queue Server console message to trigger immediate state and UI updates
-        if (msg === "Queue is empty") {
-            //wipe out RE worker
+        if (msg.startsWith("Queue is empty") || msg.startsWith("Starting queue")) {
+            //update RE worker
+            getStatus(getStatusCallback);
         }
 
         if (msg.startsWith("Starting queue processing")) {
             //get request on RE process
-            getStatus();
+            //getStatus();
         }
 
         if (msg.startsWith("Item added: success=True")) {
@@ -134,7 +159,7 @@ export default function QueueServer() {
                         <QSRunEngineWorker workerStatus={workerStatus} runningItem={runningItem} isREToggleOn={isREToggleOn} setIsREToggleOn={setIsREToggleOn}/>
                     </div>
                 </div>
-                <QSConsole title={false} description={false}/>
+                <QSConsole title={false} description={false} processConsoleMessage={processConsoleMessage}/>
             </main>
             <button onClick={addItem}>Add item</button>
         </Fragment>

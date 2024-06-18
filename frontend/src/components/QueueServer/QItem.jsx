@@ -23,7 +23,7 @@ export default function QItem ({ item=false, index=1, text='', styles='' }) {
         }
     }
 
-    const commonStyles = 'w-32 h-32 rounded-md mx-2 hover:cursor-pointer hover:shadow-lg hover:shadow-gray-500';
+    const commonStyles = 'w-32 h-32 rounded-md mx-2 hover:cursor-pointer hover:shadow-lg hover:shadow-gray-500 list-none';
     if (item!== false && Object.keys(item).length > 0 ) {
         return (
             <li  className={`${commonStyles} border border-slate-500 bg-white`} onClick={handleItemClick}>

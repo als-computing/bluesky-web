@@ -59,7 +59,7 @@ export default function QSRunEngineWorker({ isREToggleOn, setIsREToggleOn, runni
             </div>
             <div className="flex justify-center">
                 <QItem item={runningItem} />
-                <ToggleSlider />
+                {ToggleSlider() }
             </div>
             <p className="text-white text-center">idle</p>
         </section>

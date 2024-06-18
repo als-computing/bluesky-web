@@ -29,7 +29,7 @@ const handleQueueDataResponse =(res, setQueueData, queueDataRef, setRunningItem,
             } else {
                 console.log('same queue data, do nothing');
             }
-            if (JSON.stringify(res.running_item) !== JSON.stringify(runningItemRef)) {
+            if (JSON.stringify(res.running_item) !== JSON.stringify(runningItemRef.current)) {
                 console.log('different running item, updating');
                 setRunningItem(res.running_item);
             } else {
@@ -50,7 +50,8 @@ const getQueue = async (setQueueData, queueDataRef, setRunningItem, runningItemR
         const response = await axios.get('http://localhost:60610/api/queue/get', 
             {headers : {
                 'Authorization' : 'ApiKey ' + qServerKey
-            }});
+            }}
+        );
         handleQueueDataResponse(response.data, setQueueData, queueDataRef, setRunningItem, runningItemRef);
     } catch (error) {
         console.error('Error fetching queue:', error);
@@ -64,7 +65,11 @@ const getStatus = async (cb, mock = false) => {
         return;
     }
     try {
-        const response = await axios.get('http://localhost:60610/api/status');
+        const response = await axios.get('http://localhost:60610/api/status', 
+            {headers : {
+                'Authorization' : 'ApiKey ' + qServerKey
+            }}
+        );
         cb(response.data);
     } catch (error) {
         console.error('Error fetching status:', error);

@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import Button from '../library/Button';
 //import ToggleSlider from '../library/ToggleSlider'; //to do  - see if this can be refactored to include the functionality for turning off if connection fails
 
-export default function QSConsole({ title=true, description = true }) {
+export default function QSConsole({ title=true, description = true, processConsoleMessage=() =>{} }) {
 
     
     const [ wsMessages, setWsMessages ] = useState([]); //text for the websocket output
@@ -22,6 +22,8 @@ export default function QSConsole({ title=true, description = true }) {
         var eventData = JSON.parse(event.data);
         console.log({eventData});
         if ("msg" in eventData) {
+
+            //update the console with the messages, add new message to existing
             setWsMessages((messages) => { 
                 console.log({messages});
                 if (eventData.msg === "\n") return messages;
@@ -50,6 +52,7 @@ export default function QSConsole({ title=true, description = true }) {
                 }
                 console.log({bracketText});
                 console.log({mainText});
+                processConsoleMessage(mainText.trim()); //check keywords, update other React state if matches found
                 var newMessage = {mainText: mainText, bracketText: bracketText, time: timeStamp, id: id};
             
           
