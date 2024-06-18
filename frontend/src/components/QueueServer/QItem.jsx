@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function QItem ({ item=false, index=false, text='', styles='' }) {
+export default function QItem ({ item=false, index=1, text='', styles='' }) {
     const [ isOpen, setIsOpen ] = useState(false);
 
     const handleItemClick = () => {
@@ -14,7 +14,6 @@ export default function QItem ({ item=false, index=false, text='', styles='' }) 
             count: 'bg-green-600',
             rel_spiral_fermat: 'bg-green-500',
             mv: 'bg-yellow-500',
-            count: 'bg-red-500',
         };
 
         if (plan in colorMap) {
@@ -25,16 +24,16 @@ export default function QItem ({ item=false, index=false, text='', styles='' }) 
     }
 
     const commonStyles = 'w-32 h-32 rounded-md mx-2 hover:cursor-pointer hover:shadow-lg hover:shadow-gray-500';
-    if (item) {
+    if (item!== false && Object.keys(item).length > 0 ) {
         return (
-            <li key={item.item_uid} className={`${commonStyles} border border-slate-500 bg-white`} onClick={handleItemClick}>
+            <li  className={`${commonStyles} border border-slate-500 bg-white`} onClick={handleItemClick}>
                 <p className={`${getPlanColor(item.name)} text-white text-center rounded-t-md`}>{item.name}</p>
                 {isOpen ? <p>open</p> : ''}
             </li>
         )
     } else {
         return (
-            <li key={index} className={`${commonStyles} border border-dashed border-slate-400 bg-slate-700`}>
+            <li className={`${commonStyles} border border-dashed border-slate-400 bg-slate-700`}>
                 <p className="text-center text-slate-400">{text}</p>
             </li>
         )

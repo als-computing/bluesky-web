@@ -62,21 +62,64 @@ const sampleQueueData = [
 
 export default function QueueServer() {
     const [ queueData, setQueueData ] = useState([]);
-    const queueDataRef = useRef(queueData); //required to allow comparisons triggered on regular intervals
+    const queueDataRef = useRef(queueData);
+    const [ workerStatus, setWorkerStatus ] = useState('');
+    const queueDataInterval = 10000; //milliseconds interval for polling GET requests
+    const [ isREToggleOn, setIsREToggleOn ] = useState(false);
+    const [ runningItem, setRunningItem ] = useState({});
+    const runningItemRef = useRef(runningItem);
+
+    //update ref when queueData changes
     useEffect(() => {
         queueDataRef.current = queueData;
     }, [queueData]);
-    const queueDataInterval = 10000; //milliseconds interval for GET requests to update queue
-    const [ workerStatus, setWorkerStatus ] = useState('');
 
+    useEffect(() => {
+        runningItemRef.current = runningItem;
+    }, [runningItem]);
+    
     const addItem = () => {
+        //a mock function for UI purposes
         setQueueData([...queueData, queueData[0]]);
     }
 
+    const handleStatusMessage = (msg) => {
+        if (msg.re_state === "running") {
+            //check if workerStatus icon needs to have color changed
+
+            //check if running_item_uid differs from active item
+                //if different, pull from queueData
+                    //if not in queueData, call getQueue()
+
+        }
+    }
+    
     useEffect(() => {
-        getQueue(setQueueData, queueDataRef)
-        setInterval(()=> getQueue(setQueueData, queueDataRef), queueDataInterval);
+        //get current queue
+        getQueue(setQueueData, queueDataRef); //we need to send in a handler for a running item
+        //start polling
+        setInterval(()=> getQueue(setQueueData, queueDataRef, setRunningItem, runningItemRef), queueDataInterval);
     }, []);
+
+    const processConsoleMessage = (msg) => {
+        //function processess each Queue Server console message to trigger immediate state and UI updates
+        if (msg === "Queue is empty") {
+            //wipe out RE worker
+        }
+
+        if (msg.startsWith("Starting queue processing")) {
+            //get request on RE process
+            getStatus();
+        }
+
+        if (msg.startsWith("Item added: success=True")) {
+            //get request on queue items
+            getQueue(setQueueData, queueDataRef);
+        }
+    }
+    const handleREMessage = (msg) => {
+        //when the WS receives message about RE Worker, trigger UI updates on RE Worker Component
+    }
 
 
     //to do - refactor this so we can more easily set the size on different routes
@@ -88,7 +131,7 @@ export default function QueueServer() {
                         <QSList queueData={queueData}/>
                     </div>
                     <div className="w-3/12 h-full">
-                        <QSRunEngineWorker workerStatus={workerStatus} />
+                        <QSRunEngineWorker workerStatus={workerStatus} runningItem={runningItem} isREToggleOn={isREToggleOn} setIsREToggleOn={setIsREToggleOn}/>
                     </div>
                 </div>
                 <QSConsole title={false} description={false}/>

@@ -19,15 +19,21 @@ const getQServerKey = () => {
 
 const qServerKey = getQServerKey();
 
-const handleQueueDataResponse =(res, setQueueData, queueDataRef) => {
+const handleQueueDataResponse =(res, setQueueData, queueDataRef, setRunningItem, runningItemRef) => {
     //checks if UI update should occur and sends data to callback
     try {
         if (res.success === true) {
-            if (JSON.stringify(res.items) !== JSON.stringify(queueDataRef.current)) {
-                console.log('different data, updating');
+            if (JSON.stringify(res.items) !== JSON.stringify(queueDataRef.current)) { //we could also compare the plan_queue_uid which will change when the plan changes
+                console.log('different queue data, updating');
                 setQueueData(res.items);
             } else {
-                console.log('same data, do nothing');
+                console.log('same queue data, do nothing');
+            }
+            if (JSON.stringify(res.running_item) !== JSON.stringify(runningItemRef)) {
+                console.log('different running item, updating');
+                setRunningItem(res.running_item);
+            } else {
+                console.log('same running item, do nothing');
             }
         }
     } catch(error) {
@@ -35,7 +41,7 @@ const handleQueueDataResponse =(res, setQueueData, queueDataRef) => {
     }
 }
 
-const getQueue = async (setQueueData, queueDataRef, mock=false) => {
+const getQueue = async (setQueueData, queueDataRef, setRunningItem, runningItemRef, mock=false) => {
     if (mock) {
         setQueueData(mockQueueData);
         return;
@@ -45,7 +51,7 @@ const getQueue = async (setQueueData, queueDataRef, mock=false) => {
             {headers : {
                 'Authorization' : 'ApiKey ' + qServerKey
             }});
-        handleQueueDataResponse(response.data, setQueueData, queueDataRef);
+        handleQueueDataResponse(response.data, setQueueData, queueDataRef, setRunningItem, runningItemRef);
     } catch (error) {
         console.error('Error fetching queue:', error);
     }
@@ -58,7 +64,7 @@ const getStatus = async (cb, mock = false) => {
         return;
     }
     try {
-        const response = await axios.get('/api/status');
+        const response = await axios.get('http://localhost:60610/api/status');
         cb(response.data);
     } catch (error) {
         console.error('Error fetching status:', error);
@@ -92,14 +98,19 @@ const getDevicesAllowed = async (cb, mock = false) => {
 };
 
 const startRE = async () => {
+    //returns true if no errors encountered
     try {
         const response = await axios.post('http://localhost:60610/api/queue/start', 
+            {},
             {headers : {
                 'Authorization' : 'ApiKey ' + qServerKey
             }});
         console.log(response.data);
+        //check if the response says it started.. if so return success, otherwise return failed
+        return 'success';
     } catch (error) {
         console.error('Error starting RE:', error);
+        return 'failed';
     }
 }
 

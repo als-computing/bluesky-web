@@ -102,7 +102,7 @@ export default function QSConsole({ title=true, description = true }) {
         socket.addEventListener("open", event => {
             setIsOpened(true);
             console.log("Opened connection in socket to: " + wsUrl);
-            setStatusMessage("Opened connection " + dayjs().format('HH:MM A'));
+            setStatusMessage("Opened connection " + dayjs().format('hh:MM A'));
             socket.addEventListener("message", handleWebSocketMessage);
             connection.current = socket;
         })
