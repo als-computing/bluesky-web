@@ -1,9 +1,10 @@
 import QSConsole from "../components/QueueServer/QSConsole";
 import QSList from "../components/QueueServer/QSList";
 import QSRunEngineWorker from "../components/QueueServer/QSRunEngineWorker";
+import { getQServerKey } from "../utilities/connectionHelper";
 import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus } from "../components/QueueServer/apiClient";
-
-import { useState, Fragment } from 'react';
+import axios from "axios";
+import { useState, Fragment, useEffect, useRef } from 'react';
 
 const sampleQueueData = [
     {
@@ -60,21 +61,33 @@ const sampleQueueData = [
 ];
 
 export default function QueueServer() {
-    const [ queueData, setQueueData ] = useState(sampleQueueData);
+    const [ queueData, setQueueData ] = useState([]);
+    const queueDataRef = useRef(queueData); //required to allow comparisons triggered on regular intervals
+    useEffect(() => {
+        queueDataRef.current = queueData;
+    }, [queueData]);
+    const queueDataInterval = 10000; //milliseconds interval for GET requests to update queue
     const [ workerStatus, setWorkerStatus ] = useState('');
 
     const addItem = () => {
         setQueueData([...queueData, queueData[0]]);
     }
 
+    useEffect(() => {
+        getQueue(setQueueData, queueDataRef)
+        setInterval(()=> getQueue(setQueueData, queueDataRef), queueDataInterval);
+    }, []);
+
+
+    //to do - refactor this so we can more easily set the size on different routes
     return (
         <Fragment>
-            <main className="bg-black">
-                <div className="flex h-fit mx-4 border-b-white border-b pb-4">
-                    <div className="w-10/12 h-full mt-4 px-2 ">
+            <main className="bg-black max-w-screen-2xl m-auto rounded-md h-1/2 3xl:max-w-screen-xl">
+                <div className="flex h-fit mx-4 pt-4 border-b-white border-b pb-4">
+                    <div className="w-9/12 h-full px-2 ">
                         <QSList queueData={queueData}/>
                     </div>
-                    <div className="w-2/12 h-full">
+                    <div className="w-3/12 h-full">
                         <QSRunEngineWorker workerStatus={workerStatus} />
                     </div>
                 </div>

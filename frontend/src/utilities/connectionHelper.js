@@ -152,6 +152,17 @@ const getPVWSUrl = () => {
     return wsUrl;
 }
 
+const getQServerKey = () => {
+    var key;
+    const defaultKey = 'test';
+    if (process.env.REACT_APP_QSERVER_KEY) {
+        key = process.env.REACT_APP_QSERVER_KEY;
+    } else {
+        key = defaultKey;
+    }
+    return key;
+}
+
 const getFastAPIUrl = () => {
     //if no env variable is set, then assume that the React App is on the same workstation as the fastAPI server
         //having an env variable would be for developers running React on a separate workstation from fastAPI
@@ -252,4 +263,4 @@ const startAutomaticSetup = ({devices=[], setDevices=()=>{}, connection={}, setS
 
 
 
-export {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice, getPVWSUrl, initializeDeviceList, startAutomaticSetup};
+export {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice, getPVWSUrl, getQSConsoleUrl, initializeDeviceList, startAutomaticSetup, getQServerKey};

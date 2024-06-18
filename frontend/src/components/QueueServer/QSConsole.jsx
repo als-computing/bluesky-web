@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
+import { getQSConsoleUrl } from '../../utilities/connectionHelper';
 
 import dayjs from 'dayjs';
 
 import Button from '../library/Button';
+//import ToggleSlider from '../library/ToggleSlider'; //to do  - see if this can be refactored to include the functionality for turning off if connection fails
 
 export default function QSConsole({ title=true, description = true }) {
 
@@ -11,7 +13,7 @@ export default function QSConsole({ title=true, description = true }) {
     const [ isOpened, setIsOpened ] = useState(false); //boolean representing status of WS connection
     const [ statusMessage, setStatusMessage ] = useState('');
     const connection = useRef(null); //queue server WS via FastAPI
-    const wsUrl = "ws://localhost:8000/queue_server";
+    const wsUrl = getQSConsoleUrl();
     const messageContainerRef = useRef(null);
 
     const handleWebSocketMessage = (event) => {
@@ -131,8 +133,8 @@ export default function QSConsole({ title=true, description = true }) {
             handleOpenWS();
         }
         setIsToggleOn(!isToggleOn);
-
     };
+
     return (
         <main className="h-full ">
             {title ? <h1 className="text-center text-xl font-medium pt-8 pb-4" >Queue Server Listener</h1> : ''}
