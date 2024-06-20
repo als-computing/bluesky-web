@@ -61,6 +61,15 @@ const sampleQueueData = [
 ];
 
 export default function QueueServer() {
+    var pollingInterval;
+    if (process.env.REACT_APP_QSERVER_POLLING_INTERVAL) {
+        pollingInterval = processConsoleMessage.env.REACT_APP_QSERVER_POLLING_INTERVAL;
+    } else {
+        const tenSeconds = 10000; //10 seconds in milliseconds
+        const thirtySeconds = 30000; //30 seconds in milliseconds
+        pollingInterval = thirtySeconds;
+    }
+
     const [ workerStatus, setWorkerStatus ] = useState('');
     const [ queueData, setQueueData ] = useState([]);
     const queueDataRef = useRef(queueData);
@@ -68,7 +77,6 @@ export default function QueueServer() {
     const runEngineToggleRef = useRef(isREToggleOn);
     const [ runningItem, setRunningItem ] = useState({});
     const runningItemRef = useRef(runningItem);
-    const queueDataInterval = 1000; //milliseconds interval for polling GET requests
 
     //update ref when queueData changes
     useEffect(() => {
@@ -137,29 +145,28 @@ export default function QueueServer() {
         //getQueue(setQueueData, queueDataRef, setRunningItem, runningItemRef); //we need to send in a handler for a running item
         getQueue(handleQueueDataResponse);
         //start polling
-        setInterval(()=> getQueue(handleQueueDataResponse), queueDataInterval);
+        setInterval(()=> getQueue(handleQueueDataResponse), pollingInterval);
     }, []);
 
     const processConsoleMessage = (msg) => {
         //using the console log to trigger get requests has some issues with stale state, even with useRef
         //This can be further evaluated, but we should potentially get rid of the ref for the toggle button which had issues.
         //The get/status api endpoint seems to not provide the most recent running status when called immediately after the console triggers it
-        return;
         //console.log({msg});
         //function processess each Queue Server console message to trigger immediate state and UI updates
         if (msg.startsWith("Queue is empty") || msg.startsWith("Starting the plan")) {
             //update RE worker
-            getStatus(getStatusCallback);
+            getQueue(handleQueueDataResponse);
         }
 
         if (msg.startsWith("Starting queue processing")) {
             //get request on RE process
-            //getStatus();
+            getQueue(handleQueueDataResponse);
         }
 
         if (msg.startsWith("Item added: success=True")) {
             //get request on queue items
-            getQueue(setQueueData, queueDataRef, setRunningItem, runningItemRef);
+            getQueue(handleQueueDataResponse);
         }
     }
     const handleREMessage = (msg) => {

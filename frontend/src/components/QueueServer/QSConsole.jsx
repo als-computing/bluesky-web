@@ -162,7 +162,7 @@ export default function QSConsole({ title=true, description = true, processConso
                     </div>
                     <p name="status" className="text-white">{statusMessage}</p>
                 </div>
-                {isOpened ? <p className="text-slate-400 pl-4 pt-4">Connection Opened. Listening for Queue Server console output.</p> : <p className="animate-pulse text-white pl-4 pt-4">Waiting for connection...</p>}
+                {isOpened ? <p className="text-slate-400 pl-4 pt-4">Connection Opened. Listening for Queue Server console output.</p> : <p className="animate-pulse text-white pl-4 pt-4">Waiting for initialization...</p>}
                 <ul className="flex flex-col bg-black py-4">
                     {wsMessages.map((msg) => {
                         return (
