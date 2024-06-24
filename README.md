@@ -303,12 +303,85 @@ A convenient method for developing the React App on Mac is to start everything e
 docker-compose -f docker-compose.start-epics.no-react.yml up --build
 ```
 
+## Queue Server
+The queue server provides a method for managing and executing Bluesky plans. Within the 
+[`Queue Server Documentation`](https://blueskyproject.io/bluesky-queueserver/installation.html)
+
+[`HTTP Server Documentation`](https://blueskyproject.io/bluesky-httpserver/installation.html)
+### Installing Queue Server 
+These instructions are for directly installing Queue Server outside of a container for development purposes. To run the queue server, redis will also need to be installed.
+
+<mark>Install Redis (Mac)</mark>
+```
+brew update
+brew install redis
+brew services start redis
+```
+<br><br>
+<mark>Install Redis (linux)</mark>
+```
+sudo apt-get install redis
+sudo systemctl start redis
+```
+<br><br>
+<mark>Install Python Packages</mark>
+
+```
+conda create -n queue_server python=3.10
+activate queue_server
+conda install bluesky-queueserver -c conda-forge
+conda install bluesky-httpserver -c conda-forge
+```
+On testing with an M2 mac, it was found that using pyepics and ophyd installed from 'pip' resulted in errors. Only conda distributions worked.
+
+<mark>Installing with Conda</mark>
+```
+conda install -c conda-forge pyepics ophyd
+```
+
+### Starting the Queue Server
+<mark> Start Queue Server with Default Simulated Devices and Plans</mark>
+```
+start-re-manager --zmq-publish-console ON
+```
+<br><br>
+
+<mark> Start Queue Server with BL5.3.1 Devices</mark>
+```
+#from the /ophyd-api directory
+
+start-re-manager --zmq-publish-console ON --startup-dir /server/queue-server-configuration/startup_bl531
+```
+<br><br>
+
+<mark> Publish Queue Server Console Output in a Terminal (optional)</mark>
+```
+qserver-console-monitor
+```
+
+### Starting the HTTP Server
+
+<mark>Start HTTP Server with key 'test'</mark>
+```
+QSERVER_HTTP_SERVER_SINGLE_USER_API_KEY=test QSERVER_HTTP_SERVER_ALLOW_ORIGINS=* uvicorn --host localhost --port 60610 bluesky_httpserver.server:app
+```
+
+### Making requests via the HTTP server
+The http server is a part of the queue server, it acts as a gateway to control the queue server. The queue server itself only communicates over ZMQ, so the http server acts as an API for web clients which otherwise cannot command the queue server directly. The http server is typically hosted on port 60610.
+
+```mermaid
+flowchart LR
+    A[Web Client] -->|http request| B(HTTP Server)
+    B --> |zmq msg| C(Queue Server)
+    C --> |zmq msg|B
+    B --> |http response| A
+```
 
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-<mark>hello</mark>
+<mark>sample mark</mark>
 
 
 
