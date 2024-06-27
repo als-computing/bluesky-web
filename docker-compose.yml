@@ -10,3 +10,9 @@ services:
   server:
     build: ./server
     network_mode: host
+  qserver:
+    build: ./server/queue-server-configuration
+    network_mode: host
+  httpserver:
+    build: ./server/queue-server-configuration/httpserver
+    network_mode: host
