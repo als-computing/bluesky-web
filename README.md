@@ -336,7 +336,7 @@ On testing with an M2 mac, it was found that using pyepics and ophyd installed f
 
 <mark>Installing with Conda</mark>
 ```
-conda install -c conda-forge pyepics ophyd
+conda install pyepics ophyd -c conda-forge
 ```
 
 ### Starting the Queue Server
@@ -359,14 +359,21 @@ start-re-manager --zmq-publish-console ON --startup-dir /server/queue-server-con
 qserver-console-monitor
 ```
 
-### Starting the HTTP Server
+### HTTP Server
+The HTTP server is part of the Queue Server system and works directly with the Queue Server.
 
+<mark>Install HTTP Server </mark>
+```
+pip install bluesky-httpserver
+```
+Note that conda does not work for installing http server on Mac Silicon.
+<br><br>
 <mark>Start HTTP Server with key 'test'</mark>
 ```
 QSERVER_HTTP_SERVER_SINGLE_USER_API_KEY=test QSERVER_HTTP_SERVER_ALLOW_ORIGINS=* uvicorn --host localhost --port 60610 bluesky_httpserver.server:app
 ```
 
-### Making requests via the HTTP server
+#### Making requests via the HTTP server
 The http server is a part of the queue server, it acts as a gateway to control the queue server. The queue server itself only communicates over ZMQ, so the http server acts as an API for web clients which otherwise cannot command the queue server directly. The http server is typically hosted on port 60610.
 
 ```mermaid
