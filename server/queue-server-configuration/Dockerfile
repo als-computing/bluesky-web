@@ -8,8 +8,9 @@ COPY . /code
 RUN pip install bluesky-queueserver
 
 # Install Redis
-RUN apt-get update && apt-get install -y redis-server
+# RUN apt-get update && apt-get install -y redis-server
 
 # Run Redis server in the background and then start the queue server
-CMD redis-server --daemonize yes && start-re-manager --zmq-publish-console ON
+# CMD redis-server --daemonize yes && start-re-manager --zmq-publish-console ON
+CMD start-re-manager --zmq-publish-console ON --redis-addr redis:6379
 

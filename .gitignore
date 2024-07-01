@@ -30,6 +30,8 @@ pvws/
 
 epics-docker/
 
+.env
+
 #Jupyter Lab
 server/.ipynb_checkpoints/
 server/Untitled.ipynb

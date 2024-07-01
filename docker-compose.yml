@@ -1,18 +1,46 @@
-#Linux only
 services:
+  redis:
+    image: redis:7.4-rc2-alpine
+    networks: 
+      - qnet
   frontend:
     build: ./frontend
     ports:
       - "8081:80"
   pvws:
     build: ./pvws/docker
-    network_mode: host
+    environment:
+      - EPICS_CA_ADDR_LIST=${EPICS_CA_ADDR_LIST}
+      - EPICS_CA_AUTO_ADDR_LIST=NO
+    ports:
+      - "8080:8080"
+    networks: 
+      - qnet
   server:
     build: ./server
-    network_mode: host
+    environment:
+      - EPICS_CA_ADDR_LIST=${EPICS_CA_ADDR_LIST}
+      - EPICS_CA_AUTO_ADDR_LIST=NO
+    ports:
+      - "8000:8000"
+      - "5064:5064"
+      - "5065:5065/udp"
+    networks: 
+      - qnet
   qserver:
     build: ./server/queue-server-configuration
-    network_mode: host
+    environment:
+      - EPICS_CA_ADDR_LIST=${EPICS_CA_ADDR_LIST}
+      - EPICS_CA_AUTO_ADDR_LIST=NO
+    networks: 
+      - qnet
+    command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "redis:6379"]
   httpserver:
     build: ./server/queue-server-configuration/httpserver
-    network_mode: host
+    networks: 
+      - qnet
+    command: ["uvicorn", "--host", "0.0.0.0", "--port", "60610", "bluesky_httpserver.server:app"]
+  
+networks:
+  qnet:
+    driver: bridge
