@@ -35,7 +35,7 @@ services:
       - EPICS_CA_AUTO_ADDR_LIST=NO
     networks: 
       - qnet
-    command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "redis:6379"]
+    command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "redis:6379", "--startup-dir", "/code/startup_bl531", "--keep-re"]
   httpserver:
     build: ./server/queue-server-configuration/httpserver
     networks: 

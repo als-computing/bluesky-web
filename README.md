@@ -350,7 +350,7 @@ start-re-manager --zmq-publish-console ON
 ```
 #from the /ophyd-api directory
 
-start-re-manager --zmq-publish-console ON --startup-dir /server/queue-server-configuration/startup_bl531
+start-re-manager --zmq-publish-console ON --startup-dir /server/queue-server-configuration/startup_bl531 --keep-re
 ```
 <br><br>
 
