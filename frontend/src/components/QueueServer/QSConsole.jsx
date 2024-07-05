@@ -139,7 +139,7 @@ export default function QSConsole({ title=true, description = true, processConso
     };
 
     return (
-        <main className="h-full ">
+        <main className="">
             {title ? <h1 className="text-center text-xl font-medium pt-8 pb-4" >Queue Server Listener</h1> : ''}
             <section ref={messageContainerRef} name="message container" className="overflow-auto h-4/6  w-full rounded-lg bg-black">
                 <div name="title, toggle switch, status" className="flex items-center space-x-12 py-4 pl-4">

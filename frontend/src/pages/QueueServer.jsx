@@ -1,10 +1,12 @@
 import QSConsole from "../components/QueueServer/QSConsole";
 import QSList from "../components/QueueServer/QSList";
 import QSRunEngineWorker from "../components/QueueServer/QSRunEngineWorker";
+import QSAddItem from "../components/QueueServer/QSAddItem";
 import { getQServerKey } from "../utilities/connectionHelper";
 import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus } from "../components/QueueServer/apiClient";
 import axios from "axios";
 import { useState, Fragment, useEffect, useRef } from 'react';
+
 
 const sampleQueueData = [
     {
@@ -63,7 +65,7 @@ const sampleQueueData = [
 export default function QueueServer() {
     var pollingInterval;
     if (process.env.REACT_APP_QSERVER_POLLING_INTERVAL) {
-        pollingInterval = processConsoleMessage.env.REACT_APP_QSERVER_POLLING_INTERVAL;
+        pollingInterval = process.env.REACT_APP_QSERVER_POLLING_INTERVAL;
     } else {
         const tenSeconds = 10000; //10 seconds in milliseconds
         const thirtySeconds = 30000; //30 seconds in milliseconds
@@ -78,7 +80,8 @@ export default function QueueServer() {
     const [ runningItem, setRunningItem ] = useState({});
     const runningItemRef = useRef(runningItem);
 
-    //update ref when queueData changes
+    //use refs to allow for comparisons from GET requests to
+    //only re-render when a change is detected
     useEffect(() => {
         queueDataRef.current = queueData;
     }, [queueData]);
@@ -144,7 +147,7 @@ export default function QueueServer() {
         //get current queue
         //getQueue(setQueueData, queueDataRef, setRunningItem, runningItemRef); //we need to send in a handler for a running item
         getQueue(handleQueueDataResponse);
-        //start polling
+        //start polling at regular intervals
         setInterval(()=> getQueue(handleQueueDataResponse), pollingInterval);
     }, []);
 
@@ -168,27 +171,30 @@ export default function QueueServer() {
             //get request on queue items
             getQueue(handleQueueDataResponse);
         }
-    }
+    };
+
     const handleREMessage = (msg) => {
         //when the WS receives message about RE Worker, trigger UI updates on RE Worker Component
-    }
+    };
 
 
     //to do - refactor this so we can more easily set the size on different routes
     return (
         <Fragment>
-            <main className="bg-black max-w-screen-2xl m-auto rounded-md h-1/2 3xl:max-w-screen-xl">
+            <main className="bg-black shadow-lg max-w-screen-2xl m-auto rounded-md h-1/2 3xl:max-w-screen-xl">
                 <div className="flex h-fit mx-4 pt-4 border-b-white border-b pb-4">
-                    <div className="w-9/12 h-full px-2 ">
+                    <div className="w-9/12 px-2 ">
                         <QSList queueData={queueData}/>
                     </div>
-                    <div className="w-3/12 h-full">
+                    <div className="w-3/12">
                         <QSRunEngineWorker workerStatus={workerStatus} runningItem={runningItem} isREToggleOn={isREToggleOn} setIsREToggleOn={setIsREToggleOn}/>
                     </div>
                 </div>
                 <QSConsole title={false} description={false} processConsoleMessage={processConsoleMessage}/>
             </main>
-            <button >Add item</button>
+            <div className="mt-16 flex justify-center">
+                <QSAddItem />
+            </div>
         </Fragment>
     )
 }
