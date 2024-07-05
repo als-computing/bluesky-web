@@ -12,6 +12,9 @@ module.exports = {
       animation: {
         flash: 'flash 1s ease-in-out',
       },
+      transition: {
+        'width': 'width'
+      }
     },
     screens: {
       'sm': '640px',

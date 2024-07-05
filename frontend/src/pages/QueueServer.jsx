@@ -192,7 +192,7 @@ export default function QueueServer() {
                 </div>
                 <QSConsole title={false} description={false} processConsoleMessage={processConsoleMessage}/>
             </main>
-            <div className="mt-16 flex justify-center">
+            <div className="mt-16 mb-20 flex justify-center">
                 <QSAddItem />
             </div>
         </Fragment>

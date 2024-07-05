@@ -1,23 +1,14 @@
 import axios from 'axios';
+import { mockDevicesAllowedResponse, mockPlansAllowedResponse } from './qServerMockData';
+import { getHttpServerUrl, getQServerKey } from '../../utilities/connectionHelper';
 
 // Mock data (if needed)
 const mockQueueData = {};
 const mockStatusData = {};
-const mockPlansAllowedData = {};
-const mockDevicesAllowedData = {};
 
-const getQServerKey = () => {
-    var key;
-    const defaultKey = 'test';
-    if (process.env.REACT_APP_QSERVER_KEY) {
-        key = process.env.REACT_APP_QSERVER_KEY;
-    } else {
-        key = defaultKey;
-    }
-    return key;
-}
 
 const qServerKey = getQServerKey();
+const httpServerUrl = getHttpServerUrl();
 
 /* const handleQueueDataResponse =(res, setQueueData, queueDataRef, setRunningItem, runningItemRef, setIsREToggleOn) => {
     //checks if UI update should occur and sends data to callback
@@ -100,11 +91,15 @@ const getStatus = async (cb, mock = false) => {
 
 const getPlansAllowed = async (cb, mock = false) => {
     if (mock) {
-        cb(mockPlansAllowedData);
+        cb(mockPlansAllowedResponse);
         return;
     }
     try {
-        const response = await axios.get('/plans/allowed');
+        const response = await axios.get(httpServerUrl + 'api/plans/allowed',
+            {headers : {
+                'Authorization' : 'ApiKey ' + qServerKey
+            }}
+        );
         cb(response.data);
     } catch (error) {
         console.error('Error fetching plans allowed:', error);
@@ -113,11 +108,15 @@ const getPlansAllowed = async (cb, mock = false) => {
 
 const getDevicesAllowed = async (cb, mock = false) => {
     if (mock) {
-        cb(mockDevicesAllowedData);
+        cb(mockDevicesAllowedResponse);
         return;
     }
     try {
-        const response = await axios.get('/devices/allowed');
+        const response = await axios.get(httpServerUrl + 'api/devices/allowed',
+            {headers : {
+                'Authorization' : 'ApiKey ' + qServerKey
+            }}
+        );
         cb(response.data);
     } catch (error) {
         console.error('Error fetching devices allowed:', error);
