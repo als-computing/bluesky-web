@@ -1,6 +1,8 @@
 import { tailwindIcons } from "../../assets/icons";
 import { useState, useEffect } from 'react';
 import { getDevicesAllowed, getPlansAllowed } from "./apiClient";
+import QSParameterInput from "./QSParameterInput";
+import MultiSelectInput from "./MulitSelectInput";
 
 export default function QSAddItem() {
     const arrowsPointingOut = tailwindIcons.arrowsPointingOut;
@@ -13,6 +15,7 @@ export default function QSAddItem() {
     const [allowedPlans, setAllowedPlans] = useState({});
     const [allowedDevices, setAllowedDevices] = useState({});
     const [activePlan, setActivePlan] = useState(false);
+    const [parameters, setParameters] = useState([]);
 
     const handlePlanResponse = (data) => {
         //process the response and provide an empty
@@ -43,6 +46,20 @@ export default function QSAddItem() {
         }
     };
 
+    const handlePlanSelect = (plan) => {
+        if (activePlan !== plan) {
+            setActivePlan(plan);
+            //construct a parameter object in lieu of the default array format, easier to read and update inputs on
+            var tempParameters = {};
+            const multiSelectParamList = ['detectors']; //a list of parameters that require an array input as opposed to a string input
+            for (var param of allowedPlans[plan].parameters) {
+                let defaultValue = multiSelectParamList.includes(param.name) ? [] : '';
+                tempParameters[param.name] = {...param, value: defaultValue};
+            }
+            setParameters(tempParameters);
+        }
+    }
+
     useEffect(() => {
         getDevicesAllowed(handleDeviceResponse);
         getPlansAllowed(handlePlanResponse);
@@ -61,23 +78,26 @@ export default function QSAddItem() {
                         <h1 className="pl-3">PLAN</h1>
                         <div className={`${activePlan ? 'opacity-100 hover:cursor-pointer hover:text-slate-600' : 'opacity-0'} pr-2`} onClick={() => setActivePlan(false)}>{arrowLongLeft}</div>
                     </div>
-                    <ul className={`${activePlan ? '' : ''} ${isExpanded ? 'h-[21.5rem] duration-[1100ms]' : 'h-0 duration-700'} overflow-auto overflow-y-auto transition-all ease-in`}>
+                    <ul className={`${activePlan ? '' : ''} ${isExpanded ? 'hhh-[21.5rem] h-[calc(100%-2.5rem)] duration-[1100ms]' : 'h-0 duration-700'} overflow-auto overflow-y-auto transition-all ease-in`}>
                         {Object.keys(allowedPlans).map((plan) => {
                             return (
                                 <li key={plan} 
                                     className={`${activePlan === plan ? 'bg-indigo-200' : ''} hover:cursor-pointer group leading-tight flex`} 
-                                    onClick={() => setActivePlan(plan)}>
+                                    onClick={() => handlePlanSelect(plan)}>
                                         <p className={`${activePlan ? 'w-full': 'w-2/12 border-r-2 border-slate-300'} group-hover:bg-indigo-300 px-2 py-1`}>{plan.replaceAll('_', ' ')}</p>
-                                        <p className={`${activePlan ? 'hidden w-0' : 'w-10/12 pl-4 group-hover:bg-indigo-50'}`}>{allowedPlans[plan].description}</p>
+                                        <p className={`${activePlan ? 'hidden w-0' : 'w-10/12 pl-4 group-hover:bg-indigo-50'} py-1`}>{allowedPlans[plan].description}</p>
                                 </li>
                             )
                         })}
                     </ul>
                 </div>
-                <div name="PARAMETERS" className={`${activePlan ? 'w-5/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 `}>
+                <div name="PARAMETERS" className={`${activePlan ? 'w-5/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 h-full`}>
                     <div className="bg-gray-200 h-10 text-center flex justify-around items-center">
                         <h1>PARAMETERS</h1>
                         <div >{arrowRefresh}</div>
+                    </div>
+                    <div name="parameter inputs" className="flex flex-wrap justify-around py-4 px-2 overflow-auto h-[calc(100%-2.5rem)]">
+                        {Object.keys(parameters).map((param) => <QSParameterInput key={param} param={parameters[param]} parameters={parameters} setParameters={setParameters} allowedDevices={allowedDevices} plan={activePlan} />)}
                     </div>
                 </div>
                 <div name="REVIEW" className={`${activePlan ? 'w-3/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 `}>

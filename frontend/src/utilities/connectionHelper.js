@@ -189,7 +189,7 @@ const getHttpServerUrl = () => {
     const port = ":60610";
     var httpUrl;
     if (process.env.REACT_APP_HTTP_SERVER_URL) {
-        httpUrl = process.env.REACT_APP_HTTP_SERVRE_URL;
+        httpUrl = process.env.REACT_APP_HTTP_SERVER_URL;
     } else {
         httpUrl = "http://" + currentWebsiteIP + port + pathname;
     }

@@ -8,9 +8,16 @@ module.exports = {
           '0%, 100%': { backgroundColor: 'transparent' },
           '50%': { backgroundColor: '#fef3c7' }, // bg-yellow-200
         },
+        wiggle: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '25%': { transform: 'translateX(-3px)' },
+          '50%': { transform: 'translateX(3px)' },
+          '75%': { transform: 'translateX(-3px)' },
+        },
       },
       animation: {
         flash: 'flash 1s ease-in-out',
+        wiggle: 'wiggle 0.3s ease',
       },
       transition: {
         'width': 'width'
