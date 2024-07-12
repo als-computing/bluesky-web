@@ -26,14 +26,14 @@ export default function QItem ({ item=false, index=1, text='', styles='' }) {
     const commonStyles = 'w-32 h-32 rounded-md mx-2 hover:cursor-pointer hover:shadow-lg hover:shadow-gray-500 list-none';
     if (item!== false && Object.keys(item).length > 0 ) {
         return (
-            <li  className={`${commonStyles} border border-slate-500 bg-white`} onClick={handleItemClick}>
+            <li  className={`${commonStyles} border border-slate-500 bg-white ${styles}`} onClick={handleItemClick}>
                 <p className={`${getPlanColor(item.name)} text-white text-center rounded-t-md`}>{item.name}</p>
                 {isOpen ? <p>open</p> : ''}
             </li>
         )
     } else {
         return (
-            <li className={`${commonStyles} border border-dashed border-slate-400 bg-slate-700`}>
+            <li className={`${commonStyles} border border-dashed border-slate-400 bg-slate-700 ${styles}`}>
                 <p className="text-center text-slate-400">{text}</p>
             </li>
         )

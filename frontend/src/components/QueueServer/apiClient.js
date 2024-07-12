@@ -140,6 +140,22 @@ const startRE = async () => {
     }
 };
 
+const postQueueItem = async (body) => {
+    try {
+        const response = await axios.post(httpServerUrl + 'api/queue/item/add', 
+        body,
+        {headers : {
+            'Authorization' : 'ApiKey ' + qServerKey
+        }});
+    console.log(response.data);
+    //check if the response says it started.. if so return success, otherwise return failed
+    return 'success';
+    } catch (error) {
+        console.error('Error submitting plan', error);
+        return 'failed';
+    }
+}
 
 
-export { getQueue, getStatus, getPlansAllowed, getDevicesAllowed, startRE };
+
+export { getQueue, getStatus, getPlansAllowed, getDevicesAllowed, startRE, postQueueItem };

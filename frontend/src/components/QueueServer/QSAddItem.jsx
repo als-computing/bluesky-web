@@ -1,8 +1,9 @@
 import { tailwindIcons } from "../../assets/icons";
 import { useState, useEffect } from 'react';
-import { getDevicesAllowed, getPlansAllowed } from "./apiClient";
+import { getDevicesAllowed, getPlansAllowed, postQueueItem } from "./apiClient";
 import QSParameterInput from "./QSParameterInput";
-import MultiSelectInput from "./MulitSelectInput";
+import AddQueueItemButton from "./AddQueueItemButton";
+import QItem from "./QItem";
 
 export default function QSAddItem() {
     const arrowsPointingOut = tailwindIcons.arrowsPointingOut;
@@ -99,6 +100,23 @@ export default function QSAddItem() {
             stateCopy.item.name = name;
             return stateCopy;
         })
+    };
+
+    const isAddQueueItemActive = () => {
+        //check if all required parameters have been filled out, otherwise button should not be clickable
+        var allRequiredParametersFilled = true;
+        for (var key in parameters) {
+            if (parameters[key].required && parameters[key].value.length === 0) {
+                allRequiredParametersFilled = false;
+                break;
+            }
+        }
+        return allRequiredParametersFilled;
+    };
+
+    const submitPlan = (body) => {
+        console.log({body});
+        postQueueItem(body);
     }
 
 
@@ -115,7 +133,7 @@ export default function QSAddItem() {
                         <h1 className="pl-3">PLAN</h1>
                         <div className={`${activePlan ? 'opacity-100 hover:cursor-pointer hover:text-slate-600' : 'opacity-0'} pr-2`} onClick={() => setActivePlan(false)}>{arrowLongLeft}</div>
                     </div>
-                    <ul className={`${activePlan ? '' : ''} ${isExpanded ? 'hhh-[21.5rem] h-[calc(100%-2.5rem)] duration-[1100ms]' : 'h-0 duration-700'} overflow-auto overflow-y-auto transition-all ease-in`}>
+                    <ul className={`${activePlan ? '' : ''} ${isExpanded ? 'h-[calc(100%-2.5rem)] duration-[1100ms]' : 'h-0 duration-700'} overflow-auto overflow-y-auto transition-all ease-in`}>
                         {Object.keys(allowedPlans).map((plan) => {
                             return (
                                 <li key={plan} 
@@ -148,6 +166,10 @@ export default function QSAddItem() {
                 <div name="SUBMIT" className={`${activePlan ? 'w-2/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 `}>
                     <div className="bg-gray-200 h-10 text-center flex justify-start items-center">
                         <h1 className="pl-8">SUBMIT</h1>
+                    </div>
+                    <div className="flex flex-col space-y-4 items-center py-4">
+                        <QItem item={body.item} text={body.name} styles={'hover:cursor-default hover:shadow-none'}/>
+                        <AddQueueItemButton text={'Add To Queue'} isActive={isAddQueueItemActive} styles={'drop-shadow-md'} cb={() => submitPlan(body)}/>
                     </div>
                 </div>
             </form>

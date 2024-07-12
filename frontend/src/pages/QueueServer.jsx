@@ -187,7 +187,7 @@ export default function QueueServer() {
     //to do - refactor this so we can more easily set the size on different routes
     return (
         <Fragment>
-            <main className="bg-black shadow-lg max-w-screen-2xl m-auto rounded-md max-h-[50vh] h-[60rem] 3xl:max-w-screen-xl">
+            <main className="bg-black shadow-lg max-w-screen-2xl m-auto rounded-md h-[40rem] 3xl:max-w-screen-xl">
                 <div className="flex mx-4 border-b-white border-b h-2/6">
                     <div className="w-9/12 px-2 ">
                         <QSList queueData={queueData}/>
