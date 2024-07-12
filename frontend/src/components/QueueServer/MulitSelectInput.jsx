@@ -3,10 +3,10 @@ import { tailwindIcons } from '../../assets/icons';
 
 const items = ['Item 1', 'Item 2', 'Item 3', 'Item 4'];
 
-export default function MultiSelectInput({cb=()=>{}, label='', allowedDevices=[], parameters={}, setParameters=()=>{}, plan={plan}, description='', required=false, inputType='int', deviceList=[], styles=''}) {
+export default function MultiSelectInput({cb=()=>{}, label='', isItemInArray=()=>{}, addItem=()=>{}, removeItem=()=>{}, selectedItems=[], allowedDevices=[], parameters={}, setParameters=()=>{}, plan={plan}, description='', required=false, inputType='int', deviceList=[], styles=''}) {
     const [inputValue, setInputValue] = useState('');
     const [availableItems, setAvailableItems] = useState(Object.keys(allowedDevices));
-    const [selectedItems, setSelectedItems] = useState([]); //need to replace this with parameters[label].value
+    //const [selectedItems, setSelectedItems] = useState([]); //need to replace this with parameters[label].value
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [isWiggling, setIsWiggling] = useState(false);
 
@@ -18,18 +18,24 @@ export default function MultiSelectInput({cb=()=>{}, label='', allowedDevices=[]
     };
 
     const handleItemClick = (item) => {
-        if (!selectedItems.includes(item)) {
-            setSelectedItems([...selectedItems, item]); //modify this to set the value in parameters
+        //refactor this to take an arg that does not close dropdown if we came from an 'enter' key
+
+        if (!isItemInArray(item)) { 
+            addItem(item);
             setAvailableItems(availableItems.filter((i) => i !== item));
             setInputValue('');
             setDropdownVisible(false);
         }
     };
 
+
+
     const handleRemoveItem = (item) => {
-        setSelectedItems(selectedItems.filter((i) => i !== item)); //modify this, add a temp object using setParameters( internal function)
+        removeItem(item);
         setAvailableItems([...availableItems, item]);
     };
+
+
 
     const handleClickOutside = (event) => {
         if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -59,14 +65,14 @@ export default function MultiSelectInput({cb=()=>{}, label='', allowedDevices=[]
 
     useEffect(() => {
         setAvailableItems(Object.keys(allowedDevices));
-        setSelectedItems([]);
+        //setSelectedItems([]); //replace with setParameters
     }, [plan]);
-
+//edit line 69 for parameters
     return (
         <div ref={containerRef} className="relative w-full max-w-96 border-2 border-slate-300 rounded-lg mt-2 h-fit">
             <p className="text-sm pl-4 text-gray-500 border-b border-dashed border-slate-300">{`${label} ${required ? '(required)' : '(optional)'}`}</p> 
             <div className="flex flex-wrap justify-around rounded p-2">
-                {selectedItems.map((item) => (
+                {selectedItems.map((item) => ( 
                     <div key={item} className="flex items-center bg-[#DCEAF1] text-sky-900 pl-2 pr-1 py-1 m-1 rounded">
                         <span>{item}</span>
                         <button

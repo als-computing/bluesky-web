@@ -16,6 +16,14 @@ export default function QSAddItem() {
     const [allowedDevices, setAllowedDevices] = useState({});
     const [activePlan, setActivePlan] = useState(false);
     const [parameters, setParameters] = useState([]);
+    const [body, setBody] = useState({
+        item: {
+            'name': '',
+            'kwargs': '',
+            'item_type': 'plan'
+        }
+    });
+
 
     const handlePlanResponse = (data) => {
         //process the response and provide an empty
@@ -65,6 +73,25 @@ export default function QSAddItem() {
         getPlansAllowed(handlePlanResponse);
     }, []);
 
+    //remove this and refactor to put updates into functions after testing
+    const updateBodyKwargs = (parameters) => {
+        setBody(state => {
+            var stateCopy = state;
+            var newKwargs = {};
+            for (var key in parameters) {
+                let val = parameters[key].value;
+                if (val === '' || (Array.isArray(val) && val.length === 0)) {
+                    //value is empty, do not add to kwargs
+                } else {
+                    newKwargs[key] = parameters[key].value;
+                }
+            }
+            stateCopy.item.kwargs = newKwargs;
+            return stateCopy;
+        })
+    };
+
+
     return (
         <section className={`${isExpanded ? 'w-full' : 'w-96'} border border-solid rounded-lg shadow-lg transition-width ease-in duration-1000`}>
             <header onClick={() => isExpanded ? '' : setIsExpanded(true)} className={`${isExpanded ? 'w-full justify-between' : 'hover:cursor-pointer rounded-b-lg'} bg-[#213149] text-white text-2xl px-12 py-3 rounded-t-lg flex items-center space-x-2 justify-center `}>
@@ -97,12 +124,15 @@ export default function QSAddItem() {
                         <div >{arrowRefresh}</div>
                     </div>
                     <div name="parameter inputs" className="flex flex-wrap justify-around py-4 px-2 overflow-auto h-[calc(100%-2.5rem)]">
-                        {Object.keys(parameters).map((param) => <QSParameterInput key={param} param={parameters[param]} parameters={parameters} setParameters={setParameters} allowedDevices={allowedDevices} plan={activePlan} />)}
+                        {Object.keys(parameters).map((param) => <QSParameterInput key={param} param={parameters[param]} parameters={parameters} updateBodyKwargs={updateBodyKwargs} setParameters={setParameters} allowedDevices={allowedDevices} plan={activePlan} />)}
                     </div>
                 </div>
                 <div name="REVIEW" className={`${activePlan ? 'w-3/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 `}>
                     <div className="bg-gray-200 h-10 text-center flex justify-start items-center">
                         <h1 className="pl-8">REVIEW</h1>
+                    </div>
+                    <div name="POST body" className="flex items-start py-4 px-2 overflow-auto h-[calc(100%-2.5rem)]">
+                       <pre className="text-sm">{JSON.stringify(body, null, 2)}</pre>
                     </div>
                 </div>
                 <div name="SUBMIT" className={`${activePlan ? 'w-2/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 `}>

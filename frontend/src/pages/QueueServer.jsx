@@ -181,8 +181,8 @@ export default function QueueServer() {
     //to do - refactor this so we can more easily set the size on different routes
     return (
         <Fragment>
-            <main className="bg-black shadow-lg max-w-screen-2xl m-auto rounded-md h-1/2 3xl:max-w-screen-xl">
-                <div className="flex h-fit mx-4 pt-4 border-b-white border-b pb-4">
+            <main className="bg-black shadow-lg max-w-screen-2xl m-auto rounded-md max-h-[50vh] h-[60rem] 3xl:max-w-screen-xl">
+                <div className="flex mx-4 border-b-white border-b h-2/6">
                     <div className="w-9/12 px-2 ">
                         <QSList queueData={queueData}/>
                     </div>
@@ -190,7 +190,9 @@ export default function QueueServer() {
                         <QSRunEngineWorker workerStatus={workerStatus} runningItem={runningItem} isREToggleOn={isREToggleOn} setIsREToggleOn={setIsREToggleOn}/>
                     </div>
                 </div>
-                <QSConsole title={false} description={false} processConsoleMessage={processConsoleMessage}/>
+                <div className="h-4/6">
+                    <QSConsole title={false} description={false} processConsoleMessage={processConsoleMessage}/>
+                </div>
             </main>
             <div className="mt-16 mb-20 flex justify-center">
                 <QSAddItem />
