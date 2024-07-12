@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { tailwindIcons } from '../../assets/icons';
 
-const items = ['Item 1', 'Item 2', 'Item 3', 'Item 4'];
-
 export default function MultiSelectInput({cb=()=>{}, label='', isItemInArray=()=>{}, addItem=()=>{}, removeItem=()=>{}, selectedItems=[], allowedDevices=[], parameters={}, setParameters=()=>{}, plan={plan}, description='', required=false, inputType='int', deviceList=[], styles=''}) {
     const [inputValue, setInputValue] = useState('');
     const [availableItems, setAvailableItems] = useState(Object.keys(allowedDevices));
-    //const [selectedItems, setSelectedItems] = useState([]); //need to replace this with parameters[label].value
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [isWiggling, setIsWiggling] = useState(false);
 
@@ -18,7 +15,7 @@ export default function MultiSelectInput({cb=()=>{}, label='', isItemInArray=()=
     };
 
     const handleItemClick = (item) => {
-        //refactor this to take an arg that does not close dropdown if we came from an 'enter' key
+        //TODO: refactor this to take an arg that does not close dropdown if we came from an 'enter' key
 
         if (!isItemInArray(item)) { 
             addItem(item);
@@ -63,11 +60,7 @@ export default function MultiSelectInput({cb=()=>{}, label='', isItemInArray=()=
         };
     }, []);
 
-    useEffect(() => {
-        setAvailableItems(Object.keys(allowedDevices));
-        //setSelectedItems([]); //replace with setParameters
-    }, [plan]);
-//edit line 69 for parameters
+
     return (
         <div ref={containerRef} className="relative w-full max-w-96 border-2 border-slate-300 rounded-lg mt-2 h-fit">
             <p className="text-sm pl-4 text-gray-500 border-b border-dashed border-slate-300">{`${label} ${required ? '(required)' : '(optional)'}`}</p> 
@@ -93,7 +86,7 @@ export default function MultiSelectInput({cb=()=>{}, label='', isItemInArray=()=
                 />
             </div>
             {dropdownVisible && (
-                <ul className="absolute w-full bg-white border border-gray-300 rounded mt-1 max-h-40 overflow-auto">
+                <ul className="z-10 absolute w-full bg-white border border-gray-300 rounded mt-1 max-h-40 overflow-auto">
                     {availableItems
                         .filter((item) => item.toLowerCase().includes(inputValue.toLowerCase()))
                         .map((item) => (

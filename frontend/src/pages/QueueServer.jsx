@@ -149,6 +149,7 @@ export default function QueueServer() {
         getQueue(handleQueueDataResponse);
         //start polling at regular intervals
         setInterval(()=> getQueue(handleQueueDataResponse), pollingInterval);
+        console.log('page load')
     }, []);
 
     const processConsoleMessage = (msg) => {

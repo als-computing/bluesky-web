@@ -60,9 +60,10 @@ export default function QSAddItem() {
             //construct a parameter object in lieu of the default array format, easier to read and update inputs on
             var tempParameters = {};
             const multiSelectParamList = ['detectors']; //a list of parameters that require an array input as opposed to a string input
+            const requiredParamList = ['detectors', 'detector', 'motor', 'target_field', 'signal'];
             for (var param of allowedPlans[plan].parameters) {
                 let defaultValue = multiSelectParamList.includes(param.name) ? [] : '';
-                tempParameters[param.name] = {...param, value: defaultValue};
+                tempParameters[param.name] = {...param, value: defaultValue, required: requiredParamList.includes(param.name)};
             }
             setParameters(tempParameters);
             updateBodyKwargs(tempParameters);
