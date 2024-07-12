@@ -30,10 +30,29 @@ export default function QSParameterInput( {cb=()=>{}, allowedDevices=[], param={
         });
     }
 
+    //-------Functions for TextInput ----------
+    const stringParameterList = ['md'];
+    const booleanParameterList = ['snake', 'backstep', 'take_pre_data'];
+    const integerParameterList = ['num', 'nth'];
+    const arrayParameterList = ['positions'];
+    const handleInputChange = (value) => {
+        //todo: add error checking here for input type
+
+        setParameters(state => {
+            var stateCopy = JSON.parse(JSON.stringify(state));
+            stateCopy[param.name].value = value;
+            updateBodyKwargs(stateCopy);
+            return stateCopy;
+        });
+    };
+
+
+    // ----to do, create a boolean input for parameters like 'snake'
+
     if (Array.isArray(param.value)) {
         var isRequired = requiredParameterTypes.includes(param.name);
         return <MultiSelectInput isItemInArray={isItemInArray} addItem={addItem} removeItem={removeItem} selectedItems={parameters[param.name].value} label={param.name} allowedDevices={allowedDevices} parameters={parameters} setParameters={setParameters} plan={plan} required={isRequired}/>
     } else {
-        return <TextInput label={param.name}/>
+        return <TextInput label={param.name} value={parameters[param.name].value} cb={handleInputChange}/>
     }
 }

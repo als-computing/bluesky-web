@@ -65,6 +65,8 @@ export default function QSAddItem() {
                 tempParameters[param.name] = {...param, value: defaultValue};
             }
             setParameters(tempParameters);
+            updateBodyKwargs(tempParameters);
+            updateBodyName(plan);
         }
     }
 
@@ -73,7 +75,6 @@ export default function QSAddItem() {
         getPlansAllowed(handlePlanResponse);
     }, []);
 
-    //remove this and refactor to put updates into functions after testing
     const updateBodyKwargs = (parameters) => {
         setBody(state => {
             var stateCopy = state;
@@ -90,6 +91,14 @@ export default function QSAddItem() {
             return stateCopy;
         })
     };
+
+    const updateBodyName = (name) => {
+        setBody(state => {
+            var stateCopy = state;
+            stateCopy.item.name = name;
+            return stateCopy;
+        })
+    }
 
 
     return (
