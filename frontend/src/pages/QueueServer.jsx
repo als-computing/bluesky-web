@@ -171,6 +171,11 @@ export default function QueueServer() {
             //get request on queue items
             getQueue(handleQueueDataResponse);
         }
+
+        if (msg.startsWith("The plan failed")) {
+            //get request on queue items
+            setTimeout(()=> getQueue(handleQueueDataResponse), 500 ); //call the server some time after failure occurs
+        }
     };
 
     const handleREMessage = (msg) => {
