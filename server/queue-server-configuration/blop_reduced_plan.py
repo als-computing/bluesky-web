@@ -1,17 +1,20 @@
+#RE(agent.learn(A, B,C))
+
 from blop import Agent
 from blop import Objective
 from blop import DOF
-import Shadow
+#import Shadow
 from databroker import Broker
+import numpy as np
 
 db = Broker.named("temp")
 
 # the toroid() function can calculate the corresponding beam size for a given (x_rot, y_rot) pair. Shadow is used for beamline simulation.
 def toroid(X_ROT,Y_ROT):
-    beam = Shadow.Beam()
-    oe0 = Shadow.Source()
-    oe1 = Shadow.OE()
-    oe2 = Shadow.OE()
+    beam = False
+    oe0 = False
+    oe1 = False
+    oe2 = False
 
     oe1.X_ROT = X_ROT
     oe1.Y_ROT = Y_ROT
@@ -98,7 +101,6 @@ def call_agent(type="qei", n=4, iterations=8):
 
     yield from agent.learn(type, n, iterations)
 
-#we need the state of the agent to be accessible after its run as a plan
-#most time is spent looking at results from the agent processing to better optimize
+
 
     
