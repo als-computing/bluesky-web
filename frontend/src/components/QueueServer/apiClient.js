@@ -140,7 +140,7 @@ const startRE = async () => {
     }
 };
 
-const postQueueItem = async (body) => {
+const postQueueItem = async (body={}, cb=()=>{}) => {
     try {
         const response = await axios.post(httpServerUrl + 'api/queue/item/add', 
         body,
@@ -148,7 +148,7 @@ const postQueueItem = async (body) => {
             'Authorization' : 'ApiKey ' + qServerKey
         }});
     console.log(response.data);
-    //check if the response says it started.. if so return success, otherwise return failed
+    cb(response.data);
     return 'success';
     } catch (error) {
         console.error('Error submitting plan', error);
