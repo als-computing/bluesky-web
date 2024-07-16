@@ -57,7 +57,7 @@ export default function QSAddItem() {
     };
 
     const [isExpanded, setIsExpanded] = useState(false);
-    const [isSubmissionPopupOpen, setIsSubmissionPopupOpen] = useState(true);
+    const [isSubmissionPopupOpen, setIsSubmissionPopupOpen] = useState(false);
     const [submissionResponse, setSubmissionResponse] = useState({});
     const [allowedPlans, setAllowedPlans] = useState({});
     const [allowedDevices, setAllowedDevices] = useState({});
@@ -114,7 +114,7 @@ export default function QSAddItem() {
         //construct a parameter object in lieu of the default QS array format, easier to read and update inputs on
         var tempParameters = {};
         const multiSelectParamList = ['detectors']; //a list of parameters that require an array input as opposed to a string input
-        const requiredParamList = ['detectors', 'detector', 'motor', 'target_field', 'signal', 'npts', 'x_motor'];
+        const requiredParamList = ['detectors', 'detector', 'motor', 'target_field', 'signal', 'npts', 'x_motor', 'start', 'stop', 'x_range'];
         for (var param of allowedPlans[plan].parameters) {
             let defaultValue = multiSelectParamList.includes(param.name) ? [] : '';
             tempParameters[param.name] = {...param, value: defaultValue, required: requiredParamList.includes(param.name)};
