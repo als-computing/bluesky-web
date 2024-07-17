@@ -12,9 +12,19 @@ export default function QSConsole({ title=true, description = true, processConso
     const [ wsMessages, setWsMessages ] = useState([]); //text for the websocket output
     const [ isOpened, setIsOpened ] = useState(false); //boolean representing status of WS connection
     const [ statusMessage, setStatusMessage ] = useState('');
+    const [isToggleOn, setIsToggleOn] = useState(false); //toggle UI switch for turning output on and off
     const connection = useRef(null); //queue server WS via FastAPI
     const wsUrl = getQSConsoleUrl();
     const messageContainerRef = useRef(null);
+
+    const toggleSwitch = () => {
+        if (isToggleOn) {
+            handleCloseWS();
+        } else {
+            handleOpenWS();
+        }
+        setIsToggleOn(!isToggleOn);
+    };
 
     const handleWebSocketMessage = (event) => {
         //console.log('received message from ws');
@@ -105,7 +115,7 @@ export default function QSConsole({ title=true, description = true, processConso
         socket.addEventListener("open", event => {
             setIsOpened(true);
             console.log("Opened connection in socket to: " + wsUrl);
-            setStatusMessage("Opened connection " + dayjs().format('hh:MM A'));
+            setStatusMessage("Opened connection " + dayjs().format('hh:mm A'));
             socket.addEventListener("message", handleWebSocketMessage);
             connection.current = socket;
         })
@@ -127,16 +137,13 @@ export default function QSConsole({ title=true, description = true, processConso
         }
     }, [wsMessages]);
 
-    const [isToggleOn, setIsToggleOn] = useState(false);
+    useEffect(() => {
+        toggleSwitch();
+    }, []);
 
-    const toggleSwitch = () => {
-        if (isToggleOn) {
-            handleCloseWS();
-        } else {
-            handleOpenWS();
-        }
-        setIsToggleOn(!isToggleOn);
-    };
+    
+
+
 
     return (
         <main className="h-full">

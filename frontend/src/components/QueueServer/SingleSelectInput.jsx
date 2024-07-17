@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { tailwindIcons } from '../../assets/icons';
 
-export default function SingleSelectInput({cb=()=>{}, label='', isItemInArray=()=>{}, addItem=()=>{}, clearItem=()=>{}, selectedItems=[], allowedDevices=[], parameters={}, setParameters=()=>{}, plan={plan}, description='', required=false, inputType='int', deviceList=[], styles=''}) {
+export default function SingleSelectInput({cb=()=>{}, label='', isItemInArray=()=>{}, addItem=()=>{}, clearItem=()=>{}, allowedDevices=[], parameters={}, plan={plan}, description='', required=false, styles=''}) {
     const [inputValue, setInputValue] = useState('');
     const [availableItems, setAvailableItems] = useState(Object.keys(allowedDevices));
     const [dropdownVisible, setDropdownVisible] = useState(false);

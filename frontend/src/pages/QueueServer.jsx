@@ -164,17 +164,26 @@ export default function QueueServer() {
         }
 
         if (msg.startsWith("Starting queue processing")) {
-            //get request on RE process
             getQueue(handleQueueDataResponse);
         }
 
         if (msg.startsWith("Item added: success=True")) {
-            //get request on queue items
             getQueue(handleQueueDataResponse);
+        }
+
+        if (msg.startsWith("Clearing the queue")) {
+            getQueue(handleQueueDataResponse);
+        }
+
+        if (msg.startsWith("Queue is empty")) {
+            //message will occur if RE worker turned on with no available queue items
+            //TO DO - fix this because it's not turning the toggle switch to 'off'
+            setTimeout(()=> getQueue(handleQueueDataResponse), 500 ); //call the server some time after failure occurs
         }
 
         if (msg.startsWith("The plan failed")) {
             //get request on queue items
+            //qserver takes some time to place the item back into the queue
             setTimeout(()=> getQueue(handleQueueDataResponse), 500 ); //call the server some time after failure occurs
         }
     };
@@ -189,10 +198,10 @@ export default function QueueServer() {
         <Fragment>
             <main className="bg-black shadow-lg max-w-screen-2xl m-auto rounded-md h-[40rem] 3xl:max-w-screen-xl">
                 <div className="flex mx-4 border-b-white border-b h-2/6">
-                    <div className="w-9/12 px-2 ">
+                    <div className="w-9/12 px-2 mt-2">
                         <QSList queueData={queueData}/>
                     </div>
-                    <div className="w-3/12">
+                    <div className="w-3/12 mt-2">
                         <QSRunEngineWorker workerStatus={workerStatus} runningItem={runningItem} isREToggleOn={isREToggleOn} setIsREToggleOn={setIsREToggleOn}/>
                     </div>
                 </div>

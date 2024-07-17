@@ -233,7 +233,7 @@ export default function QSAddItem() {
                 </div>
                 <div name="REVIEW" className={`${activePlan ? 'w-3/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 `}>
                     <div className="bg-gray-200 h-10 flex justify-center items-center">
-                        <h1 className="text-center">REVIEW</h1>
+                        <h1 className="text-center">SUMMARY</h1>
                     </div>
                     <div name="POST body" className="flex items-start py-4 px-2 overflow-auto h-[calc(100%-2.5rem)]">
                        <pre className="text-sm">{JSON.stringify(body, null, 2)}</pre>

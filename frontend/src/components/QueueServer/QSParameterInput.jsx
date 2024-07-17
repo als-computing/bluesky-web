@@ -75,7 +75,7 @@ export default function QSParameterInput( {cb=()=>{}, allowedDevices=[], param={
         return <MultiSelectInput isItemInArray={isItemInArray} addItem={addItem} removeItem={removeItem} selectedItems={parameters[param.name].value} label={param.name} allowedDevices={allowedDevices} parameters={parameters} setParameters={setParameters} plan={plan} required={parameters[param.name].required}/>
     } else {
         if (singleInputTypeList.includes(param.name)) {
-            return <SingleSelectInput required={parameters[param.name].required} isItemInArray={isItemInArray} addItem={replaceItem} clearItem={clearItem} selectedItems={parameters[param.name].value} label={param.name} allowedDevices={allowedDevices} parameters={parameters} setParameters={setParameters} plan={plan}/>
+            return <SingleSelectInput required={parameters[param.name].required} isItemInArray={isItemInArray} addItem={replaceItem} clearItem={clearItem} selectedItems={parameters[param.name].value} label={param.name} allowedDevices={allowedDevices} parameters={parameters} plan={plan}/>
         } else {
             return <TextInput label={param.name} value={parameters[param.name].value} cb={handleInputChange} required={parameters[param.name].required}/>
         }
