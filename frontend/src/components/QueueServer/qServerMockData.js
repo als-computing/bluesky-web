@@ -4011,6 +4011,6 @@ const mockGetQueueItemResponse = {
         "user_group": "primary",
         "item_uid": "070d4e21-8408-43f9-a418-20afb411449f"
     }  
-}
+};
 
 export { mockDevicesAllowedResponse, mockPlansAllowedResponse, mockGetQueueItemResponse };

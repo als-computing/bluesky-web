@@ -210,7 +210,7 @@ export default function QueueServer() {
 
     const handleQItemClick = (uid) => {
         //send a get Request to Qserver for the item UID, then displays a large popup with item
-        getQueueItem(uid, handleOpenQItemPopup, true)
+        getQueueItem(uid, handleOpenQItemPopup)
     };
 
     const handleQItemPopupClose = () => {
