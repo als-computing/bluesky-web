@@ -2,8 +2,9 @@ import QSConsole from "../components/QueueServer/QSConsole";
 import QSList from "../components/QueueServer/QSList";
 import QSRunEngineWorker from "../components/QueueServer/QSRunEngineWorker";
 import QSAddItem from "../components/QueueServer/QSAddItem";
+import QItemPopup from "../components/QueueServer/QItemPopup";
 import { getQServerKey } from "../utilities/connectionHelper";
-import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus } from "../components/QueueServer/apiClient";
+import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus, getQueueItem } from "../components/QueueServer/apiClient";
 import axios from "axios";
 import { useState, Fragment, useEffect, useRef } from 'react';
 
@@ -63,6 +64,18 @@ const sampleQueueData = [
 ];
 
 export default function QueueServer() {
+
+    const [ workerStatus, setWorkerStatus ] = useState('');
+    const [ isQItemPopupVisible, setIsQItemPopupVisible ] = useState(false);
+    const [ popupItem, setPopupItem ] = useState({});
+    const [ queueData, setQueueData ] = useState([]);
+    const queueDataRef = useRef(queueData);
+    const [ isREToggleOn, setIsREToggleOn ] = useState(false);
+    const runEngineToggleRef = useRef(isREToggleOn);
+    const [ runningItem, setRunningItem ] = useState({});
+    const runningItemRef = useRef(runningItem);
+
+    //setup polling interval for getting regular updates from the http server
     var pollingInterval;
     if (process.env.REACT_APP_QSERVER_POLLING_INTERVAL) {
         pollingInterval = process.env.REACT_APP_QSERVER_POLLING_INTERVAL;
@@ -72,13 +85,6 @@ export default function QueueServer() {
         pollingInterval = thirtySeconds;
     }
 
-    const [ workerStatus, setWorkerStatus ] = useState('');
-    const [ queueData, setQueueData ] = useState([]);
-    const queueDataRef = useRef(queueData);
-    const [ isREToggleOn, setIsREToggleOn ] = useState(false);
-    const runEngineToggleRef = useRef(isREToggleOn);
-    const [ runningItem, setRunningItem ] = useState({});
-    const runningItemRef = useRef(runningItem);
 
     //use refs to allow for comparisons from GET requests to
     //only re-render when a change is detected
@@ -192,14 +198,35 @@ export default function QueueServer() {
         //when the WS receives message about RE Worker, trigger UI updates on RE Worker Component
     };
 
+    const handleOpenQItemPopup = (data) => {
+        if (data.success !== false) {
+            //set popup to visible
+            setPopupItem(data.item);
+            setIsQItemPopupVisible(true);
+        } else {
+            console.log('No item found in "get queue item" response');
+        }
+    }
+
+    const handleQItemClick = (uid) => {
+        //send a get Request to Qserver for the item UID, then displays a large popup with item
+        getQueueItem(uid, handleOpenQItemPopup, true)
+    };
+
+    const handleQItemPopupClose = () => {
+        setIsQItemPopupVisible(false);
+        setPopupItem({});
+    };
+
 
     //to do - refactor this so we can more easily set the size on different routes
     return (
         <Fragment>
-            <main className="bg-black shadow-lg max-w-screen-2xl m-auto rounded-md h-[40rem] 3xl:max-w-screen-xl">
+            <main className="bg-black shadow-lg max-w-screen-2xl m-auto rounded-md h-[40rem] 3xl:max-w-screen-xl relative">
+                {isQItemPopupVisible ? <QItemPopup handleQItemPopupClose={handleQItemPopupClose} popupItem={popupItem}/> : ''}
                 <div className="flex mx-4 border-b-white border-b h-2/6">
                     <div className="w-9/12 px-2 mt-2">
-                        <QSList queueData={queueData}/>
+                        <QSList queueData={queueData} handleQItemClick={handleQItemClick}/>
                     </div>
                     <div className="w-3/12 mt-2">
                         <QSRunEngineWorker workerStatus={workerStatus} runningItem={runningItem} isREToggleOn={isREToggleOn} setIsREToggleOn={setIsREToggleOn}/>

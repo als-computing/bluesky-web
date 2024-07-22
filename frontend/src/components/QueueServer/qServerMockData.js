@@ -3997,4 +3997,20 @@ const mockPlansAllowedResponse = {
     "plans_allowed_uid": "a2fea229-75eb-496f-a776-d2405d7f24a3"
 };
 
-export { mockDevicesAllowedResponse, mockPlansAllowedResponse };
+const mockGetQueueItemResponse = {
+    "msg": "",
+    "item": {
+        "name": "count",
+        "kwargs": {
+            "detectors": [
+                "jittery_motor2"
+            ]
+        },
+        "item_type": "plan",
+        "user": "UNAUTHENTICATED_SINGLE_USER",
+        "user_group": "primary",
+        "item_uid": "070d4e21-8408-43f9-a418-20afb411449f"
+    }  
+}
+
+export { mockDevicesAllowedResponse, mockPlansAllowedResponse, mockGetQueueItemResponse };

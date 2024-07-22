@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { mockDevicesAllowedResponse, mockPlansAllowedResponse } from './qServerMockData';
+import { mockDevicesAllowedResponse, mockPlansAllowedResponse, mockGetQueueItemResponse } from './qServerMockData';
 import { getHttpServerUrl, getQServerKey } from '../../utilities/connectionHelper';
 
 // Mock data (if needed)
@@ -60,7 +60,7 @@ const getQueue = async (cb, mock=false) => {
         return;
     }
     try {
-        const response = await axios.get('http://localhost:60610/api/queue/get', 
+        const response = await axios.get(httpServerUrl + 'api/queue/get', 
             {headers : {
                 'Authorization' : 'ApiKey ' + qServerKey
             }}
@@ -78,7 +78,7 @@ const getStatus = async (cb, mock = false) => {
         return;
     }
     try {
-        const response = await axios.get('http://localhost:60610/api/status', 
+        const response = await axios.get(httpServerUrl + 'api/status', 
             {headers : {
                 'Authorization' : 'ApiKey ' + qServerKey
             }}
@@ -126,7 +126,7 @@ const getDevicesAllowed = async (cb, mock = false) => {
 const startRE = async () => {
     //returns true if no errors encountered
     try {
-        const response = await axios.post('http://localhost:60610/api/queue/start', 
+        const response = await axios.post(httpServerUrl + 'api/queue/start', 
             {},
             {headers : {
                 'Authorization' : 'ApiKey ' + qServerKey
@@ -154,8 +154,25 @@ const postQueueItem = async (body={}, cb=()=>{}) => {
         console.error('Error submitting plan', error);
         return 'failed';
     }
+};
+
+const getQueueItem = async (uid='', cb=()=>{}, mock=false) => {
+    if (mock) {
+        cb(mockGetQueueItemResponse);
+        return;
+    }
+    try {
+        const response = await axios.get(httpServerUrl + 'api/queue/item/get',
+            {headers : {
+                'Authorization' : 'ApiKey ' + qServerKey
+            }}
+        );
+        cb(response.data);
+    } catch (error) {
+        console.error('Error fetching queue item:', error);
+    }
 }
 
 
 
-export { getQueue, getStatus, getPlansAllowed, getDevicesAllowed, startRE, postQueueItem };
+export { getQueue, getStatus, getPlansAllowed, getDevicesAllowed, startRE, postQueueItem, getQueueItem };
