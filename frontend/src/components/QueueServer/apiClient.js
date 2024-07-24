@@ -162,17 +162,37 @@ const getQueueItem = async (uid='', cb=()=>{}, mock=false) => {
         return;
     }
     try {
-        const response = await axios.get(httpServerUrl + 'api/queue/item/get',
-            {headers : {
+        const response = await axios.get(httpServerUrl + 'api/queue/item/get', {
+            params: {uid: uid},
+            headers : {
+                'uid' : uid,
                 'Authorization' : 'ApiKey ' + qServerKey
-            }}
+            }
+        },
         );
         cb(response.data);
     } catch (error) {
         console.error('Error fetching queue item:', error);
     }
-}
+};
+
+const deleteQueueItem = async (body={}, cb=()=>{}) => {
+    try {
+        const response = await axios.post(httpServerUrl + 'api/queue/item/remove', 
+        body,
+        {headers : {
+            'Authorization' : 'ApiKey ' + qServerKey
+        }});
+    console.log(response.data);
+    cb(response.data);
+    return 'success';
+    } catch (error) {
+        console.error('Error submitting plan', error);
+        return 'failed';
+    }
+};
 
 
 
-export { getQueue, getStatus, getPlansAllowed, getDevicesAllowed, startRE, postQueueItem, getQueueItem };
+
+export { getQueue, getStatus, getPlansAllowed, getDevicesAllowed, startRE, postQueueItem, getQueueItem, deleteQueueItem };

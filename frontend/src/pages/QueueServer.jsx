@@ -192,6 +192,12 @@ export default function QueueServer() {
             //qserver takes some time to place the item back into the queue
             setTimeout(()=> getQueue(handleQueueDataResponse), 500 ); //call the server some time after failure occurs
         }
+
+        if (msg.startsWith("Removing item from the queue")) {
+            //get request on queue items
+            //qserver takes some time to place the item back into the queue
+            setTimeout(()=> getQueue(handleQueueDataResponse), 500 ); //call the server some time after failure occurs
+        }
     };
 
     const handleREMessage = (msg) => {
@@ -210,7 +216,8 @@ export default function QueueServer() {
 
     const handleQItemClick = (uid) => {
         //send a get Request to Qserver for the item UID, then displays a large popup with item
-        getQueueItem(uid, handleOpenQItemPopup)
+        console.log({uid});
+        getQueueItem(uid, handleOpenQItemPopup);
     };
 
     const handleQItemPopupClose = () => {
