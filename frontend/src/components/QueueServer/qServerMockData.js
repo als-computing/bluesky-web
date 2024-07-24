@@ -4013,4 +4013,24 @@ const mockGetQueueItemResponse = {
     }  
 };
 
-export { mockDevicesAllowedResponse, mockPlansAllowedResponse, mockGetQueueItemResponse };
+const mockDeleteQueueItemResponse = {
+    "success": true,
+    "msg": "",
+    "item": {
+      "name": "count",
+      "kwargs": {
+        "detectors": [
+          "ab_det",
+          "custom_test_flyer"
+        ],
+        "num": 10
+      },
+      "item_type": "plan",
+      "user": "UNAUTHENTICATED_SINGLE_USER",
+      "user_group": "primary",
+      "item_uid": "1c5e0e17-5452-426c-9959-aa3e51f0e1d8"
+    },
+    "qsize": 0
+};
+
+export { mockDevicesAllowedResponse, mockPlansAllowedResponse, mockGetQueueItemResponse, mockDeleteQueueItemResponse };

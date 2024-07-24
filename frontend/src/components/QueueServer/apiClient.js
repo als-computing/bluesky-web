@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { mockDevicesAllowedResponse, mockPlansAllowedResponse, mockGetQueueItemResponse } from './qServerMockData';
+import { mockDevicesAllowedResponse, mockPlansAllowedResponse, mockGetQueueItemResponse, mockDeleteQueueItemResponse } from './qServerMockData';
 import { getHttpServerUrl, getQServerKey } from '../../utilities/connectionHelper';
 
 // Mock data (if needed)
@@ -187,7 +187,7 @@ const deleteQueueItem = async (body={}, cb=()=>{}) => {
     cb(response.data);
     return 'success';
     } catch (error) {
-        console.error('Error submitting plan', error);
+        console.error('Error deleting item from queue', error);
         return 'failed';
     }
 };

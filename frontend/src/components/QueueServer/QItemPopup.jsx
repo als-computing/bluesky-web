@@ -1,22 +1,55 @@
 import { useState, Fragment } from "react";
+import DeleteResultPopup from "./DeleteResultPopup";
 import { getPlanColor, getPlanColorOpacity } from "./qItemColorData";
 import { tailwindIcons } from "../../assets/icons";
 import Button from "../library/Button";
 import { deleteQueueItem } from "./apiClient";
 
+const mockDeleteQueueItemResponse = {
+    "success": true,
+    "msg": "",
+    "item": {
+      "name": "count",
+      "kwargs": {
+        "detectors": [
+          "ab_det",
+          "custom_test_flyer"
+        ],
+        "num": 10
+      },
+      "item_type": "plan",
+      "user": "UNAUTHENTICATED_SINGLE_USER",
+      "user_group": "primary",
+      "item_uid": "1c5e0e17-5452-426c-9959-aa3e51f0e1d8"
+    },
+    "qsize": 0
+};
+
 export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} } ) {
     const [isDeleteModeVisible, setIsDeleteModeVisibile] = useState(false);
+    const [areResultsVisible, setAreResultsVisible] = useState(false);
+    const [response, setResponse] = useState({});
 
     //Color settings for delete mode
     const deleteBg = 'bg-slate-300';
     const deleteBorder = 'border-slate-300';
     const deleteText = 'text-slate-400';
 
-    const handleDeleteResponse = (msg) => {
+    const handleDeleteResponse = (data) => {
+        //load the UI for the response
+        setAreResultsVisible(true);
+        setResponse(data);
+
         //on success, display message that it was deleted, show a 'ok' button that closes the popup
 
         //on failure, indicate it failed and show the error. show a 'ok' button that goes back to the popup
-    }
+    };
+
+    const handleCloseResults = () => {
+        setIsDeleteModeVisibile(false);
+        setAreResultsVisible(false);
+        handleQItemPopupClose();
+    };
 
     const handleFirstDeleteClick = () => {
         //display set of buttons to delete
@@ -38,7 +71,8 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
     
     const handleConfirmDeleteClick = (uid) => {
         //send request to api
-        deleteQueueItem(popupItem.item_uid);
+        const body = {uid: uid};
+        deleteQueueItem(body, handleDeleteResponse);
     };
     const mockGetQueueItemResponse = {
         "msg": "",
@@ -55,6 +89,8 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
             "item_uid": "070d4e21-8408-43f9-a418-20afb411449f"
         }  
     };
+
+
 
     const printParameter = (kwarg) => {
         if (Array.isArray(popupItem.kwargs[kwarg])) {
@@ -107,8 +143,9 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
     return (
         <Fragment>
             
-        <div className={`absolute top-0 left-0 w-full h-full z-10 ${getPlanColorOpacity(popupItem.name)} flex justify-center items-center ${isDeleteModeVisible ? 'bg-red-600/40' : ''}`}>
-            <div className={`w-[30rem] h-[30rem] rounded-lg ${isDeleteModeVisible ? deleteBg : 'bg-slate-50'}`}>
+        <div name="background" className={`absolute top-0 left-0 w-full h-full z-10 ${getPlanColorOpacity(popupItem.name)} flex justify-center items-center ${isDeleteModeVisible ? 'bg-red-600/40' : ''}`}>
+            <div name="main popup" className={`relative w-[30rem] h-[30rem] rounded-lg ${isDeleteModeVisible ? deleteBg : 'bg-slate-50'}`}>
+                {areResultsVisible ? <DeleteResultPopup response={response} cb={handleCloseResults}/> : ''}
                 <span className={`${getPlanColor(popupItem.name)} flex items-center rounded-t-lg ${isDeleteModeVisible ? 'opacity-20' : ''}`}>
                     <p className='w-1/12'></p>
                     <p className={`w-10/12 text-center text-white text-2xl py-1  `}>{popupItem.name}</p>
