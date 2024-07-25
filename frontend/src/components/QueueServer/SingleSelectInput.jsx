@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { tailwindIcons } from '../../assets/icons';
+import { Tooltip } from 'react-tooltip';
 
 export default function SingleSelectInput({cb=()=>{}, label='', isItemInArray=()=>{}, addItem=()=>{}, clearItem=()=>{}, allowedDevices=[], parameters={}, plan={plan}, description='', required=false, styles=''}) {
     const [inputValue, setInputValue] = useState('');
@@ -52,7 +53,8 @@ export default function SingleSelectInput({cb=()=>{}, label='', isItemInArray=()
 
     return (
         <div ref={containerRef} className="relative w-5/12 max-w-96 border-2 border-slate-300 rounded-lg mt-2 h-fit">
-            <p className="text-sm pl-4 text-gray-500 border-b border-dashed border-slate-300">{`${label} ${required ? '(required)' : '(optional)'}`}</p> 
+            <p id={label+'ParamInputTooltip'} className="text-sm pl-4 text-gray-500 border-b border-dashed border-slate-300">{`${label} ${required ? '(required)' : '(optional)'}`}</p>
+            <Tooltip anchorSelect={'#' + label + 'ParamInputTooltip'} children={<p className="whitespace-pre-wrap">{description}</p>} place="top" variant="info" style={{'maxWidth' : "500px", 'height': 'fit-content'}} delayShow='400'/> 
             <div className={` flex rounded p-2 hover:cursor-pointer`} onClick={handleInputClick}>
                 <div className="w-10/12 flex justify-center">
                     <p className={`${parameters[label].value.length === 0 ? '' : 'px-2 py-1'} w-fit bg-[#DCEAF1] text-sky-900 rounded`}>{parameters[label].value}</p>

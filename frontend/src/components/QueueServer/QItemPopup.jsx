@@ -62,9 +62,9 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
 
     
     const handleConfirmDeleteClick = () => {
-        //send POST request to api
+        setIsDeleteModeVisibile(false); //close the delete mode popup
         const body = {uid: popupItem.item_uid};
-        deleteQueueItem(body, handleDeleteResponse);
+        deleteQueueItem(body, handleDeleteResponse); //send POST, show results popup
     };
 
 

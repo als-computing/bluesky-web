@@ -72,12 +72,12 @@ export default function QSParameterInput( {cb=()=>{}, allowedDevices=[], param={
     // ----to do, create a boolean input for parameters like 'snake'
 
     if (Array.isArray(param.value)) {
-        return <MultiSelectInput isItemInArray={isItemInArray} addItem={addItem} removeItem={removeItem} selectedItems={parameters[param.name].value} label={param.name} allowedDevices={allowedDevices} parameters={parameters} setParameters={setParameters} plan={plan} required={parameters[param.name].required}/>
+        return <MultiSelectInput isItemInArray={isItemInArray} addItem={addItem} removeItem={removeItem} selectedItems={parameters[param.name].value} label={param.name} allowedDevices={allowedDevices} parameters={parameters} setParameters={setParameters} plan={plan} required={parameters[param.name].required} description={parameters[param.name].description}/>
     } else {
         if (singleInputTypeList.includes(param.name)) {
-            return <SingleSelectInput required={parameters[param.name].required} isItemInArray={isItemInArray} addItem={replaceItem} clearItem={clearItem} selectedItems={parameters[param.name].value} label={param.name} allowedDevices={allowedDevices} parameters={parameters} plan={plan}/>
+            return <SingleSelectInput required={parameters[param.name].required} isItemInArray={isItemInArray} addItem={replaceItem} clearItem={clearItem} selectedItems={parameters[param.name].value} label={param.name} allowedDevices={allowedDevices} parameters={parameters} plan={plan} description={parameters[param.name].description}/>
         } else {
-            return <TextInput label={param.name} value={parameters[param.name].value} cb={handleInputChange} required={parameters[param.name].required}/>
+            return <TextInput label={param.name} value={parameters[param.name].value} cb={handleInputChange} required={parameters[param.name].required} description={parameters[param.name].description}/>
         }
     }
 }
