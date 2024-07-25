@@ -3,8 +3,6 @@ import { tailwindIcons } from "../../assets/icons";
 import Button from '../library/Button';
 
 export default function DeleteResultPopup( {isVisible=false, cb=()=>{}, response={} }) {
-    const [isTextCopied, setIsTextCopied] = useState(false);
-
     const closePopup = () => {
         cb();
     };

@@ -1,5 +1,6 @@
 import { useState, Fragment } from "react";
 import DeleteResultPopup from "./DeleteResultPopup";
+import ConfirmDeleteItemPopup from "./ConfirmDeleteItemPopup";
 import { getPlanColor, getPlanColorOpacity } from "./qItemColorData";
 import { tailwindIcons } from "../../assets/icons";
 import { Tooltip } from 'react-tooltip';
@@ -60,9 +61,9 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
     
 
     
-    const handleConfirmDeleteClick = (uid) => {
+    const handleConfirmDeleteClick = () => {
         //send POST request to api
-        const body = {uid: uid};
+        const body = {uid: popupItem.item_uid};
         deleteQueueItem(body, handleDeleteResponse);
     };
 
@@ -93,7 +94,8 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
             content: 
                 <Fragment>
                     {Object.keys(popupItem.kwargs).map((kwarg) => printParameter(kwarg))}
-                    <div className="flex justify-center py-4"><Button text='Copy Plan' styles="m-auto"/></div>
+                    
+                    <div className="flex justify-center py-4"><Button text='Copy Plan' styles={`m-auto ${isDeleteModeVisible ? 'opacity-0' : ''}`}/></div>
                 </Fragment>
         },
         {
@@ -121,7 +123,7 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
                         <div id={name+'Tooltip'} className="w-10 text-slate-400 m-auto">{icon}</div>
                         <Tooltip anchorSelect={'#' + name + 'Tooltip'} content={name} place="left" variant="info"/>
                     </div>
-                    <div className="w-4/6 bg-white rounded-md border px-2 pt-2">
+                    <div className={`w-4/6 rounded-md border px-2 pt-2 ${isDeleteModeVisible ? deleteBg + ' ' + deleteBorder : 'bg-white'}`}>
                         {content}
                     </div>
                     <div className="w-1/6"></div>
@@ -149,6 +151,7 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
         <div name="background" className={`absolute top-0 left-0 w-full h-full z-10 ${getPlanColorOpacity(popupItem.name)} flex justify-center items-center ${isDeleteModeVisible ? 'bg-red-600/40' : ''}`}>
             <div name="main popup" className={`relative w-[30rem] h-[30rem] rounded-lg ${isDeleteModeVisible ? deleteBg : 'bg-slate-50'}`}>
                 {areResultsVisible ? <DeleteResultPopup response={response} cb={handleCloseResults}/> : ''}
+                {isDeleteModeVisible ? <ConfirmDeleteItemPopup handleCancel={handleCancelDeleteClick} handleDelete={handleConfirmDeleteClick} /> : ''}
                 <span className={`${getPlanColor(popupItem.name)} flex items-center rounded-t-lg ${isDeleteModeVisible ? 'opacity-20' : ''}`}>
                     <p className='w-1/12'></p>
                     <p className={`w-10/12 text-center text-white text-2xl py-1  `}>{popupItem.name}</p>
@@ -156,10 +159,8 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
                 </span>
                 <section className="overflow-auto flex flex-col space-y-4">
                    {rowContent.map((row) => Row(row.name, row.icon, row.content) )}
-                    <div className={`flex justify-center space-x-2 items-center w-full min-h-24 ${isDeleteModeVisible ? 'bg-white' : ''}`}>
-                        {isDeleteModeVisible ? <Button text='Cancel' cb={handleCancelDeleteClick} styles="bg-slate-700 hover:bg-slate-900"/> : ''}
-                        <span className={`hover:cursor-pointer ${isDeleteModeVisible ? 'text-red-500 hover:cursor-auto' : ''} w-12 h-12 hover:text-red-500`} onClick={handleFirstDeleteClick}>{tailwindIcons.trash}</span>
-                        {isDeleteModeVisible ? <Button text='Delete' cb={()=> handleConfirmDeleteClick(popupItem.item_uid)} styles="bg-red-600 hover:bg-red-400"/> : ''}
+                    <div className={`flex justify-center `}>
+                        <span className={` ${isDeleteModeVisible ? 'hidden' : ''} hover:cursor-pointer w-12 h-12 hover:text-red-500`} onClick={handleFirstDeleteClick}>{tailwindIcons.trash}</span>
                     </div>
                 </section>
             </div>
