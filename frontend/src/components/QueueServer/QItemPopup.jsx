@@ -2,6 +2,7 @@ import { useState, Fragment } from "react";
 import DeleteResultPopup from "./DeleteResultPopup";
 import { getPlanColor, getPlanColorOpacity } from "./qItemColorData";
 import { tailwindIcons } from "../../assets/icons";
+import { Tooltip } from 'react-tooltip';
 import Button from "../library/Button";
 import { deleteQueueItem } from "./apiClient";
 
@@ -36,13 +37,8 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
     const deleteText = 'text-slate-400';
 
     const handleDeleteResponse = (data) => {
-        //load the UI for the response
         setAreResultsVisible(true);
         setResponse(data);
-
-        //on success, display message that it was deleted, show a 'ok' button that closes the popup
-
-        //on failure, indicate it failed and show the error. show a 'ok' button that goes back to the popup
     };
 
     const handleCloseResults = () => {
@@ -52,44 +48,23 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
     };
 
     const handleFirstDeleteClick = () => {
-        //display set of buttons to delete
+        //display set of buttons to delete, grey out background
         setIsDeleteModeVisibile(true);
     };
 
     
     const handleCancelDeleteClick = () => {
-        //remove buttons from ui
+        //remove buttons from ui, revert to original background color
         setIsDeleteModeVisibile(false);
     }
     
-    const rowContent = [
-        {
-            icon: 'adjustmentsVertical',
-            content: ''
-        }
-    ];
+
     
     const handleConfirmDeleteClick = (uid) => {
-        //send request to api
+        //send POST request to api
         const body = {uid: uid};
         deleteQueueItem(body, handleDeleteResponse);
     };
-    const mockGetQueueItemResponse = {
-        "msg": "",
-        "item": {
-            "name": "count",
-            "kwargs": {
-                "detectors": [
-                    "jittery_motor2"
-                ]
-            },
-            "item_type": "plan",
-            "user": "UNAUTHENTICATED_SINGLE_USER",
-            "user_group": "primary",
-            "item_uid": "070d4e21-8408-43f9-a418-20afb411449f"
-        }  
-    };
-
 
 
     const printParameter = (kwarg) => {
@@ -111,28 +86,56 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
         )
     };
 
-    const Row = (icon, content) => {
-        if (icon === 'adjustmentsVertical') {
+    const rowContent = [
+        {
+            name:'Parameters',
+            icon: tailwindIcons.adjustmentsVertical,
+            content: 
+                <Fragment>
+                    {Object.keys(popupItem.kwargs).map((kwarg) => printParameter(kwarg))}
+                    <div className="flex justify-center py-4"><Button text='Copy Plan' styles="m-auto"/></div>
+                </Fragment>
+        },
+        {
+            name:'UID',
+            icon: tailwindIcons.fingerprint,
+            content: popupItem.item_uid,
+        },
+        {
+            name:'User',
+            icon: tailwindIcons.user,
+            content: popupItem.user,
+        },
+        {
+            name:'User_Group',
+            icon: tailwindIcons.users,
+            content: popupItem.user_group,
+        },
+    ];
+
+    const Row = (name, icon, content) => {
+        if (name === 'Parameters') {
             return (
-                <div className="flex pt-4">
+                <div key={name} className="flex pt-4">
                     <div className="w-1/6"> 
-                        <div className="w-10 text-slate-400 m-auto">{tailwindIcons.adjustmentsVertical}</div>
+                        <div id={name+'Tooltip'} className="w-10 text-slate-400 m-auto">{icon}</div>
+                        <Tooltip anchorSelect={'#' + name + 'Tooltip'} content={name} place="left" variant="info"/>
                     </div>
                     <div className="w-4/6 bg-white rounded-md border px-2 pt-2">
-                        {Object.keys(popupItem.kwargs).map((kwarg) => printParameter(kwarg))}
-                        <div className="flex justify-center py-4"><Button text='Copy Plan' styles="m-auto"/></div>
+                        {content}
                     </div>
                     <div className="w-1/6"></div>
                 </div>
             )
         }
         return(
-            <div className="flex items-center">
+            <div key={name} className="flex items-center">
                 <div className="w-1/6"> 
-                    <div className="w-10 text-slate-400 m-auto">{icon}</div>
+                    <div id={name+'Tooltip'} className="w-10 text-slate-400 m-auto">{icon}</div>
+                    <Tooltip anchorSelect={'#' + name + 'Tooltip'} content={name.replace('_', ' ')} place="left" variant="info"/>
                 </div>
                 <p className="w-4/6">
-                    {popupItem.user_group}
+                    {content}
                 </p>
                 <div className="w-1/6"></div>
             </div>
@@ -152,9 +155,23 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
                     <div className='w-1/12 hover:cursor-pointer' onClick={handleQItemPopupClose}>{tailwindIcons.xCircle}</div>
                 </span>
                 <section className="overflow-auto flex flex-col space-y-4">
-                    <div className="flex pt-4">
+                   {rowContent.map((row) => Row(row.name, row.icon, row.content) )}
+                    <div className={`flex justify-center space-x-2 items-center w-full min-h-24 ${isDeleteModeVisible ? 'bg-white' : ''}`}>
+                        {isDeleteModeVisible ? <Button text='Cancel' cb={handleCancelDeleteClick} styles="bg-slate-700 hover:bg-slate-900"/> : ''}
+                        <span className={`hover:cursor-pointer ${isDeleteModeVisible ? 'text-red-500 hover:cursor-auto' : ''} w-12 h-12 hover:text-red-500`} onClick={handleFirstDeleteClick}>{tailwindIcons.trash}</span>
+                        {isDeleteModeVisible ? <Button text='Delete' cb={()=> handleConfirmDeleteClick(popupItem.item_uid)} styles="bg-red-600 hover:bg-red-400"/> : ''}
+                    </div>
+                </section>
+            </div>
+        </div>
+        </Fragment>
+    )
+}
+/* 
+ <div className="flex pt-4">
                         <div className="w-1/6"> 
-                            <div className="w-10 text-slate-400 m-auto">{tailwindIcons.adjustmentsVertical}</div>
+                            <div id="parameterTooltip" className="w-10 text-slate-400 m-auto">{tailwindIcons.adjustmentsVertical}</div>
+                            <Tooltip anchorSelect="#parameterTooltip" content="parameters" place="left" className="bg-slate-100 noArrow" variant="info"/>
                         </div>
                         <div className={`w-4/6 rounded-md border px-2 pt-2 ${isDeleteModeVisible ? deleteBg + ' ' + deleteBorder : 'bg-white'}`}>
                             {Object.keys(popupItem.kwargs).map((kwarg) => printParameter(kwarg))}
@@ -164,7 +181,8 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
                     </div>
                     <div className="flex items-center">
                         <div className="w-1/6"> 
-                            <div className="w-10 text-slate-400 m-auto">{tailwindIcons.fingerprint}</div>
+                            <div id="fingerprintTooltip" className="w-10 text-slate-400 m-auto">{tailwindIcons.fingerprint}</div>
+                            <Tooltip anchorSelect="#fingerprintTooltip" content="UID" place="left" className="bg-slate-100 noArrow" variant="info"/>
                         </div>
                         <p className="w-4/6">
                             {popupItem.item_uid}
@@ -189,14 +207,4 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
                         </p>
                         <div className="w-1/6"></div>
                     </div>
-                    <div className={`flex justify-center space-x-2 items-center w-full min-h-24 ${isDeleteModeVisible ? 'bg-white' : ''}`}>
-                        {isDeleteModeVisible ? <Button text='Cancel' cb={handleCancelDeleteClick} styles="bg-slate-700 hover:bg-slate-900"/> : ''}
-                        <span className={`hover:cursor-pointer ${isDeleteModeVisible ? 'text-red-500 hover:cursor-auto' : ''} w-12 h-12 hover:text-red-500`} onClick={handleFirstDeleteClick}>{tailwindIcons.trash}</span>
-                        {isDeleteModeVisible ? <Button text='Delete' cb={()=> handleConfirmDeleteClick(popupItem.item_uid)} styles="bg-red-600 hover:bg-red-400"/> : ''}
-                    </div>
-                </section>
-            </div>
-        </div>
-        </Fragment>
-    )
-}
+ */
