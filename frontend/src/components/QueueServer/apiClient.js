@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { mockDevicesAllowedResponse, mockPlansAllowedResponse, mockGetQueueItemResponse, mockDeleteQueueItemResponse } from './qServerMockData';
+import { mockDevicesAllowedResponse, mockPlansAllowedResponse, mockGetQueueItemResponse, mockDeleteQueueItemResponse, mockQueueHistoryData } from './qServerMockData';
 import { getHttpServerUrl, getQServerKey } from '../../utilities/connectionHelper';
 
 // Mock data (if needed)
@@ -68,6 +68,23 @@ const getQueue = async (cb, mock=false) => {
         cb(response.data);
     } catch (error) {
         console.error('Error fetching queue:', error);
+    }
+};
+
+const getQueueHistory = async (cb, mock=false) => {
+    if (mock) {
+        cb(mockQueueHistoryData);
+        return;
+    }
+    try {
+        const response = await axios.get(httpServerUrl + 'api/history/get', 
+            {headers : {
+                'Authorization' : 'ApiKey ' + qServerKey
+            }}
+        );
+        cb(response.data);
+    } catch (error) {
+        console.error('Error fetching history:', error);
     }
 };
 
@@ -195,4 +212,4 @@ const deleteQueueItem = async (body={}, cb=()=>{}) => {
 
 
 
-export { getQueue, getStatus, getPlansAllowed, getDevicesAllowed, startRE, postQueueItem, getQueueItem, deleteQueueItem };
+export { getQueue, getStatus, getPlansAllowed, getDevicesAllowed, startRE, postQueueItem, getQueueItem, deleteQueueItem, getQueueHistory };

@@ -4033,4 +4033,62 @@ const mockDeleteQueueItemResponse = {
     "qsize": 0
 };
 
-export { mockDevicesAllowedResponse, mockPlansAllowedResponse, mockGetQueueItemResponse, mockDeleteQueueItemResponse };
+const mockQueueHistoryData = {
+  "success": true,
+  "msg": "",
+  "items": [
+    {
+      "name": "count",
+      "kwargs": {
+        "detectors": [
+          "ab_det"
+        ]
+      },
+      "item_type": "plan",
+      "user": "UNAUTHENTICATED_SINGLE_USER",
+      "user_group": "primary",
+      "item_uid": "418393b5-ea17-434d-8899-190a1b7b3f9a",
+      "result": {
+        "exit_status": "completed",
+        "run_uids": [
+          "70701cd4-80f8-4559-ae31-685ee8bd5e8f"
+        ],
+        "scan_ids": [
+          1
+        ],
+        "time_start": 1721942455.82465,
+        "time_stop": 1721942456.559789,
+        "msg": "",
+        "traceback": ""
+      }
+    },
+    {
+      "name": "count",
+      "kwargs": {
+        "detectors": [
+          "bool_sig"
+        ]
+      },
+      "item_type": "plan",
+      "user": "UNAUTHENTICATED_SINGLE_USER",
+      "user_group": "primary",
+      "item_uid": "cd103773-ffe6-412a-879b-a02b3610c2fc",
+      "result": {
+        "exit_status": "completed",
+        "run_uids": [
+          "7bc5a727-43d1-455d-a8af-fc1d92743183"
+        ],
+        "scan_ids": [
+          2
+        ],
+        "time_start": 1721942682.8607092,
+        "time_stop": 1721942683.549676,
+        "msg": "",
+        "traceback": ""
+      }
+    }
+  ],
+  "plan_history_uid": "bcaab829-6629-49f4-a6ab-851b7baaf9bb"
+}
+
+export { mockDevicesAllowedResponse, mockPlansAllowedResponse, mockGetQueueItemResponse, mockDeleteQueueItemResponse, mockQueueHistoryData };

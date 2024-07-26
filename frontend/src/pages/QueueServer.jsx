@@ -4,7 +4,7 @@ import QSRunEngineWorker from "../components/QueueServer/QSRunEngineWorker";
 import QSAddItem from "../components/QueueServer/QSAddItem";
 import QItemPopup from "../components/QueueServer/QItemPopup";
 import { getQServerKey } from "../utilities/connectionHelper";
-import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus, getQueueItem } from "../components/QueueServer/apiClient";
+import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus, getQueueItem, getQueueHistory } from "../components/QueueServer/apiClient";
 import axios from "axios";
 import { useState, Fragment, useEffect, useRef } from 'react';
 
@@ -67,9 +67,13 @@ export default function QueueServer() {
 
     const [ workerStatus, setWorkerStatus ] = useState('');
     const [ isQItemPopupVisible, setIsQItemPopupVisible ] = useState(false);
+    const [ isHistoryVisible, setIsHistoryVisible ] = useState(false);
     const [ popupItem, setPopupItem ] = useState({});
     const [ queueData, setQueueData ] = useState([]);
     const queueDataRef = useRef(queueData);
+    const [queueHistoryData, setQueueHistoryData ] = useState([]);
+    const queueHistoryDataRef = useRef(queueHistoryData);
+    const planHistoryUidRef = useRef('');
     const [ isREToggleOn, setIsREToggleOn ] = useState(false);
     const runEngineToggleRef = useRef(isREToggleOn);
     const [ runningItem, setRunningItem ] = useState({});
@@ -99,6 +103,10 @@ export default function QueueServer() {
     useEffect(() => {
         runEngineToggleRef.current = isREToggleOn;
     }, [isREToggleOn]);
+
+    useEffect(() => {
+        queueHistoryDataRef.current = queueHistoryData;
+    }, [queueHistoryData]);
     
 
 
@@ -147,12 +155,30 @@ export default function QueueServer() {
         } catch(error) {
             console.log({error});
         }
-    }
+    };
+
+    const handleQueueHistoryResponse = (res) => {
+        if (res.success === true) {
+            try {
+                //only triggers render if the history uid changed
+                if (res.plan_history_uid !== planHistoryUidRef.current) {
+                    setQueueHistoryData(res.items);
+                    planHistoryUidRef.current = res.plan_history_uid;
+                }
+            } catch(e) {
+                console.log(e);
+            }
+        } else {
+            console.log('Error retrieving queue history');
+            console.log({res});
+        }
+    };
     
     useEffect(() => {
         //get current queue
         //getQueue(setQueueData, queueDataRef, setRunningItem, runningItemRef); //we need to send in a handler for a running item
         getQueue(handleQueueDataResponse);
+        getQueueHistory(handleQueueHistoryResponse);
         //start polling at regular intervals
         setInterval(()=> getQueue(handleQueueDataResponse), pollingInterval);
         console.log('page load')
@@ -238,6 +264,7 @@ export default function QueueServer() {
                     <div className="w-3/12 mt-2">
                         <QSRunEngineWorker workerStatus={workerStatus} runningItem={runningItem} isREToggleOn={isREToggleOn} setIsREToggleOn={setIsREToggleOn}/>
                     </div>
+                    {isHistoryVisible ? <QSList queueData={queueHistoryData} handleQItemClick={handleQItemClick}/> : ''}
                 </div>
                 <div className="h-4/6">
                     <QSConsole title={false} description={false} processConsoleMessage={processConsoleMessage}/>
