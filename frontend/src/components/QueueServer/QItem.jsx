@@ -2,14 +2,7 @@ import { useState, Fragment } from 'react';
 import { tailwindIcons } from '../../assets/icons';
 import { getPlanColor } from './qItemColorData';
 
-export default function QItem ({ item=false, index=1, text='', styles='', clickable=true, handleClick=()=>{} }) {
-    const [ isOpen, setIsOpen ] = useState(false);
-
-    const handleItemClick = () => {
-        if (clickable) {
-            setIsOpen(!isOpen);
-        }
-    };
+export default function QItem ({ item=false, label=1, text='', styles='', clickable=true, handleClick=()=>{} }) {
     
     const commonStyles = 'w-32 h-32 rounded-md mx-2 hover:cursor-pointer hover:shadow-lg hover:shadow-gray-500 list-none';
     if (item!== false && Object.keys(item).length > 0 ) {
@@ -29,7 +22,7 @@ export default function QItem ({ item=false, index=1, text='', styles='', clicka
                         })}
                     </div>
                 </li>
-                <p className="text-slate-300 font-bold text-xs mt-1">{index}</p>
+                <p className="text-slate-300 font-bold text-xs mt-1">{label}</p>
             </div>
         )
     } else {

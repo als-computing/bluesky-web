@@ -67,7 +67,7 @@ export default function QueueServer() {
 
     const [ workerStatus, setWorkerStatus ] = useState('');
     const [ isQItemPopupVisible, setIsQItemPopupVisible ] = useState(false);
-    const [ isHistoryVisible, setIsHistoryVisible ] = useState(false);
+    const [ isHistoryVisible, setIsHistoryVisible ] = useState(true);
     const [ popupItem, setPopupItem ] = useState({});
     const [ queueData, setQueueData ] = useState([]);
     const queueDataRef = useRef(queueData);
@@ -190,9 +190,10 @@ export default function QueueServer() {
         //The get/status api endpoint seems to not provide the most recent running status when called immediately after the console triggers it
         //console.log({msg});
         //function processess each Queue Server console message to trigger immediate state and UI updates
-        if (msg.startsWith("Queue is empty") || msg.startsWith("Starting the plan")) {
+        if (msg.startsWith("Starting the plan")) {
             //update RE worker
             getQueue(handleQueueDataResponse);
+            getQueueHistory(handleQueueHistoryResponse);
         }
 
         if (msg.startsWith("Starting queue processing")) {
@@ -255,18 +256,33 @@ export default function QueueServer() {
     //to do - refactor this so we can more easily set the size on different routes
     return (
         <Fragment>
-            <main className="bg-black shadow-lg max-w-screen-2xl m-auto rounded-md h-[40rem] 3xl:max-w-screen-xl relative">
-                {isQItemPopupVisible ? <QItemPopup handleQItemPopupClose={handleQItemPopupClose} popupItem={popupItem}/> : ''}
-                <div className="flex mx-4 border-b-white border-b h-2/6">
+            <main className="bg-black shadow-lg max-w-screen-2xl m-auto rounded-md h-[50rem] 3xl:max-w-screen-xl relative">
+            {isQItemPopupVisible ? (
+                <QItemPopup handleQItemPopupClose={handleQItemPopupClose} popupItem={popupItem} />
+            ) : (
+                ''
+            )}
+                <div className="flex mx-4 border-b-white border-b h-2/6 items-center">
                     <div className="w-9/12 px-2 mt-2">
                         <QSList queueData={queueData} handleQItemClick={handleQItemClick}/>
                     </div>
                     <div className="w-3/12 mt-2">
-                        <QSRunEngineWorker workerStatus={workerStatus} runningItem={runningItem} isREToggleOn={isREToggleOn} setIsREToggleOn={setIsREToggleOn}/>
+                        <QSRunEngineWorker 
+                            workerStatus={workerStatus} 
+                            runningItem={runningItem} 
+                            isREToggleOn={isREToggleOn} 
+                            setIsREToggleOn={setIsREToggleOn}
+                        />
                     </div>
-                    {isHistoryVisible ? <QSList queueData={queueHistoryData} handleQItemClick={handleQItemClick}/> : ''}
                 </div>
-                <div className="h-4/6">
+                {isHistoryVisible ? (
+                    <div className="h-2/6 flex items-center">
+                        <QSList queueData={queueHistoryData} handleQItemClick={handleQItemClick} type='history' />
+                    </div>
+                ) : (
+                    ''
+                )}
+                <div className={`${isHistoryVisible ? 'h-2/6' : 'h-4/6'} `}>
                     <QSConsole title={false} description={false} processConsoleMessage={processConsoleMessage}/>
                 </div>
             </main>
