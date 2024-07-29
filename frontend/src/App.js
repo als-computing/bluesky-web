@@ -19,7 +19,7 @@ import Sidebar from './components/Sidebar/Sidebar.jsx';
 
 function App() {
   const location = useLocation();
-  const compressRightSide = location.pathname.startsWith('/queueserver');
+  const compressRightSide = location.pathname.startsWith('/queueserver') || location.pathname.startsWith('/beamlines');
 
 
   return (

@@ -67,7 +67,7 @@ export default function QueueServer() {
 
     const [ workerStatus, setWorkerStatus ] = useState('');
     const [ isQItemPopupVisible, setIsQItemPopupVisible ] = useState(false);
-    const [ isHistoryVisible, setIsHistoryVisible ] = useState(false);
+    const [ isHistoryVisible, setIsHistoryVisible ] = useState(true);
     const [ popupItem, setPopupItem ] = useState({});
     const [ queueData, setQueueData ] = useState([]);
     const queueDataRef = useRef(queueData);
@@ -269,7 +269,57 @@ export default function QueueServer() {
     //to do - refactor this so we can more easily set the size on different routes
     return (
         <Fragment>
-            <main className="bg-black shadow-lg max-w-screen-2xl m-auto rounded-md h-[50rem] 3xl:max-w-screen-xl relative">
+            <main className="bg-black shadow-lg max-w-screen-2xl m-auto flex rounded-md h-[40rem] 3xl:max-w-screen-xl relative">
+                {/* ITEM POPUP  */}
+                {isQItemPopupVisible ? (
+                    <QItemPopup handleQItemPopupClose={handleQItemPopupClose} popupItem={popupItem} />
+                ) : (
+                    ''
+                )}  
+
+                {/* LEFT SIDE */}
+                <div className="w-5/6">
+                    {/* TOP of LEFT SIDE  */}
+                    <div className="flex mx-4 border-b-white border-b h-2/6 items-center">
+                        <div className="w-9/12 px-2 mt-2">
+                            <QSList queueData={queueData} handleQItemClick={handleQItemClick}/>
+                        </div>
+                        <div className="w-3/12 mt-2">
+                            <QSRunEngineWorker 
+                                workerStatus={workerStatus} 
+                                runningItem={runningItem} 
+                                isREToggleOn={isREToggleOn} 
+                                setIsREToggleOn={setIsREToggleOn}
+                            />
+                        </div>
+                    </div>
+
+                    {/* BOTTOM of LEFT SIDE */}
+                    <div className={`h-4/6`}>
+                        <QSConsole title={false} description={false} processConsoleMessage={processConsoleMessage}/>
+                    </div>
+                </div>
+
+                {/* RIGHT SIDE */}
+                {isHistoryVisible ? (
+                    <div className="h-full w-1/6 border-l-white border-ddl rounded-r-md bg-slate-900">
+                        <QSList queueData={queueHistoryData} handleQItemClick={handleQItemClick} type='history' />
+                    </div>
+                ) : (
+                    ''
+                )}
+            </main>
+
+            <div className="mt-16 mb-20 flex justify-center">
+                <QSAddItem />
+            </div>
+        </Fragment>
+    )
+
+    //original prior to adding history feature , 07/29
+    return (
+        <Fragment>
+            <main className="bg-black shadow-lg max-w-screen-2xl m-auto rounded-md h-[45rem] 3xl:max-w-screen-xl relative">
             {isQItemPopupVisible ? (
                 <QItemPopup handleQItemPopupClose={handleQItemPopupClose} popupItem={popupItem} />
             ) : (
@@ -295,10 +345,11 @@ export default function QueueServer() {
                 ) : (
                     ''
                 )}
-                <div className={`${isHistoryVisible ? 'h-2/6' : 'h-4/6'} `}>
+                <div className={`h-4/6`}>
                     <QSConsole title={false} description={false} processConsoleMessage={processConsoleMessage}/>
                 </div>
             </main>
+
             <div className="mt-16 mb-20 flex justify-center">
                 <QSAddItem />
             </div>

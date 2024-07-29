@@ -16,9 +16,9 @@ export default function QSList({ queueData=[], handleQItemClick=()=>{}, type='de
     } else if (type === 'history') {
         console.log({queueData});
         return (
-            <section className="w-full">
-                <h2 className="text-white text-xl text-center">History</h2>
-                <ul className="flex flex-row-reverse justify-end mt-2 overflow-auto" style={{'scrollbar-color': 'grey black'}}>
+            <section className="h-full w-full flex flex-col ">
+                <h2 className="h-[10%] text-white text-xl text-center flex items-end justify-center mb-1 pb-1">History</h2>
+                <ul className="flex flex-col-reverse space-y-8 h-[90%] overflow-y-auto" style={{'scrollbar-color': 'grey rgb(15 23 42)'}}>
                     {queueData.map((item, index) => <QItem item={item} label={dayjs(item.result.time_stop * 1000).format('MM/DD hh:mm a')} key={item.item_uid} handleClick={()=>handleQItemClick(item)}/>)}
                 </ul>
             </section>
