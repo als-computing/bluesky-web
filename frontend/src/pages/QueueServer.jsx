@@ -218,6 +218,7 @@ export default function QueueServer() {
             //get request on queue items
             //qserver takes some time to place the item back into the queue
             setTimeout(()=> getQueue(handleQueueDataResponse), 500 ); //call the server some time after failure occurs
+            setTimeout(()=> getQueueHistory(handleQueueHistoryResponse), 500 );
         }
 
         if (msg.startsWith("Removing item from the queue")) {
