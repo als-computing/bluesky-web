@@ -148,27 +148,27 @@ export default function QSConsole({ title=true, description = true, processConso
     return (
         <main className="h-full">
             {title ? <h1 className="text-center text-xl font-medium pt-8 pb-4" >Queue Server Listener</h1> : ''}
-            <section ref={messageContainerRef} name="message container" className="overflow-auto h-full  w-full rounded-lg bg-black" style={{'scrollbar-color': 'grey black'}}>
-                <div name="title, toggle switch, status" className="flex items-center space-x-12 py-4 pl-4">
-                    <h2 name="title" className="text-white text-xl">Queue Server Console Output</h2>
-                    <div name="toggle" className="flex w-fit items-center space-x-2">
-                        <p className={`${isToggleOn ? 'text-gray-400' : 'text-white'}`}>OFF</p>
-                        <button
-                            onClick={toggleSwitch}
-                            className={`w-16 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer ${
-                                isToggleOn ? 'bg-green-600' : 'bg-gray-300'
+            <div name="title, toggle switch, status" className="flex items-center space-x-12 pl-12 h-1/6">
+                <h2 name="title" className="text-white text-xl">Queue Server Console Output</h2>
+                <div name="toggle" className="flex w-fit items-center space-x-2">
+                    <p className={`${isToggleOn ? 'text-gray-400' : 'text-white'}`}>OFF</p>
+                    <button
+                        onClick={toggleSwitch}
+                        className={`w-16 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer ${
+                            isToggleOn ? 'bg-green-600' : 'bg-gray-300'
+                        }`}
+                        >
+                        <div
+                            className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${
+                                isToggleOn ? 'translate-x-9' : 'translate-x-0'
                             }`}
-                            >
-                            <div
-                                className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${
-                                    isToggleOn ? 'translate-x-9' : 'translate-x-0'
-                                }`}
-                            ></div>
-                        </button>
-                        <p className={`${isToggleOn ? 'text-white' : 'text-gray-400'}`}>ON</p>
-                    </div>
-                    <p name="status" className="text-white">{statusMessage}</p>
+                        ></div>
+                    </button>
+                    <p className={`${isToggleOn ? 'text-white' : 'text-gray-400'}`}>ON</p>
                 </div>
+                <p name="status" className="text-white">{statusMessage}</p>
+            </div>
+            <section ref={messageContainerRef} name="message container" className="overflow-auto h-5/6  w-full rounded-lg bg-black" style={{'scrollbar-color': 'grey black'}}>
                 {isOpened ? <p className="text-slate-400 pl-4 pt-4">Connection Opened. Listening for Queue Server console output.</p> : <p className="animate-pulse text-white pl-4 pt-4">Waiting for initialization...</p>}
                 <ul className="flex flex-col bg-black py-4">
                     {wsMessages.map((msg) => {
