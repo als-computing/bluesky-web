@@ -7,9 +7,9 @@ export default function QSList({ queueData=[], handleQItemClick=()=>{}, type='de
         return (
             <section className="">
                 <h2 className="text-white text-xl text-center">Queue Items</h2>
-                <ul className="flex flex-row-reverse border-r border-r-white pr-2 mt-2 overflow-auto" style={{'scrollbar-color': 'grey black'}}>
-                    {queueData.map((item, index) => <QItem item={item} label={index} key={item.item_uid} handleClick={handleQItemClick}/>)}
-                    {queueData.length < 4 ? [...new Array(5-queueData.length)].map((item, index) => <QItem item={item} index={index} key={index}/>) : '' }
+                <ul className="flex flex-row-reverse border-r border-r-white pr-2 mt-2 overflow-auto justify-evenly" style={{'scrollbar-color': 'grey black'}}>
+                    {queueData.map((item, index) => <QItem item={item} label={index} key={item.item_uid} handleClick={()=>handleQItemClick(item)}/>)}
+                    {queueData.length < 3 ? [...new Array(4 - queueData.length)].map((item, index) => <QItem item={item} index={index} key={index}/>) : '' }
                 </ul>
             </section>
         )

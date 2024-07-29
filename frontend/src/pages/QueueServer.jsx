@@ -67,7 +67,7 @@ export default function QueueServer() {
 
     const [ workerStatus, setWorkerStatus ] = useState('');
     const [ isQItemPopupVisible, setIsQItemPopupVisible ] = useState(false);
-    const [ isHistoryVisible, setIsHistoryVisible ] = useState(true);
+    const [ isHistoryVisible, setIsHistoryVisible ] = useState(false);
     const [ popupItem, setPopupItem ] = useState({});
     const [ queueData, setQueueData ] = useState([]);
     const queueDataRef = useRef(queueData);
@@ -234,17 +234,30 @@ export default function QueueServer() {
     const handleOpenQItemPopup = (data) => {
         if (data.success !== false) {
             //set popup to visible
-            setPopupItem(data.item);
+            if (data.item) {
+                //occurs on GET request
+                setPopupItem(data.item);
+            } else {
+                //occurs when item is sent in directly
+                setPopupItem(data);
+            }
             setIsQItemPopupVisible(true);
         } else {
             console.log('No item found in "get queue item" response');
         }
     }
 
-    const handleQItemClick = (uid) => {
-        //send a get Request to Qserver for the item UID, then displays a large popup with item
-        console.log({uid});
-        getQueueItem(uid, handleOpenQItemPopup);
+    const handleQItemClick = (arg) => {
+        //until httpserver queue/item/get endpoint is fixed,
+        //populate the item popup with the existing data.
+        //It is better to do a 'GET' on item UID in case the item parameters
+        //have been changed by a user on another workstation and the data is stale
+        if (typeof arg === 'string') {
+            getQueueItem(arg, handleOpenQItemPopup);
+        } else {
+            //entire item has been sent in
+            handleOpenQItemPopup(arg);
+        }
     };
 
     const handleQItemPopupClose = () => {
@@ -276,7 +289,7 @@ export default function QueueServer() {
                     </div>
                 </div>
                 {isHistoryVisible ? (
-                    <div className="h-2/6 flex items-center">
+                    <div className="h-2/6 flex items-center border-b-white border-b mx-4">
                         <QSList queueData={queueHistoryData} handleQItemClick={handleQItemClick} type='history' />
                     </div>
                 ) : (
