@@ -168,7 +168,7 @@ export default function QSConsole({ title=true, description = true, processConso
                 </div>
                 <p name="status" className="text-white">{statusMessage}</p>
             </div>
-            <section ref={messageContainerRef} name="message container" className="overflow-auto h-5/6  w-full rounded-lg bg-black" style={{'scrollbar-color': 'grey black'}}>
+            <section ref={messageContainerRef} name="message container" className="overflow-auto h-5/6  w-full rounded-lg bg-black" style={{'scrollbarColor': 'grey black'}}>
                 {isOpened ? <p className="text-slate-400 pl-4 pt-4">Connection Opened. Listening for Queue Server console output.</p> : <p className="animate-pulse text-white pl-4 pt-4">Waiting for initialization...</p>}
                 <ul className="flex flex-col bg-black py-4">
                     {wsMessages.map((msg) => {
