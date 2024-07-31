@@ -29,7 +29,7 @@ const mockDeleteQueueItemResponse = {
     "qsize": 0
 };
 
-export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} } ) {
+export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{}, isItemDeleteButtonVisible=true } ) {
     const [isDeleteModeVisible, setIsDeleteModeVisibile] = useState(false);
     const [areResultsVisible, setAreResultsVisible] = useState(false);
     const [response, setResponse] = useState({});
@@ -128,7 +128,7 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
             {
                 name: 'Status',
                 icon: result.exit_status === 'failed' ? tailwindIcons.exclamationTriangle : tailwindIcons.checkmarkInCircle,
-                content: popupItem.result.exit_status
+                content: <p>Status: {popupItem.result.exit_status}</p>
             },
             {
                 name: 'Timeline',
@@ -193,10 +193,10 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
                     <div id={name+'Tooltip'} className="w-10 text-slate-400 m-auto">{icon}</div>
                     <Tooltip anchorSelect={'#' + name + 'Tooltip'} content={name.replace('_', ' ')} place="left" variant="info"/>
                 </div>
-                <p className={`${name === 'Traceback' ? 'bg-white p-2 rounded-md border border-slate-200' : ''} w-4/6`}>
+                <p className={`${name === 'Traceback' ? 'w-5/6 bg-white p-2 mr-2 rounded-md border border-slate-200' : 'w-4/6'}`}>
                     {content}
                 </p>
-                <div className="w-1/6"></div>
+                {name==='Traceback' ? '' : <div className="w-1/6"></div> }
             </div>
         )
     };
@@ -204,7 +204,7 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
 
         return (
             <div name="background" className={`absolute top-0 left-0 w-full h-full z-10 ${getPlanColorOpacity(popupItem.name)} flex justify-center items-center ${isDeleteModeVisible ? 'bg-red-600/40' : ''}`}>
-                <div name="main popup" className={`relative ${isHistory ? 'w-[90%]' : 'w-[30rem]'} h-[30rem] rounded-lg ${isDeleteModeVisible ? deleteBg : 'bg-slate-50'}`}>
+                <div name="main popup" className={`relative ${isHistory ? 'w-[90%] h-[90%]' : 'w-[30rem] h-[30rem]'} rounded-lg ${isDeleteModeVisible ? deleteBg : 'bg-slate-50'}`}>
                     {areResultsVisible ? <DeleteResultPopup response={response} cb={handleCloseResults}/> : ''}
                     {isDeleteModeVisible ? <ConfirmDeleteItemPopup handleCancel={handleCancelDeleteClick} handleDelete={handleConfirmDeleteClick} /> : ''}
                     <span name="title" className={`${getPlanColor(popupItem.name)} h-[10%] flex items-center rounded-t-lg ${isDeleteModeVisible ? 'opacity-20' : ''}`}>
@@ -212,9 +212,10 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
                         <p className={`w-10/12 text-center text-white text-2xl py-1  `}>{popupItem.name}</p>
                         <div className='w-1/12 hover:cursor-pointer' onClick={handleQItemPopupClose}>{tailwindIcons.xCircle}</div>
                     </span>
-                    <div name="content" className="h-[90%] overflow-auto">
+                    <div name="content" className="h-[90%] flex">
                         {isHistory ? (
-                            <section name="history results" className="overflow-auto flex flex-col space-y-4">
+                            <section name="history results" className="w-3/5 h-full overflow-auto flex flex-col space-y-4 py-2 border-r border-r-slate-200">
+                                <h2 className="text-center text-xl font-semibold">Results</h2>
                                 {results.map((item) => {
                                     return (
                                         item.content !== null ?
@@ -227,9 +228,10 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{} 
                         ) : ( 
                             ''
                         )}
-                        <section name="settings" className="overflow-auto flex flex-col space-y-4">
-                        {settings.map((row) => Row(row.name, row.icon, row.content) )}
-                            <div className={`flex justify-center `}>
+                        <section name="settings" className={`${isHistory ? 'w-2/5' : 'w-full'} h-full overflow-auto flex flex-col space-y-4 py-2`}>
+                            <h2 className="text-center text-xl font-semibold">Plan Information</h2>
+                            {settings.map((row) => Row(row.name, row.icon, row.content) )}
+                            <div name="delete icon" className={`${isItemDeleteButtonVisible ? '' : 'hidden'} flex justify-center `}>
                                 <span className={` ${isDeleteModeVisible ? 'hidden' : ''} hover:cursor-pointer w-12 h-12 hover:text-red-500`} onClick={handleFirstDeleteClick}>{tailwindIcons.trash}</span>
                             </div>
                         </section>

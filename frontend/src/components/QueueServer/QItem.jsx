@@ -2,12 +2,12 @@ import { useState, Fragment } from 'react';
 import { tailwindIcons } from '../../assets/icons';
 import { getPlanColor } from './qItemColorData';
 
-export default function QItem ({ item=false, label=1, text='', styles='', clickable=true, handleClick=()=>{} }) {
+export default function QItem ({ item=false, label=1, text='', styles='', clickable=true, handleClick=()=>{}, type="default" }) {
     
     const commonStyles = 'w-32 h-32 rounded-md mx-2 hover:cursor-pointer hover:shadow-lg hover:shadow-gray-500 list-none';
     if (item!== false && Object.keys(item).length > 0 ) {
         if ('result' in item) {
-            //Queue History
+            //Queue History and kicked back plans
             return (
                 <div className="flex flex-col items-center">
                     <div className="h-6 w-6 text-red-500">
@@ -32,8 +32,7 @@ export default function QItem ({ item=false, label=1, text='', styles='', clicka
                         <p className="text-slate-300 font-bold text-xs mt-1">{label}</p>
                     </div>
                 </div>
-
-                )
+            )
         } else {
             //Current Queue Item
             return (

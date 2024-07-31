@@ -78,6 +78,7 @@ export default function QueueServer() {
     const runEngineToggleRef = useRef(isREToggleOn);
     const [ runningItem, setRunningItem ] = useState({});
     const runningItemRef = useRef(runningItem);
+    const [ isItemDeleteButtonVisible, setIsItemDeleteButtonVisible ] = useState(true);
 
     //setup polling interval for getting regular updates from the http server
     var pollingInterval;
@@ -232,7 +233,8 @@ export default function QueueServer() {
         //when the WS receives message about RE Worker, trigger UI updates on RE Worker Component
     };
 
-    const handleOpenQItemPopup = (data) => {
+    const handleOpenQItemPopup = (data, showDeleteButton=true) => {
+        console.log({showDeleteButton})
         if (data.success !== false) {
             //set popup to visible
             if (data.item) {
@@ -241,6 +243,8 @@ export default function QueueServer() {
             } else {
                 //occurs when item is sent in directly
                 setPopupItem(data);
+                showDeleteButton ? setIsItemDeleteButtonVisible(true) : setIsItemDeleteButtonVisible(false);
+                console.log({isItemDeleteButtonVisible})
             }
             setIsQItemPopupVisible(true);
         } else {
@@ -248,7 +252,7 @@ export default function QueueServer() {
         }
     }
 
-    const handleQItemClick = (arg) => {
+    const handleQItemClick = (arg, showDeleteButton=true) => {
         //until httpserver queue/item/get endpoint is fixed,
         //populate the item popup with the existing data.
         //It is better to do a 'GET' on item UID in case the item parameters
@@ -257,7 +261,7 @@ export default function QueueServer() {
             getQueueItem(arg, handleOpenQItemPopup);
         } else {
             //entire item has been sent in
-            handleOpenQItemPopup(arg);
+            handleOpenQItemPopup(arg, showDeleteButton);
         }
     };
 
@@ -273,7 +277,7 @@ export default function QueueServer() {
             <main className="bg-black shadow-lg max-w-screen-2xl m-auto flex rounded-md h-[40rem] 3xl:max-w-screen-xl relative">
                 {/* ITEM POPUP  */}
                 {isQItemPopupVisible ? (
-                    <QItemPopup handleQItemPopupClose={handleQItemPopupClose} popupItem={popupItem} />
+                    <QItemPopup handleQItemPopupClose={handleQItemPopupClose} popupItem={popupItem} isItemDeleteButtonVisible={isItemDeleteButtonVisible} />
                 ) : (
                     ''
                 )}  
@@ -283,7 +287,7 @@ export default function QueueServer() {
                     {/* TOP of LEFT SIDE  */}
                     <div className="flex mx-4 border-b-white border-b h-2/6 items-center">
                         <div className="w-9/12 px-2 mt-2">
-                            <QSList queueData={queueData} handleQItemClick={handleQItemClick}/>
+                            <QSList queueData={queueData} handleQItemClick={handleQItemClick} type='default'/>
                         </div>
                         <div className="w-3/12 mt-2">
                             <QSRunEngineWorker 
