@@ -7,16 +7,17 @@ export default function QItem ({ item=false, label=1, text='', styles='', clicka
     const commonStyles = 'w-32 h-32 rounded-md mx-2 hover:cursor-pointer hover:shadow-lg hover:shadow-gray-500 list-none';
     if (item!== false && Object.keys(item).length > 0 ) {
         if ('result' in item) {
-            //Queue History and kicked back plans
+            //Queue History and Queue Items that previously failed
+            const failed = item.result.exit_status === 'failed';
             return (
-                <div className="flex flex-col items-center">
-                    <div className="h-6 w-6 text-red-500">
-                        {item.result.exit_status === 'failed' ? tailwindIcons.exclamationTriangle : ''}
-                    </div>
-                    
+                <div className="flex flex-col items-center">                    
                     <div className="flex flex-col items-center rounded-t-md">
                         <li  className={`${commonStyles} border ${item.result.exit_status === 'failed' ? 'border-red-600' : 'border-slate-500'}  bg-slate-400 overflow-clip rounded-t-md ${styles}`} onClick={handleClick}>
-                            <p className={`${getPlanColor(item.name)} text-white text-center rounded-t-md opacity-80`}>{item.name}</p>
+                            <span className={`${getPlanColor(item.name)} flex items-center justify-around rounded-t-md opacity-80`}>
+                                {failed ? <div className="h-6 w-6 text-red-500">{tailwindIcons.exclamationTriangle}</div> : ''}
+                                <p className={` text-white text-center `}>{item.name}</p>
+                                {failed ? <div className="h-6 w-6 "></div> : ''}
+                            </span>
                             {item.item_uid ? <p className="text-xs truncate ml-2">{item.item_uid}</p> : ''}
                             <div className="text-xs text-slate-500 ml-2 mt-2">
                                 {Object.keys(item.kwargs).map((kwarg) => {
