@@ -4091,4 +4091,43 @@ const mockQueueHistoryData = {
   "plan_history_uid": "bcaab829-6629-49f4-a6ab-851b7baaf9bb"
 }
 
-export { mockDevicesAllowedResponse, mockPlansAllowedResponse, mockGetQueueItemResponse, mockDeleteQueueItemResponse, mockQueueHistoryData };
+const mockAddItemSuccessResponse = {
+    "success": true,
+    "msg": "",
+    "qsize": 2,
+    "item": {
+        "name": "count",
+        "kwargs": {
+            "detectors": [
+                "det1",
+                "det2"
+            ],
+            "num": 10,
+            "delay": 1
+        },
+        "item_type": "plan",
+        "user": "UNAUTHENTICATED_SINGLE_USER",
+        "user_group": "primary",
+        "item_uid": "466700c8-9a8a-4818-919a-26831954951e"
+    }
+};
+
+const mockAddItemFailResponse = {
+    "success": false,
+    "msg": "Failed to add an item: Plan validation failed: Plan 'countttt' is not in the list of allowed plans.\nPlan: {'name': 'countttt',\n 'kwargs': {'detectors': ['det1', 'det2'], 'num': 10, 'delay': 1},\n 'item_type': 'plan'}",
+    "qsize": null,
+    "item": {
+        "name": "countttt",
+        "kwargs": {
+            "detectors": [
+                "det1",
+                "det2"
+            ],
+            "num": 10,
+            "delay": 1
+        },
+        "item_type": "plan"
+    }
+};
+
+export { mockDevicesAllowedResponse, mockPlansAllowedResponse, mockGetQueueItemResponse, mockDeleteQueueItemResponse, mockQueueHistoryData, mockAddItemFailResponse, mockAddItemSuccessResponse };
