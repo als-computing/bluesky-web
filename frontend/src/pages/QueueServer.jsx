@@ -151,6 +151,9 @@ export default function QueueServer() {
                     }
                 } else {
                     //console.log('same running item, do nothing');
+                    if (Object.keys(res.running_item).length === 0) {
+                        setIsREToggleOn(false);
+                    }
                 }
             }
         } catch(error) {
