@@ -2,7 +2,7 @@ import { useState, Fragment } from 'react';
 import { tailwindIcons } from '../../assets/icons';
 import { getPlanColor } from './qItemColorData';
 
-export default function QItem ({ item=false, label=1, text='', styles='', clickable=true, handleClick=()=>{}, type="default" }) {
+export default function QItem ({ item=false, label='', text='', styles='', clickable=true, handleClick=()=>{}, type="default" }) {
     
     const commonStyles = 'w-32 h-32 rounded-md mx-2 hover:cursor-pointer hover:shadow-lg hover:shadow-gray-500 list-none';
     if (item!== false && Object.keys(item).length > 0 ) {

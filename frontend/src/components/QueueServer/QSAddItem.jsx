@@ -6,8 +6,23 @@ import AddQueueItemButton from "./AddQueueItemButton";
 import SubmissionResultPopup from "./SubmissionResultPopup";
 import QItem from "./QItem";
 import Button from "../library/Button";
+const sampleBody = {item: {
+    'name': '',
+    'kwargs': '',
+    'item_type': 'plan'
+}}
 
 export default function QSAddItem() {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [isSubmissionPopupOpen, setIsSubmissionPopupOpen] = useState(false);
+    const [submissionResponse, setSubmissionResponse] = useState({});
+    const [allowedPlans, setAllowedPlans] = useState({});
+    const [allowedDevices, setAllowedDevices] = useState({});
+    const [activePlan, setActivePlan] = useState(false);
+    const [parameters, setParameters] = useState([]);
+    const [body, setBody] = useState(sampleBody);
+    const [positionInput, setPositionInput] = useState('end');
+
     const arrowsPointingOut = tailwindIcons.arrowsPointingOut;
     const arrowsPointingIn = tailwindIcons.arrowsPointingIn;
     const arrowRefresh = tailwindIcons.arrowRefresh;
@@ -56,20 +71,6 @@ export default function QSAddItem() {
         }
     };
 
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [isSubmissionPopupOpen, setIsSubmissionPopupOpen] = useState(false);
-    const [submissionResponse, setSubmissionResponse] = useState({});
-    const [allowedPlans, setAllowedPlans] = useState({});
-    const [allowedDevices, setAllowedDevices] = useState({});
-    const [activePlan, setActivePlan] = useState(false);
-    const [parameters, setParameters] = useState([]);
-    const [body, setBody] = useState({
-        item: {
-            'name': '',
-            'kwargs': '',
-            'item_type': 'plan'
-        }
-    });
 
 
     const handlePlanResponse = (data) => {
@@ -246,7 +247,21 @@ export default function QSAddItem() {
                     </div>
                     <div className="flex flex-col space-y-4 items-center py-4">
                         <QItem item={body.item} text={body.name} clickable={false} styles={'hover:cursor-default hover:shadow-none'}/>
+                        <label className="flex justify-center w-fit items-center">
+                            Position: 
+                            <input 
+                                className="w-12 border border-slate-200 rounded-sm bg-slate-50 text-center ml-2"
+                                value={positionInput}
+                                onChange={e => setPositionInput(e.target.value)}
+                            />
+                        </label>
                         <AddQueueItemButton text={'Add To Queue'} isButtonEnabled={checkRequiredParameters} styles={'drop-shadow-md'} cb={() => submitPlan(body)}/>
+                        <span className="flex w-4/5 items-center">
+                            <div className="h-1 border-b border-slate-300 w-2/5"></div>
+                            <p className="text-slate-300 w-1/5 text-center">or</p>
+                            <div className="h-1 border-b border-slate-300 w-2/5"></div>
+                        </span>
+                        <AddQueueItemButton text={'Execute Now'} isButtonEnabled={checkRequiredParameters} styles={'drop-shadow-md'} cb={() => submitPlan(body)}/>
                     </div>
                 </div>
             </form>
