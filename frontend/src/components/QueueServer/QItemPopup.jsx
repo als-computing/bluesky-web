@@ -33,6 +33,7 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
     const [isDeleteModeVisible, setIsDeleteModeVisibile] = useState(false);
     const [areResultsVisible, setAreResultsVisible] = useState(false);
     const [response, setResponse] = useState({});
+    const [isTracebackCopied, setIsTracebackCopied] = useState(false);
 
     //check if item is in the current queue or the history
     const isHistory = 'result' in popupItem;
@@ -71,6 +72,16 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
         setIsDeleteModeVisibile(false); //close the delete mode popup
         const body = {uid: popupItem.item_uid};
         deleteQueueItem(body, handleDeleteResponse); //send POST, show results popup
+    };
+
+    const handleCopyTracebackClick = () => {
+        navigator.clipboard.writeText(popupItem.result.traceback)
+            .then(() => {
+                setIsTracebackCopied(true);
+            })
+            .catch((err) => {
+                console.error('Failed to copy traceback: ', err);
+            });
     };
 
 
@@ -128,7 +139,7 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
             {
                 name: 'Status',
                 icon: result.exit_status === 'failed' ? tailwindIcons.exclamationTriangle : tailwindIcons.checkmarkInCircle,
-                content: <p>Status: {popupItem.result.exit_status}</p>
+                content: <p >Status: {popupItem.result.exit_status}</p>
             },
             {
                 name: 'Timeline',
@@ -165,7 +176,15 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
                 icon: tailwindIcons.commandLine,
                 content:
                     (result.traceback.length > 0) ?
-                        <p className="whitespace-pre-wrap h-fit" style={{'scrollbarColor': 'grey white'}}> {result.traceback}</p>
+                        <article className="h-fit relative" style={{'scrollbarColor': 'grey white'}}>
+                            <div 
+                                className={`${isTracebackCopied ? 'text-green-500' : 'text-sky-400'} h-10 aspect-square absolute top-0 right-0 hover:text-green-300 hover:cursor-pointer`}
+                                onClick={handleCopyTracebackClick}
+                            >
+                                {isTracebackCopied ? tailwindIcons.clipBoardDocumentCheck : tailwindIcons.clipBoardDocument}
+                            </div>
+                            <p className="whitespace-pre-wrap pt-6"> {result.traceback}</p>
+                        </article>
                     :
                         null
             }
@@ -193,9 +212,9 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
                     <div id={name+'Tooltip'} className="w-10 text-slate-400 m-auto">{icon}</div>
                     <Tooltip anchorSelect={'#' + name + 'Tooltip'} content={name.replace('_', ' ')} place="left" variant="info"/>
                 </div>
-                <p className={`${name === 'Traceback' ? 'w-5/6 bg-white p-2 mr-2 rounded-md border border-slate-200' : 'w-4/6'}`}>
+                <div className={`${name === 'Traceback' ? 'w-5/6 bg-white p-2 mr-2 rounded-md border border-slate-200' : 'w-4/6'}`}>
                     {content}
-                </p>
+                </div>
                 {name==='Traceback' ? '' : <div className="w-1/6"></div> }
             </div>
         )
@@ -207,10 +226,10 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
                 <div name="main popup" className={`relative ${isHistory ? 'w-[90%] h-[90%]' : 'w-[30rem] h-[30rem]'} rounded-lg ${isDeleteModeVisible ? deleteBg : 'bg-slate-50'}`}>
                     {areResultsVisible ? <DeleteResultPopup response={response} cb={handleCloseResults}/> : ''}
                     {isDeleteModeVisible ? <ConfirmDeleteItemPopup handleCancel={handleCancelDeleteClick} handleDelete={handleConfirmDeleteClick} /> : ''}
-                    <span name="title" className={`${getPlanColor(popupItem.name)} h-[10%] flex items-center rounded-t-lg ${isDeleteModeVisible ? 'opacity-20' : ''}`}>
-                        <p className='w-1/12'></p>
-                        <p className={`w-10/12 text-center text-white text-2xl py-1  `}>{popupItem.name}</p>
-                        <div className='w-1/12 hover:cursor-pointer' onClick={handleQItemPopupClose}>{tailwindIcons.xCircle}</div>
+                    <span name="title" className={`${getPlanColor(popupItem.name)} h-[10%] flex items-center justify-between rounded-t-lg ${isDeleteModeVisible ? 'opacity-20' : ''}`}>
+                        <div className="h-5/6 aspect-square w-fit text-red-500 ml-4">{popupItem.result && popupItem.result.exit_status === 'failed' ? tailwindIcons.exclamationTriangle : ''}</div>
+                        <p className={`text-center text-white text-2xl py-1  `}>{popupItem.name}</p>
+                        <div name="close popup button" className='h-5/6 aspect-square w-fit hover:cursor-pointer mr-4' onClick={handleQItemPopupClose}>{tailwindIcons.xCircle}</div>
                     </span>
                     <div name="content" className="h-[90%] flex">
                         {isHistory ? (
@@ -253,7 +272,7 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
                     <section className="overflow-auto flex flex-col space-y-4">
                        {settings.map((row) => Row(row.name, row.icon, row.content) )}
                         <div name="delete button" className={`flex justify-center `}>
-                            <span className={`${isDeleteModeVisible ? 'hidden' : ''} hover:cursor-pointer w-12 h-12 hover:text-red-500`} onClick={handleFirstDeleteClick}>{tailwindIcons.trash}</span>
+                            <span className={`${isDeleteModeVisible ? 'hidden' : ''} hover:cursor-pointer w-10 h-10 hover:text-red-500`} onClick={handleFirstDeleteClick}>{tailwindIcons.trash}</span>
                         </div>
                     </section>
                 </div>

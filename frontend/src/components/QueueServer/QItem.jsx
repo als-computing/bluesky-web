@@ -10,28 +10,25 @@ export default function QItem ({ item=false, label=1, text='', styles='', clicka
             //Queue History and Queue Items that previously failed
             const failed = item.result.exit_status === 'failed';
             return (
-                <div className="flex flex-col items-center">                    
-                    <div className="flex flex-col items-center rounded-t-md">
-                        <li  className={`${commonStyles} border ${item.result.exit_status === 'failed' ? 'border-red-600' : 'border-slate-500'}  bg-slate-400 overflow-clip rounded-t-md ${styles}`} onClick={handleClick}>
-                            <span className={`${getPlanColor(item.name)} flex items-center justify-around rounded-t-md opacity-80`}>
-                                {failed ? <div className="h-6 w-6 text-red-500">{tailwindIcons.exclamationTriangle}</div> : ''}
-                                <p className={` text-white text-center `}>{item.name}</p>
-                                {failed ? <div className="h-6 w-6 "></div> : ''}
-                            </span>
-                            {item.item_uid ? <p className="text-xs truncate ml-2">{item.item_uid}</p> : ''}
-                            <div className="text-xs text-slate-500 ml-2 mt-2">
-                                {Object.keys(item.kwargs).map((kwarg) => {
-                                    return (
-                                        <div key={kwarg}>
-                                            <p className="text-black">{kwarg} </p>
-                                            <p className="ml-2 text-wrap text-clip">{Array.isArray(item.kwargs[kwarg]) ? item.kwargs[kwarg].toString().replaceAll(',', ', ') : item.kwargs[kwarg]}</p>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        </li>
-                        <p className="text-slate-300 font-bold text-xs mt-1">{label}</p>
-                    </div>
+                <div className="flex flex-col items-center relative">
+                    {failed ? <div name="warning symbol" className="text-red-500 absolute left-1/2 transform -translate-x-1/2 -translate-y-full aspect-square h-6">{tailwindIcons.exclamationTriangle}</div> : ''}                    
+                    <li name="item"  className={`${commonStyles} border ${item.result.exit_status === 'failed' ? 'border-red-600' : 'border-slate-500'}  bg-slate-400 overflow-clip rounded-t-md ${styles}`} onClick={handleClick}>
+                        <span className={`${getPlanColor(item.name)} flex items-center justify-around rounded-t-md opacity-80`}>
+                            <p className={` text-white text-center `}>{item.name}</p>
+                        </span>
+                        {item.item_uid ? <p className="text-xs truncate ml-2">{item.item_uid}</p> : ''}
+                        <div className="text-xs text-slate-500 ml-2 mt-2">
+                            {Object.keys(item.kwargs).map((kwarg) => {
+                                return (
+                                    <div key={kwarg}>
+                                        <p className="text-black">{kwarg} </p>
+                                        <p className="ml-2 text-wrap text-clip">{Array.isArray(item.kwargs[kwarg]) ? item.kwargs[kwarg].toString().replaceAll(',', ', ') : item.kwargs[kwarg]}</p>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </li>
+                    <p name="bottom label" className="text-slate-300 font-bold text-xs mt-1">{label}</p>
                 </div>
             )
         } else {

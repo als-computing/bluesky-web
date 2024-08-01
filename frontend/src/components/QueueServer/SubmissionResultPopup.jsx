@@ -28,7 +28,7 @@ export default function SubmissionResultPopup( {isVisible=false, cb=()=>{}, resp
             <p>{response.item.item_type} type: {response.item.name}</p>
             <div className="flex">
                 <p>Item UID: {response.item.item_uid}</p>
-                <div className="hover:cursor-pointer" onClick={handleCopyClick}>
+                <div className="hover:cursor-pointer w-10 aspect-square" onClick={handleCopyClick}>
                     {isTextCopied ? tailwindIcons.clipBoardDocumentCheck : tailwindIcons.clipBoardDocument}
                 </div>
             </div>  
