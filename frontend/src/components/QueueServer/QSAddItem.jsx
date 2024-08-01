@@ -1,6 +1,6 @@
 import { tailwindIcons } from "../../assets/icons";
 import { useState, useEffect } from 'react';
-import { getDevicesAllowed, getPlansAllowed, postQueueItem } from "./apiClient";
+import { getDevicesAllowed, getPlansAllowed, postQueueItem, executeItem } from "./apiClient";
 import QSParameterInput from "./QSParameterInput";
 import AddQueueItemButton from "./AddQueueItemButton";
 import SubmissionResultPopup from "./SubmissionResultPopup";
@@ -178,6 +178,18 @@ export default function QSAddItem() {
         }
     };
 
+    const executePlan = (body) => {
+        //
+        let allRequiredParametersFilled = checkRequiredParameters();
+        if (allRequiredParametersFilled) {
+            //execute fails if position is included, only send in item key value pair
+            const executeBody = {
+                item: body.item
+            };
+            executeItem(executeBody, handleSubmissionResponse);
+        }
+    }
+
     const closeSubmissionPopup = () => {
         setIsSubmissionPopupOpen(false);
         setActivePlan(false);
@@ -200,7 +212,7 @@ export default function QSAddItem() {
             console.log(typeof val)
             sanitizedVal = parseInt(val);
         }
-        
+
         //automatically revert to 'back' when user deletes all values
         if (val === '') {
             sanitizedVal = 'back';
@@ -213,6 +225,7 @@ export default function QSAddItem() {
         });
         setPositionInput(val);
     };
+
 
     useEffect(() => {
         getDevicesAllowed(handleDeviceResponse);
@@ -286,7 +299,7 @@ export default function QSAddItem() {
                             <p className="text-slate-300 w-1/5 text-center">or</p>
                             <div className="h-1 border-b border-slate-300 w-2/5"></div>
                         </span>
-                        <AddQueueItemButton text={'Execute Now'} isButtonEnabled={checkRequiredParameters} styles={'drop-shadow-md'} cb={() => submitPlan(body)}/>
+                        <AddQueueItemButton text={'Execute Now'} isButtonEnabled={checkRequiredParameters} styles={'drop-shadow-md'} cb={() => executePlan(body)}/>
                     </div>
                 </div>
             </form>

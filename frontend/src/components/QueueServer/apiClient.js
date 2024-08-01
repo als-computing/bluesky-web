@@ -173,6 +173,22 @@ const postQueueItem = async (body={}, cb=()=>{}) => {
     }
 };
 
+const executeItem = async (body={}, cb=()=>{}) => {
+    try {
+        const response = await axios.post(httpServerUrl + 'api/queue/item/execute', 
+        body,
+        {headers : {
+            'Authorization' : 'ApiKey ' + qServerKey
+        }});
+    console.log(response.data);
+    cb(response.data);
+    return 'success';
+    } catch (error) {
+        console.error('Error executing plan', error);
+        return 'failed';
+    }
+}
+
 const getQueueItem = async (uid='', cb=()=>{}, mock=false) => {
     if (mock) {
         cb(mockGetQueueItemResponse);
@@ -212,4 +228,4 @@ const deleteQueueItem = async (body={}, cb=()=>{}) => {
 
 
 
-export { getQueue, getStatus, getPlansAllowed, getDevicesAllowed, startRE, postQueueItem, getQueueItem, deleteQueueItem, getQueueHistory };
+export { getQueue, getStatus, getPlansAllowed, getDevicesAllowed, startRE, postQueueItem, getQueueItem, deleteQueueItem, getQueueHistory, executeItem };

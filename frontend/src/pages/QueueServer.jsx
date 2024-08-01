@@ -191,6 +191,11 @@ export default function QueueServer() {
         //The get/status api endpoint seems to not provide the most recent running status when called immediately after the console triggers it
         //console.log({msg});
         //function processess each Queue Server console message to trigger immediate state and UI updates
+        if (msg.startsWith("Processing the next queue item")) {
+            getQueue(handleQueueDataResponse);
+            getQueueHistory(handleQueueHistoryResponse);
+        }
+
         if (msg.startsWith("Starting the plan")) {
             //update RE worker
             getQueue(handleQueueDataResponse);
