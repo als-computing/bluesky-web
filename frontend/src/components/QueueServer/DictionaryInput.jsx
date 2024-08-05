@@ -54,9 +54,10 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
                 wipedDictionary[inputNum].key = '';
                 cb(createJSON(wipedDictionary));
             } else {
-                //key value pair is valid, set the parameter state with callback
                 stateCopy[inputNum].msg = '';
-                cb(createJSON(stateCopy));
+                var JSONObject = createJSON(stateCopy);
+                var deleteParam = JSON.stringify(JSONObject) === '{}'; //delete the param from the parameter state if it's empty
+                cb(JSONObject, deleteParam);
             }
             return stateCopy;
         });
@@ -68,9 +69,9 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
             <div className="border border-red-200">
                 <ul className="w-full">
                     <li className="flex text-center">
-                        <p className="basis-5/12">key</p>
-                        <p className="basis-2/12">:</p>
-                        <p className="basis-5/12">value</p>
+                        <p className="mx-2 basis-5/12">key</p>
+                        <p className="basis-1/12">:</p>
+                        <p className="mx-2 basis-5/12">value</p>
                     </li>
                     {Object.keys(inputDict).map(key => {
                         const item = inputDict[key];
@@ -78,13 +79,13 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
                             <li key={key} className="flex text-center w-full relative">
                                 {item.msg.length > 0 ? <p className="text-red-500 text-xs text-left absolute left-5 top-2">{item.msg}</p> : ''}
                                 <input
-                                    className={`${item.key.length === 0 && item.val.length > 0 ? 'border-red-500' : 'border-slate-400'} basis-5/12 border mx-2 my-1`} 
+                                    className={`${item.key.length === 0 && item.val.length > 0 ? 'border-red-500' : 'border-slate-400'} basis-5/12 border mx-2 my-1 text-center`} 
                                     value={item.key}
                                     onChange={(e) => handleChange(key, 'key', e.target.value)}
                                 />
                                 <p className="basis-2/12">:</p>
                                 <input
-                                    className="basis-5/12 border border-slate-400 mx-2 my-1" 
+                                    className="basis-5/12 border border-slate-400 mx-2 my-1 text-center" 
                                     value={item.val}
                                     onChange={(e) => handleChange(key, 'val', e.target.value)}
                                 />

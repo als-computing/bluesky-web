@@ -73,12 +73,17 @@ export default function QSParameterInput( {cb=()=>{}, allowedDevices=[], param={
     //----------Functions for dictionary input -------------//
     const dictionaryInputTypeList = ['md'];
 
-    const handleDictionaryChange = (dict) => {
+    const handleDictionaryChange = (dict, deleteParam=false) => {
         setParameters(state => {
             var stateCopy = JSON.parse(JSON.stringify(state));
             stateCopy[param.name].value = dict;
-            console.log({stateCopy});
-            updateBodyKwargs(stateCopy);
+            if (deleteParam) {
+                var removedBodyParams = JSON.parse(JSON.stringify(state));
+                delete removedBodyParams[param.name];
+                updateBodyKwargs(removedBodyParams)
+            } else {
+                updateBodyKwargs(stateCopy);
+            }
             return stateCopy;
         });
     };
