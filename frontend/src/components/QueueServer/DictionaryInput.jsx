@@ -29,7 +29,7 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
         //into a JSON object before sending into callback
         var JSONObject = {};
         for (const key in nestedObject) {
-            if (nestedObject[key].key !== '' && nestedObject[key].val !== '') {
+            if (nestedObject[key].key !== '') {
                 JSONObject[nestedObject[key].key] = nestedObject[key].val;
             }
         }

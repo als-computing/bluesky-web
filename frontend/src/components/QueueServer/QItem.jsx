@@ -3,6 +3,17 @@ import { tailwindIcons } from '../../assets/icons';
 import { getPlanColor } from './qItemColorData';
 
 export default function QItem ({ item=false, label='', text='', styles='', clickable=true, handleClick=()=>{}, type="default" }) {
+
+    const displayKwarg = (value) => {
+        //value may be an Array, String, or Object
+        if (Array.isArray(value)) {
+            return value.toString().replaceAll(',', ', ');
+        } else if (typeof value === 'string') {
+            return value;
+        } else {
+            return JSON.stringify(value);
+        }
+    }
     
     const commonStyles = 'w-32 h-32 rounded-md mx-2 hover:cursor-pointer hover:shadow-lg hover:shadow-gray-500 list-none';
     if (item!== false && Object.keys(item).length > 0 ) {
@@ -19,10 +30,12 @@ export default function QItem ({ item=false, label='', text='', styles='', click
                         {item.item_uid ? <p className="text-xs truncate ml-2">{item.item_uid}</p> : ''}
                         <div className="text-xs text-slate-500 ml-2 mt-2">
                             {Object.keys(item.kwargs).map((kwarg) => {
+                                console.log('here')
+                                console.log(item.kwargs[kwarg]);
                                 return (
                                     <div key={kwarg}>
                                         <p className="text-black">{kwarg} </p>
-                                        <p className="ml-2 text-wrap text-clip">{Array.isArray(item.kwargs[kwarg]) ? item.kwargs[kwarg].toString().replaceAll(',', ', ') : item.kwargs[kwarg]}</p>
+                                        <p className="ml-2 text-wrap text-clip">{displayKwarg(item.kwargs[kwarg])}</p>
                                     </div>
                                 )
                             })}
@@ -43,7 +56,7 @@ export default function QItem ({ item=false, label='', text='', styles='', click
                                 return (
                                     <div key={kwarg}>
                                         <p className="text-black">{kwarg} </p>
-                                        <p className="ml-2 text-wrap text-clip">{Array.isArray(item.kwargs[kwarg]) ? item.kwargs[kwarg].toString().replaceAll(',', ', ') : item.kwargs[kwarg]}</p>
+                                        <p className="ml-2 text-wrap text-clip">{displayKwarg(item.kwargs[kwarg])}</p>
                                     </div>
                                 )
                             })}
