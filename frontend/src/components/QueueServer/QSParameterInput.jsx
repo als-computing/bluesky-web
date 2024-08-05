@@ -74,14 +74,14 @@ export default function QSParameterInput( {cb=()=>{}, allowedDevices=[], param={
     const dictionaryInputTypeList = ['md'];
 
     const handleDictionaryChange = (dict) => {
-        // only a
         setParameters(state => {
             var stateCopy = JSON.parse(JSON.stringify(state));
             stateCopy[param.name].value = dict;
+            console.log({stateCopy});
             updateBodyKwargs(stateCopy);
             return stateCopy;
         });
-    }
+    };
 
 
     // ----to do, create a boolean input for parameters like 'snake'
