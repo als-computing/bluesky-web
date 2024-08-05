@@ -66,7 +66,7 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
         <div className={`border-2 border-slate-300 rounded-lg w-11/12 max-w-96 min-w-72 mt-2 h-fit ${styles}`}>
             <p id={label+'ParamInputTooltip'} className="text-sm pl-4 text-gray-500 border-b border-dashed border-slate-300">{`${label} ${required ? '(required)' : '(optional)'}`}</p>
             <Tooltip anchorSelect={'#' + label + 'ParamInputTooltip'} children={<p className="whitespace-pre-wrap">{description}</p>} place="top" variant="info" style={{'maxWidth' : "500px", 'height': 'fit-content'}} delayShow='400'/>
-            <div className="border border-red-200">
+            <div className="">
                 <ul className="w-full">
                     <li className="flex text-center">
                         <p className="mx-2 basis-5/12">key</p>
