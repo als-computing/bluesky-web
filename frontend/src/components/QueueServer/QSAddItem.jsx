@@ -6,6 +6,7 @@ import AddQueueItemButton from "./AddQueueItemButton";
 import SubmissionResultPopup from "./SubmissionResultPopup";
 import QItem from "./QItem";
 import Button from "../library/Button";
+import { Tooltip } from "react-tooltip";
 const sampleBody = {
     item: {
     'name': '',
@@ -226,6 +227,8 @@ export default function QSAddItem() {
         setPositionInput(val);
     };
 
+    const positionTooltipMessage = 'The position for the plan to be inserted at. \n Type = String or Integer. \n Default = "back" for the back of the Queue. \n Use "front" to insert at the front of the Queue. \n Integer values may be used, where 0 represents the front of the Queue.'
+
 
     useEffect(() => {
         getDevicesAllowed(handleDeviceResponse);
@@ -285,7 +288,7 @@ export default function QSAddItem() {
                     </div>
                     <div className="flex flex-col space-y-4 items-center py-4">
                         <QItem item={body.item} text={body.name} clickable={false} styles={'hover:cursor-default hover:shadow-none'}/>
-                        <label className="flex justify-center w-fit items-center">
+                        <label id="positionLabel" className="flex justify-center w-fit items-center">
                             Position: 
                             <input 
                                 className="w-12 border border-slate-200 rounded-sm bg-slate-50 text-center ml-2"
@@ -293,6 +296,7 @@ export default function QSAddItem() {
                                 onChange={e => handlePositionInputChange(e.target.value)}
                             />
                         </label>
+                        <Tooltip anchorSelect={'#positionLabel'} children={<p className="whitespace-pre-wrap">{positionTooltipMessage}</p>} offset={25} place="top" variant="info" style={{'maxWidth' : "500px", 'height': 'fit-content'}} delayShow='400'/>
                         <AddQueueItemButton text={'Add To Queue'} isButtonEnabled={checkRequiredParameters} styles={'drop-shadow-md'} cb={() => submitPlan(body)}/>
                         <span className="flex w-4/5 items-center">
                             <div className="h-1 border-b border-slate-300 w-2/5"></div>
