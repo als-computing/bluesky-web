@@ -47,7 +47,7 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
             stateCopy[inputNum][type] = newValue;
             if (stateCopy[inputNum].key === '' & stateCopy[inputNum].val !== '') {
                 //warn that we need a key entered for the value.
-                stateCopy[inputNum].msg = 'Please provide a key for this value';
+                stateCopy[inputNum].msg = 'Provide a key';
                 //wipe the value in the parameter state with callback to prevent submission of invalid JSON
                 var wipedDictionary = JSON.parse(JSON.stringify(stateCopy));
                 wipedDictionary[inputNum].val = '';
@@ -55,6 +55,7 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
                 cb(createJSON(wipedDictionary));
             } else {
                 //key value pair is valid, set the parameter state with callback
+                stateCopy[inputNum].msg = '';
                 cb(createJSON(stateCopy));
             }
             return stateCopy;
@@ -74,16 +75,16 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
                     {Object.keys(inputDict).map(key => {
                         const item = inputDict[key];
                         return (
-                            <li key={key} className="flex text-center w-full">
-                                {item.msg.length > 0 ? <p className="basis-full text-red-500 text-xs text-left">{item.msg}</p> : ''}
+                            <li key={key} className="flex text-center w-full relative">
+                                {item.msg.length > 0 ? <p className="text-red-500 text-xs text-left absolute left-5 top-2">{item.msg}</p> : ''}
                                 <input
-                                    className="basis-5/12 border border-slate-400 mx-2 my-1" 
+                                    className={`${item.key.length === 0 && item.val.length > 0 ? 'border-red-500' : 'border-slate-400'} basis-5/12 border mx-2 my-1`} 
                                     value={item.key}
                                     onChange={(e) => handleChange(key, 'key', e.target.value)}
                                 />
                                 <p className="basis-2/12">:</p>
                                 <input
-                                    className="basis-5/12" 
+                                    className="basis-5/12 border border-slate-400 mx-2 my-1" 
                                     value={item.val}
                                     onChange={(e) => handleChange(key, 'val', e.target.value)}
                                 />
