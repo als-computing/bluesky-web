@@ -82,7 +82,14 @@ export default function QSAddItem() {
         if ('success' in data) {
             if (data.success === true) {
                 if ('plans_allowed' in data) {
-                    setAllowedPlans(data.plans_allowed);
+                    //format the keys to be in order
+                    const sortedPlans = Object.keys(data.plans_allowed)
+                        .sort()
+                        .reduce((acc, key) => {
+                            acc[key] = data.plans_allowed[key];
+                            return acc;
+                        }, {});
+                    setAllowedPlans(sortedPlans);
                 } else {
                     console.log('No plans_allowed key found in response object from allowed plans')
                 }
