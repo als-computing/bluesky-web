@@ -16,6 +16,8 @@ export default function QSConsole({ title=true, description = true, processConso
     const connection = useRef(null); //queue server WS via FastAPI
     const wsUrl = getQSConsoleUrl();
     const messageContainerRef = useRef(null);
+    const hasErrorOccuredRef = useRef(false);
+    const didUserTurnOffWS = useRef(false);
 
     const toggleSwitch = () => {
         if (isToggleOn) {
@@ -108,7 +110,8 @@ export default function QSConsole({ title=true, description = true, processConso
             setStatusMessage("Last connection attempt to websocket failed at " + dayjs().format('HH:MM A'))
             setIsToggleOn(false);
             console.log({error});
-        })
+            hasErrorOccuredRef.current = true;
+        });
 
     
         //if websocket opens, add event listener for messages
@@ -118,6 +121,31 @@ export default function QSConsole({ title=true, description = true, processConso
             setStatusMessage("Opened connection " + dayjs().format('hh:mm A'));
             socket.addEventListener("message", handleWebSocketMessage);
             connection.current = socket;
+        });
+
+        //if websocket closes, attempt to reconnect & display a message
+        socket.addEventListener("close", event => {
+            console.log('ws connection to fastapi server closed');
+            setIsToggleOn(false);
+            if (hasErrorOccuredRef.current === true) {
+                //Either the fastAPI server stopped running, or the initial connection attempt failed
+                //reset the ref
+                hasErrorOccuredRef.current = false;
+                setStatusMessage("Error occured during connection attempt at  " + dayjs().format('hh:MM A'));
+            } else {
+                //no error has occured, so the connection closed from user input or due to computer sleeping
+                if (didUserTurnOffWS.current === false) {
+                    //computer fell asleep
+                    //attempt to reconnect WS
+                    handleOpenWS();
+                    setIsToggleOn(true);
+                } else {
+                    setStatusMessage("Manually disconnected from websocket at " + dayjs().format('hh:MM A'));
+                    //user turned off ws
+                    //reset the ref
+                    didUserTurnOffWS.current = false;
+                }
+            }
         })
     }
 
@@ -127,6 +155,7 @@ export default function QSConsole({ title=true, description = true, processConso
     }
 
     const handleCloseWS = () => {
+        didUserTurnOffWS.current = true;
         closeWebSocket(connection);
         setIsOpened(false);
     }

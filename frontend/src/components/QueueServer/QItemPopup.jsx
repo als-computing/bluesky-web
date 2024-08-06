@@ -96,6 +96,7 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
     };
 
 
+    //to do - revise this for a single return with conditional rendering onthe div / p tag for content
     const printParameter = (kwarg) => {
         if (Array.isArray(popupItem.kwargs[kwarg])) {
             return (
@@ -277,26 +278,4 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
                 </div>
             </div>
         );
-
-        return (
-            <div name="background" className={`absolute top-0 left-0 w-full h-full z-10 ${getPlanColorOpacity(popupItem.name)} flex justify-center items-center ${isDeleteModeVisible ? 'bg-red-600/40' : ''}`}>
-                <div name="main popup" className={`relative ${isHistory ? 'w-[60rem]' : 'w-[30rem]'} h-[30rem] rounded-lg ${isDeleteModeVisible ? deleteBg : 'bg-slate-50'}`}>
-                    {areResultsVisible ? <DeleteResultPopup response={response} cb={handleCloseResults}/> : ''}
-                    {isDeleteModeVisible ? <ConfirmDeleteItemPopup handleCancel={handleCancelDeleteClick} handleDelete={handleConfirmDeleteClick} /> : ''}
-                    <span className={`${getPlanColor(popupItem.name)} flex items-center rounded-t-lg ${isDeleteModeVisible ? 'opacity-20' : ''}`}>
-                        <p className='w-1/12'></p>
-                        <p className={`w-10/12 text-center text-white text-2xl py-1  `}>{popupItem.name}</p>
-                        <div className='w-1/12 hover:cursor-pointer' onClick={handleQItemPopupClose}>{tailwindIcons.xCircle}</div>
-                    </span>
-                    <section className="overflow-auto flex flex-col space-y-4">
-                       {settings.map((row) => Row(row.name, row.icon, row.content) )}
-                        <div name="delete button" className={`flex justify-center `}>
-                            <span className={`${isDeleteModeVisible ? 'hidden' : ''} hover:cursor-pointer w-10 h-10 hover:text-red-500`} onClick={handleFirstDeleteClick}>{tailwindIcons.trash}</span>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        );
-   
-
 };
