@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tooltip } from "react-tooltip";
 
 
-export default function TextInput( {cb=()=>{}, value='', label='', description='', required=false, inputType='int', deviceList=[], styles=''} ) {
+export default function TextInput( {cb=()=>{}, value='', label='', description='', required=false, inputType='int', deviceList=[], styles='', resetInputsTrigger=false} ) {
     const [inputValue, setInputValue] = useState(value);
 
     const intTypeList = ['num'];
@@ -25,6 +25,10 @@ export default function TextInput( {cb=()=>{}, value='', label='', description='
             cb(newValue);
         }
     };
+
+    useEffect(()=> {
+        setInputValue('');
+    }, [resetInputsTrigger]);
 
     return (
        <div className={`border-2 border-slate-300 rounded-lg w-5/12 max-w-48 min-w-36 mt-2 h-fit ${styles}`}>

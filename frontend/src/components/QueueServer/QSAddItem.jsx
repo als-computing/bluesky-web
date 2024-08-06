@@ -26,6 +26,7 @@ export default function QSAddItem() {
     const [parameters, setParameters] = useState([]);
     const [body, setBody] = useState(sampleBody);
     const [positionInput, setPositionInput] = useState('back');
+    const [resetInputsTrigger, setResetInputsTrigger] = useState(false);
 
     const arrowsPointingOut = tailwindIcons.arrowsPointingOut;
     const arrowsPointingIn = tailwindIcons.arrowsPointingIn;
@@ -35,6 +36,9 @@ export default function QSAddItem() {
     const checkmarkInCircle = tailwindIcons.checkmarkInCircle;
     const clipBoardDocument = tailwindIcons.clipBoardDocument;
     const clipBoardDocumentCheck = tailwindIcons.clipBoardDocumentCheck;
+
+    const positionTooltipMessage = 'The position for the plan to be inserted at. \n Type = String or Integer. \n Default = "back" for the back of the Queue. \n Use "front" to insert at the front of the Queue. \n Integer values may be used, where 0 represents the front of the Queue.'
+
 
     const sampleResponse = {
         "success": true,
@@ -119,6 +123,7 @@ export default function QSAddItem() {
             setActivePlan(plan);
             initializeParameters(plan);
             updateBodyName(plan);
+            setResetInputsTrigger(prev => !prev);
         }
     };
 
@@ -205,6 +210,7 @@ export default function QSAddItem() {
 
     const handleParameterRefreshClick = (activePlan) => {
         initializeParameters(activePlan);
+        setResetInputsTrigger(prev => !prev);
     };
 
     const handleExpandClick = () => {
@@ -234,7 +240,6 @@ export default function QSAddItem() {
         setPositionInput(val);
     };
 
-    const positionTooltipMessage = 'The position for the plan to be inserted at. \n Type = String or Integer. \n Default = "back" for the back of the Queue. \n Use "front" to insert at the front of the Queue. \n Integer values may be used, where 0 represents the front of the Queue.'
 
 
     useEffect(() => {
@@ -278,7 +283,7 @@ export default function QSAddItem() {
                     </div>
                     <div name="parameter inputs" className="flex flex-wrap justify-center space-x-2 space-y-4 py-4 px-2 overflow-auto h-[calc(100%-2.5rem)]">
                         {activePlan ? <h3>{activePlan}: {allowedPlans[activePlan].description}</h3> : ''}
-                        {Object.keys(parameters).map((param) => <QSParameterInput key={param} param={parameters[param]} parameters={parameters} updateBodyKwargs={updateBodyKwargs} setParameters={setParameters} allowedDevices={allowedDevices} plan={activePlan} />)}
+                        {Object.keys(parameters).map((param) => <QSParameterInput key={param} param={parameters[param]} parameters={parameters} updateBodyKwargs={updateBodyKwargs} setParameters={setParameters} allowedDevices={allowedDevices} plan={activePlan} resetInputsTrigger={resetInputsTrigger} />)}
                     </div>
                 </div>
                 <div name="REVIEW" className={`${activePlan ? 'w-3/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 `}>

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tooltip } from "react-tooltip";
-export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required=true, description='', styles='' }) {
+export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required=true, description='', styles='', resetInputsTrigger=false }) {
 
     //hardcode the number of possible key value input pairs
     //this does not allow the user to add more, but better controls the UI
@@ -61,7 +61,12 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
             }
             return stateCopy;
         });
-    }
+    };
+
+    useEffect(() => {
+        setInputDict(inputDictDefault);
+    }, [resetInputsTrigger]);
+
     return (
         <div className={`border-2 border-slate-300 rounded-lg w-11/12 max-w-96 min-w-72 mt-2 h-fit ${styles}`}>
             <p id={label+'ParamInputTooltip'} className="text-sm pl-4 text-gray-500 border-b border-dashed border-slate-300">{`${label} ${required ? '(required)' : '(optional)'}`}</p>
