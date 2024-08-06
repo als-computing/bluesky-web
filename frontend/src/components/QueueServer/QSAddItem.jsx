@@ -165,7 +165,6 @@ export default function QSAddItem() {
         })
     };
 
-
     const checkRequiredParameters = () => {
         //check if all required parameters have been filled out, otherwise button should not be clickable
         var allRequiredParametersFilled = true;
@@ -203,9 +202,10 @@ export default function QSAddItem() {
         }
     }
 
-    const closeSubmissionPopup = () => {
+    const closeSubmissionPopup = (clearInputs=true) => {
+        console.log({clearInputs})
         setIsSubmissionPopupOpen(false);
-        setActivePlan(false);
+        if (clearInputs) setActivePlan(false);
     };
 
     const handleParameterRefreshClick = (activePlan) => {

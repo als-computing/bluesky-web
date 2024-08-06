@@ -13,7 +13,7 @@ export default function QItem ({ item=false, label='', text='', styles='', click
         } else {
             return JSON.stringify(value);
         }
-    }
+    };
     
     const commonStyles = 'w-32 h-32 rounded-md mx-2 hover:cursor-pointer hover:shadow-lg hover:shadow-gray-500 list-none';
     if (item!== false && Object.keys(item).length > 0 ) {
@@ -30,8 +30,6 @@ export default function QItem ({ item=false, label='', text='', styles='', click
                         {item.item_uid ? <p className="text-xs truncate ml-2">{item.item_uid}</p> : ''}
                         <div className="text-xs text-slate-500 ml-2 mt-2">
                             {Object.keys(item.kwargs).map((kwarg) => {
-                                console.log('here')
-                                console.log(item.kwargs[kwarg]);
                                 return (
                                     <div key={kwarg}>
                                         <p className="text-black">{kwarg} </p>

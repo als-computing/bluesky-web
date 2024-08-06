@@ -84,6 +84,17 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
             });
     };
 
+    const displayKwarg = (value) => {
+        //value may be an Array, String, or Object
+        if (Array.isArray(value)) {
+            return value.toString().replaceAll(',', ', ');
+        } else if (typeof value === 'string') {
+            return value;
+        } else {
+            return JSON.stringify(value);
+        }
+    };
+
 
     const printParameter = (kwarg) => {
         if (Array.isArray(popupItem.kwargs[kwarg])) {
@@ -95,13 +106,21 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
                 </div>
             </span>
             )
+        } else if (typeof popupItem.kwargs[kwarg] === 'string') {
+            return (
+                <span className="flex" key={kwarg}>
+                    <p className="w-4/12">{kwarg}</p>
+                    <p className="w-8/12">{popupItem.kwargs[kwarg]}</p>
+                </span>
+            )
+        } else {
+            return (
+                <span className="flex" key={kwarg}>
+                    <p className="w-4/12">{kwarg}</p>
+                    <p className="w-8/12">{JSON.stringify(popupItem.kwargs[kwarg])}</p>
+                </span>
+            )
         }
-        return (
-            <span className="flex" key={kwarg}>
-                <p className="w-4/12">{kwarg}</p>
-                <p className="w-8/12">{popupItem.kwargs[kwarg]}</p>
-            </span>
-        )
     };
 
     const settings = [
