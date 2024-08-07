@@ -29,7 +29,7 @@ const mockDeleteQueueItemResponse = {
     "qsize": 0
 };
 
-export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{}, isItemDeleteButtonVisible=true } ) {
+export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{}, isItemDeleteButtonVisible=true, handleCopyItemClick=()=>{} } ) {
     const [isDeleteModeVisible, setIsDeleteModeVisibile] = useState(false);
     const [areResultsVisible, setAreResultsVisible] = useState(false);
     const [response, setResponse] = useState({});
@@ -132,7 +132,7 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
                 <Fragment>
                     {Object.keys(popupItem.kwargs).map((kwarg) => printParameter(kwarg))}
                     
-                    <div className="flex justify-center py-4"><Button text='Copy Plan' styles={`m-auto ${isDeleteModeVisible ? 'opacity-0' : ''}`}/></div>
+                    <div className="flex justify-center py-4"><Button text='Copy Plan' cb={()=> handleCopyItemClick(popupItem.name, popupItem.kwargs)} styles={`m-auto ${isDeleteModeVisible ? 'opacity-0' : ''}`}/></div>
                 </Fragment>
         },
         {

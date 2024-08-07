@@ -2,7 +2,7 @@ import { useState, Fragment } from 'react';
 import { tailwindIcons } from '../../assets/icons';
 import { getPlanColor } from './qItemColorData';
 
-export default function QItem ({ item=false, label='', text='', styles='', clickable=true, handleClick=()=>{}, type="default" }) {
+export default function QItem ({ item=false, label='', text='', styles='', clickable=true, handleClick=()=>{}, handleCopyItemClick=()=>{}, type="default" }) {
 
     const displayKwarg = (value) => {
         //value may be an Array, String, or Object

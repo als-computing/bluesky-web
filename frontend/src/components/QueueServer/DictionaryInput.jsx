@@ -4,7 +4,7 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
 
     //hardcode the number of possible key value input pairs
     //this does not allow the user to add more, but better controls the UI
-    const inputDictDefault = {
+    var inputDictDefault = {
         input1: {
             key: '',
             val: '',
@@ -22,8 +22,20 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
         },
     };
 
+    //for copied plans, a non-empty dictionary may be passed in on initialization
+    if (JSON.stringify(dict) !== '{}') {
+        var inputKeys = Object.keys(inputDictDefault);
+        var i = 0;
+        for (var key in dict) {
+            inputDictDefault[i].key = key;
+            inputDictDefault[i].val = dict[key];
+            i++;
+        }
+    }
+
 
     const [inputDict, setInputDict] = useState(inputDictDefault);
+
     const createJSON = (nestedObject) => {
         //transform the nested inputDict used for the form
         //into a JSON object before sending into callback
@@ -66,6 +78,10 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
     useEffect(() => {
         setInputDict(inputDictDefault);
     }, [resetInputsTrigger]);
+
+    useEffect(() => {
+
+    })
 
     return (
         <div className={`border-2 border-slate-300 rounded-lg w-11/12 max-w-96 min-w-72 mt-2 h-fit ${styles}`}>

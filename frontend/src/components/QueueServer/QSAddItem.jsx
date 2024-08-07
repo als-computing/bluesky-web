@@ -16,7 +16,7 @@ const sampleBody = {
     pos: 'back'
 }
 
-export default function QSAddItem() {
+export default function QSAddItem({copiedPlan=false}) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isSubmissionPopupOpen, setIsSubmissionPopupOpen] = useState(false);
     const [submissionResponse, setSubmissionResponse] = useState({});
@@ -127,7 +127,14 @@ export default function QSAddItem() {
         }
     };
 
-    const initializeParameters = (plan) => {
+/**
+ * Creates a new object structure for parameters that includes the plan name as a key
+ * 
+ * @param {string} plan - String name of the plan
+ * @param {object} parameters - Optional Object of format {key1: value1, key2: value2, ...}
+ * // The values may be string, array, or objects
+ */
+    const initializeParameters = (plan='', parameters={}) => {
         //construct a parameter object in lieu of the default QS array format, easier to read and update inputs on
         var tempParameters = {};
         const multiSelectParamList = ['detectors']; //a list of parameters that require an array input as opposed to a string input
@@ -136,10 +143,22 @@ export default function QSAddItem() {
             let defaultValue = multiSelectParamList.includes(param.name) ? [] : '';
             tempParameters[param.name] = {...param, value: defaultValue, required: requiredParamList.includes(param.name)};
         }
+        //optional when specific parameter values are passed in
+        if (JSON.stringify(parameters) !== '{}') {
+            for (var key in parameters) {
+                tempParameters[key].value = parameters[key];
+            }
+        }
         setParameters(tempParameters);
         updateBodyKwargs(tempParameters);
     };
 
+/**
+ * Replaces the body state variable with the parameters object passed in.
+ * 
+ * @param {object} parameters - Object of format {key1: value1, key2: value2, ...}
+ * // The values may be string, array, or objects
+ */
     const updateBodyKwargs = (parameters) => {
         setBody(state => {
             var stateCopy = state;
@@ -213,6 +232,7 @@ export default function QSAddItem() {
         setResetInputsTrigger(prev => !prev);
     };
 
+
     const handleExpandClick = () => {
         setIsExpanded(!isExpanded);
         setIsSubmissionPopupOpen(false);
@@ -241,11 +261,21 @@ export default function QSAddItem() {
     };
 
 
-
     useEffect(() => {
         getDevicesAllowed(handleDeviceResponse);
         getPlansAllowed(handlePlanResponse);
     }, []);
+
+    useEffect(() => {
+        //set the plan, paramaters, and body
+        console.log({copiedPlan})
+        if (copiedPlan !== false) {
+            setIsExpanded(true);
+            setActivePlan(copiedPlan.name);
+            initializeParameters( copiedPlan.name, copiedPlan.parameters);
+            updateBodyName(copiedPlan.name);
+        }
+    }, [copiedPlan])
 
     return (
         <section className={`${isExpanded ? 'w-full' : 'w-96'} border border-solid rounded-lg shadow-lg transition-width ease-in duration-1000`}>

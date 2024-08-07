@@ -239,10 +239,6 @@ export default function QueueServer() {
         }
     };
 
-    const handleREMessage = (msg) => {
-        //when the WS receives message about RE Worker, trigger UI updates on RE Worker Component
-    };
-
     const handleOpenQItemPopup = (data, showDeleteButton=true) => {
         console.log({showDeleteButton})
         if (data.success !== false) {
@@ -280,6 +276,23 @@ export default function QueueServer() {
         setPopupItem({});
     };
 
+/**
+ * Sets the copiedPlan state variable which triggers the plan and parameters to be updated in QSAddItem
+ * 
+ * @param {string} name - String value representing the name of the plan
+ * @param {object} parameters - Object of format {key1: value1, key2: value2, ...}
+ * // The values may be string, array, or objects
+ */
+    const handleCopyItemClick = (name='', parameters={}) => {
+        //updates the state variables in QSAddItem
+        console.log({parameters})
+        var plan = {
+            name: name,
+            parameters: parameters
+        };
+        setCopiedPlan(plan);
+    };
+
 
     //to do - refactor this so we can more easily set the size on different routes
     return (
@@ -287,7 +300,7 @@ export default function QueueServer() {
             <main className="bg-black shadow-lg max-w-screen-2xl m-auto flex rounded-md h-[40rem] 3xl:max-w-screen-xl relative">
                 {/* ITEM POPUP  */}
                 {isQItemPopupVisible ? (
-                    <QItemPopup handleQItemPopupClose={handleQItemPopupClose} popupItem={popupItem} isItemDeleteButtonVisible={isItemDeleteButtonVisible} />
+                    <QItemPopup handleQItemPopupClose={handleQItemPopupClose} popupItem={popupItem} isItemDeleteButtonVisible={isItemDeleteButtonVisible} handleCopyItemClick={handleCopyItemClick} />
                 ) : (
                     ''
                 )}  
@@ -297,7 +310,7 @@ export default function QueueServer() {
                     {/* TOP of LEFT SIDE  */}
                     <div className="flex mx-4 border-b-white border-b h-2/6 items-center">
                         <div className="w-9/12 px-2 mt-2">
-                            <QSList queueData={queueData} handleQItemClick={handleQItemClick} type='default'/>
+                            <QSList queueData={queueData} handleQItemClick={handleQItemClick} handleCopyItemClick={handleCopyItemClick} type='default'/>
                         </div>
                         <div className="w-3/12 mt-2">
                             <QSRunEngineWorker 
@@ -318,7 +331,7 @@ export default function QueueServer() {
                 {/* RIGHT SIDE */}
                 {isHistoryVisible ? (
                     <div className="h-full w-1/6 border-l-white border-ddl rounded-r-md bg-slate-900">
-                        <QSList queueData={queueHistoryData} handleQItemClick={handleQItemClick} type='history' />
+                        <QSList queueData={queueHistoryData} handleQItemClick={handleQItemClick} handleCopyItemClick={handleCopyItemClick} type='history' />
                     </div>
                 ) : (
                     ''
@@ -326,7 +339,7 @@ export default function QueueServer() {
             </main>
 
             <div className="mt-16 mb-20 flex justify-center">
-                <QSAddItem />
+                <QSAddItem copiedPlan={copiedPlan} />
             </div>
         </Fragment>
     )
