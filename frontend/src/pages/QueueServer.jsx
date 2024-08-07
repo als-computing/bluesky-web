@@ -79,6 +79,7 @@ export default function QueueServer() {
     const [ runningItem, setRunningItem ] = useState({});
     const runningItemRef = useRef(runningItem);
     const [ isItemDeleteButtonVisible, setIsItemDeleteButtonVisible ] = useState(true);
+    const [ copiedPlan, setCopiedPlan ] = useState(false);
 
     //setup polling interval for getting regular updates from the http server
     var pollingInterval;
@@ -185,6 +186,7 @@ export default function QueueServer() {
         getQueueHistory(handleQueueHistoryResponse);
         //start polling at regular intervals
         setInterval(()=> getQueue(handleQueueDataResponse), pollingInterval);
+        setInterval(()=> getQueueHistory(handleQueueHistoryResponse), pollingInterval);
         console.log('page load')
     }, []);
 
@@ -364,7 +366,7 @@ export default function QueueServer() {
             </main>
 
             <div className="mt-16 mb-20 flex justify-center">
-                <QSAddItem />
+                <QSAddItem copiedPlan={copiedPlan}/>
             </div>
         </Fragment>
     )

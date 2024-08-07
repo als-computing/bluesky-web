@@ -72,7 +72,7 @@ export default function MultiSelectInput({cb=()=>{}, label='', isItemInArray=()=
                         <span>{item}</span>
                         <button
                             onClick={() => handleRemoveItem(item)}
-                            className="ml-2 text-slate-600 hover:text-red-700"
+                            className="ml-2 text-slate-600 hover:text-red-700 h-6 aspect-square"
                         >
                             {tailwindIcons.xCircle}
                         </button>
