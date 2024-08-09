@@ -3,7 +3,7 @@ import MultiSelectInput from "./MulitSelectInput";
 import SingleSelectInput from "./SingleSelectInput";
 import DictionaryInput from "./DictionaryInput";
 
-export default function QSParameterInput( {cb=()=>{}, allowedDevices=[], param={'name': 'blank'}, updateBodyKwargs=()=>{}, parameters={}, setParameters=()=>{}, plan={plan}, styles='', resetInputsTrigger=false} ) {
+export default function QSParameterInput( {cb=()=>{}, allowedDevices=[], param={'name': 'blank'}, updateBodyKwargs=()=>{}, parameters={}, setParameters=()=>{}, plan={plan}, styles='', resetInputsTrigger=false}, copiedPlan=false ) {
     //to do: refactor to remove param.name and change param to a string
 
     //-----Functions for MultiSelectInput ---------------
@@ -97,7 +97,7 @@ export default function QSParameterInput( {cb=()=>{}, allowedDevices=[], param={
         if (singleInputTypeList.includes(param.name)) {
             return <SingleSelectInput required={parameters[param.name].required} isItemInArray={isItemInArray} addItem={replaceItem} clearItem={clearItem} selectedItems={parameters[param.name].value} label={param.name} allowedDevices={allowedDevices} parameters={parameters} plan={plan} description={parameters[param.name].description}/>
         } else if(dictionaryInputTypeList.includes(param.name)) {
-            return <DictionaryInput required={parameters[param.name].required} description={parameters[param.name].description} label={param.name} cb={handleDictionaryChange} dict={parameters[param.name].value} resetInputsTrigger={resetInputsTrigger}/>
+            return <DictionaryInput copiedPlan={copiedPlan} required={parameters[param.name].required} description={parameters[param.name].description} label={param.name} cb={handleDictionaryChange} dict={parameters[param.name].value} resetInputsTrigger={resetInputsTrigger}/>
         } else {
             return <TextInput label={param.name} value={parameters[param.name].value} cb={handleInputChange} required={parameters[param.name].required} description={parameters[param.name].description} resetInputsTrigger={resetInputsTrigger}/>
         }

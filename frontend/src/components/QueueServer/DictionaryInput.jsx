@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Tooltip } from "react-tooltip";
-export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required=true, description='', styles='', resetInputsTrigger=false }) {
+export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required=true, description='', styles='', resetInputsTrigger=false, copyDictionaryTrigger=false, copiedPlan=false }) {
 
     //hardcode the number of possible key value input pairs
     //this does not allow the user to add more, but better controls the UI
@@ -22,14 +22,20 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
         },
     };
 
-    //for copied plans, a non-empty dictionary may be passed in on initialization
-    if (JSON.stringify(dict) !== '{}') {
-        var inputKeys = Object.keys(inputDictDefault);
-        var i = 0;
-        for (var key in dict) {
-            inputDictDefault[i].key = key;
-            inputDictDefault[i].val = dict[key];
-            i++;
+
+
+    const copyDictionary = () => {
+        console.log({dict})
+        if (JSON.stringify(dict) !== '{}') {
+            var inputKeys = Object.keys(inputDictDefault);
+            var i = 0;
+            var newDict = JSON.parse(JSON.stringify(inputDictDefault));
+            for (var key in dict) {
+                newDict[inputKeys[i]].key = key;
+                newDict[inputKeys[i]].val = dict[key];
+                i++;
+            }
+            setInputDict(newDict);
         }
     }
 
@@ -53,8 +59,12 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
         //if key is empty but value is not, invalid object
         console.log('handleChange')
 
+        var stateCopy = '';
+        var dictionary = {};
+        var deleteParam = false;
+
         setInputDict(state => {
-            var stateCopy = JSON.parse(JSON.stringify(state));
+            stateCopy = JSON.parse(JSON.stringify(state));
             
             stateCopy[inputNum][type] = newValue;
             if (stateCopy[inputNum].key === '' & stateCopy[inputNum].val !== '') {
@@ -64,15 +74,16 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
                 var wipedDictionary = JSON.parse(JSON.stringify(stateCopy));
                 wipedDictionary[inputNum].val = '';
                 wipedDictionary[inputNum].key = '';
-                cb(createJSON(wipedDictionary));
+                dictionary = createJSON(wipedDictionary);
             } else {
                 stateCopy[inputNum].msg = '';
-                var JSONObject = createJSON(stateCopy);
-                var deleteParam = JSON.stringify(JSONObject) === '{}'; //delete the param from the parameter state if it's empty
-                cb(JSONObject, deleteParam);
+                var dictionary = createJSON(stateCopy);
+                deleteParam = JSON.stringify(dictionary) === '{}'; //delete the param from the parameter state if it's empty
             }
             return stateCopy;
         });
+
+        cb(dictionary, deleteParam);
     };
 
     useEffect(() => {
@@ -80,8 +91,8 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
     }, [resetInputsTrigger]);
 
     useEffect(() => {
-
-    })
+        copyDictionary();
+    }, [copiedPlan])
 
     return (
         <div className={`border-2 border-slate-300 rounded-lg w-11/12 max-w-96 min-w-72 mt-2 h-fit ${styles}`}>

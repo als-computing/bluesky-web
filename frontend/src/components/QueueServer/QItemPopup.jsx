@@ -37,7 +37,6 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
 
     //check if item is in the current queue or the history
     const isHistory = 'result' in popupItem;
-    console.log({isHistory});
 
     //Color settings for delete mode
     const deleteBg = 'bg-slate-300';

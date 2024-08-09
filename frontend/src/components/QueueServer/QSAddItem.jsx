@@ -267,7 +267,7 @@ export default function QSAddItem({copiedPlan=false}) {
     }, []);
 
     useEffect(() => {
-        //set the plan, paramaters, and body
+        //set the plan, parameters, and body
         console.log({copiedPlan})
         if (copiedPlan !== false) {
             setIsExpanded(true);
@@ -313,7 +313,7 @@ export default function QSAddItem({copiedPlan=false}) {
                     </div>
                     <div name="parameter inputs" className="flex flex-wrap justify-center space-x-2 space-y-4 py-4 px-2 overflow-auto h-[calc(100%-2.5rem)]">
                         {activePlan ? <h3>{activePlan}: {allowedPlans[activePlan].description}</h3> : ''}
-                        {Object.keys(parameters).map((param) => <QSParameterInput key={param} param={parameters[param]} parameters={parameters} updateBodyKwargs={updateBodyKwargs} setParameters={setParameters} allowedDevices={allowedDevices} plan={activePlan} resetInputsTrigger={resetInputsTrigger} />)}
+                        {Object.keys(parameters).map((param) => <QSParameterInput key={param} param={parameters[param]} parameters={parameters} updateBodyKwargs={updateBodyKwargs} setParameters={setParameters} allowedDevices={allowedDevices} plan={activePlan} resetInputsTrigger={resetInputsTrigger} copiedPlan={copiedPlan} />)}
                     </div>
                 </div>
                 <div name="REVIEW" className={`${activePlan ? 'w-3/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 `}>

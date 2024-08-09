@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import QItem from './QItem';
 import dayjs from 'dayjs';
 
-export default function QSList({ queueData=[], handleQItemClick=()=>{}, handleCopyItemClick=()=>{}, type='default' }) {
+export default function QSList({ queueData=[], handleQItemClick=()=>{}, type='default' }) {
 
     const listRef = useRef(null);
 
@@ -24,7 +24,7 @@ export default function QSList({ queueData=[], handleQItemClick=()=>{}, handleCo
             <section className="">
                 <h2 className="text-white text-xl text-center">Queue Items</h2>
                 <ul className="flex flex-row-reverse border-r border-r-white pr-2 mt-2 overflow-auto justify-evenly" style={{'scrollbarColor': 'grey black'}}>
-                    {queueData.map((item, index) => <QItem item={item} label={index} key={item.item_uid} handleCopyItemClick={handleCopyItemClick} handleClick={()=>handleQItemClick(item, true)}/>)}
+                    {queueData.map((item, index) => <QItem item={item} label={index} key={item.item_uid} handleClick={()=>handleQItemClick(item, true)}/>)}
                     {queueData.length < 3 ? [...new Array(4 - queueData.length)].map((item, index) => <QItem item={item} index={index} key={index}/>) : '' }
                 </ul>
             </section>

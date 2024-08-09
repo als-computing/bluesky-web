@@ -80,6 +80,7 @@ export default function QueueServer() {
     const runningItemRef = useRef(runningItem);
     const [ isItemDeleteButtonVisible, setIsItemDeleteButtonVisible ] = useState(true);
     const [ copiedPlan, setCopiedPlan ] = useState(false);
+    const [ copyDictionaryTrigger, setCopyDictionaryTrigger ] = useState(false);
 
     //setup polling interval for getting regular updates from the http server
     var pollingInterval;
@@ -285,11 +286,11 @@ export default function QueueServer() {
  */
     const handleCopyItemClick = (name='', parameters={}) => {
         //updates the state variables in QSAddItem
-        console.log({parameters})
         var plan = {
             name: name,
             parameters: parameters
         };
+        setCopyDictionaryTrigger(prev => !prev);
         setCopiedPlan(plan);
     };
 
@@ -300,7 +301,7 @@ export default function QueueServer() {
             <main className="bg-black shadow-lg max-w-screen-2xl m-auto flex rounded-md h-[40rem] 3xl:max-w-screen-xl relative">
                 {/* ITEM POPUP  */}
                 {isQItemPopupVisible ? (
-                    <QItemPopup handleQItemPopupClose={handleQItemPopupClose} popupItem={popupItem} isItemDeleteButtonVisible={isItemDeleteButtonVisible} handleCopyItemClick={handleCopyItemClick} />
+                    <QItemPopup handleQItemPopupClose={handleQItemPopupClose} popupItem={popupItem} isItemDeleteButtonVisible={isItemDeleteButtonVisible} handleCopyItemClick={handleCopyItemClick} copyDictionaryTrigger={copyDictionaryTrigger}/>
                 ) : (
                     ''
                 )}  
@@ -310,7 +311,7 @@ export default function QueueServer() {
                     {/* TOP of LEFT SIDE  */}
                     <div className="flex mx-4 border-b-white border-b h-2/6 items-center">
                         <div className="w-9/12 px-2 mt-2">
-                            <QSList queueData={queueData} handleQItemClick={handleQItemClick} handleCopyItemClick={handleCopyItemClick} type='default'/>
+                            <QSList queueData={queueData} handleQItemClick={handleQItemClick} type='default'/>
                         </div>
                         <div className="w-3/12 mt-2">
                             <QSRunEngineWorker 
@@ -331,7 +332,7 @@ export default function QueueServer() {
                 {/* RIGHT SIDE */}
                 {isHistoryVisible ? (
                     <div className="h-full w-1/6 border-l-white border-ddl rounded-r-md bg-slate-900">
-                        <QSList queueData={queueHistoryData} handleQItemClick={handleQItemClick} handleCopyItemClick={handleCopyItemClick} type='history' />
+                        <QSList queueData={queueHistoryData} handleQItemClick={handleQItemClick}  type='history' />
                     </div>
                 ) : (
                     ''
