@@ -116,13 +116,13 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
                             <li key={key} className="flex text-center w-full relative">
                                 {item.msg.length > 0 ? <p className="text-red-500 text-xs text-left absolute left-5 top-2">{item.msg}</p> : ''}
                                 <input
-                                    className={`${item.key.length === 0 && item.val.length > 0 ? 'border-red-500' : 'border-slate-400'} basis-5/12 border mx-2 my-1 text-center`} 
+                                    className={`${item.key.length === 0 && item.val.length > 0 ? 'border-red-500' : 'border-slate-400'} w-5/12 border mx-2 my-1 text-center`} 
                                     value={item.key}
                                     onChange={(e) => handleChange(key, 'key', e.target.value)}
                                 />
-                                <p className="basis-2/12">:</p>
+                                <p className="w-1/12">:</p>
                                 <input
-                                    className="basis-5/12 border border-slate-400 mx-2 my-1 text-center" 
+                                    className="w-5/12 border border-slate-400 mx-2 my-1 text-center" 
                                     value={item.val}
                                     onChange={(e) => handleChange(key, 'val', e.target.value)}
                                 />
