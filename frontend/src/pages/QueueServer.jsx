@@ -297,6 +297,55 @@ export default function QueueServer() {
     //to do - refactor this so we can more easily set the size on different routes
     return (
         <Fragment>
+            <main className="bg-black shadow-lg max-w-screen-2xl m-auto flex flex-col rounded-md h-[40rem] 3xl:max-w-screen-xl relative">
+                {/* ITEM POPUP  */}
+                {isQItemPopupVisible ? (
+                    <QItemPopup handleQItemPopupClose={handleQItemPopupClose} popupItem={popupItem} isItemDeleteButtonVisible={isItemDeleteButtonVisible} handleCopyItemClick={handleCopyItemClick} copyDictionaryTrigger={copyDictionaryTrigger}/>
+                ) : (
+                    ''
+                )}  
+
+                {/* TOP */}
+                <div className="flex mx-4 border-b-white  h-2/6 items-center">
+                    <div className="w-5/6 px-2 mt-2">
+                        <QSList queueData={queueData} handleQItemClick={handleQItemClick} type='default'/>
+                    </div>
+                    <div className="w-1/6 mt-2">
+                        <QSRunEngineWorker 
+                            workerStatus={workerStatus} 
+                            runningItem={runningItem} 
+                            isREToggleOn={isREToggleOn} 
+                            setIsREToggleOn={setIsREToggleOn}
+                        />
+                    </div>
+                </div>
+
+                {/* BOTTOM */}
+                <div className="h-4/6 w-full flex">
+                    {/* BOTTOM LEFT */}
+                    <div className="h-full w-5/6">
+                        <QSConsole title={false} description={false} processConsoleMessage={processConsoleMessage}/>
+                    </div>
+                    {/* BOTTOM RIGHT */}
+                    {isHistoryVisible ? (
+                        <div className="h-full w-1/6 border-l-white border-ddl rounded-r-md bg-slate-900">
+                            <QSList queueData={queueHistoryData} handleQItemClick={handleQItemClick}  type='history' />
+                        </div>
+                    ) : (
+                        ''
+                    )}
+                </div>
+            </main>
+
+            <div className="mt-16 mb-20 flex justify-center max-w-screen-2xl 3xl:max-w-screen-xl m-auto">
+                <QSAddItem copiedPlan={copiedPlan} />
+            </div>
+        </Fragment>
+    )
+
+    // add history on the right side column
+    return (
+        <Fragment>
             <main className="bg-black shadow-lg max-w-screen-2xl m-auto flex rounded-md h-[40rem] 3xl:max-w-screen-xl relative">
                 {/* ITEM POPUP  */}
                 {isQItemPopupVisible ? (
@@ -342,7 +391,7 @@ export default function QueueServer() {
                 <QSAddItem copiedPlan={copiedPlan} />
             </div>
         </Fragment>
-    )
+    )            
 
     //original prior to adding history feature , 07/29
     return (
