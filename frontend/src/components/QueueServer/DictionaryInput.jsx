@@ -40,6 +40,7 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
 
 
     const [inputDict, setInputDict] = useState(inputDictDefault);
+    const [callbackData, setCallbackData] = useState(null);
 
     const createJSON = (nestedObject) => {
         //transform the nested inputDict used for the form
@@ -79,10 +80,9 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
                 var dictionary = createJSON(stateCopy);
                 deleteParam = JSON.stringify(dictionary) === '{}'; //delete the param from the parameter state if it's empty
             }
+            setCallbackData({dictionary, deleteParam})
             return stateCopy;
         });
-
-        cb(dictionary, deleteParam);
     };
 
     useEffect(() => {
@@ -91,7 +91,13 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
 
     useEffect(() => {
         copyDictionary();
-    }, [copiedPlan])
+    }, [copiedPlan]);
+
+    useEffect(() => {
+        if (callbackData) {
+            cb(callbackData.dictionary, callbackData.deleteParam);
+        }
+    }, [callbackData]);
 
     return (
         <div className={`border-2 border-slate-300 rounded-lg w-11/12 max-w-96 min-w-72 mt-2 h-fit ${styles}`}>
