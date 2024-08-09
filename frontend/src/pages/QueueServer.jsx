@@ -328,7 +328,7 @@ export default function QueueServer() {
                     </div>
                     {/* BOTTOM RIGHT */}
                     {isHistoryVisible ? (
-                        <div className="h-full w-1/6 border-l-white border-ddl rounded-r-md bg-slate-900">
+                        <div className="h-full w-1/6 border-l-white  rounded-r-md">
                             <QSList queueData={queueHistoryData} handleQItemClick={handleQItemClick}  type='history' />
                         </div>
                     ) : (
