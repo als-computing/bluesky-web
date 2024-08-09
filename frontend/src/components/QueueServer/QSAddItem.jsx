@@ -268,7 +268,6 @@ export default function QSAddItem({copiedPlan=false}) {
 
     useEffect(() => {
         //set the plan, parameters, and body
-        console.log({copiedPlan})
         if (copiedPlan !== false) {
             setIsExpanded(true);
             setActivePlan(copiedPlan.name);

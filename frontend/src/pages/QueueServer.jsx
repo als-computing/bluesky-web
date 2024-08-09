@@ -251,7 +251,6 @@ export default function QueueServer() {
                 //occurs when item is sent in directly
                 setPopupItem(data);
                 showDeleteButton ? setIsItemDeleteButtonVisible(true) : setIsItemDeleteButtonVisible(false);
-                console.log({isItemDeleteButtonVisible})
             }
             setIsQItemPopupVisible(true);
         } else {

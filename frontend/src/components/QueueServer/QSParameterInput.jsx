@@ -99,7 +99,7 @@ export default function QSParameterInput( {cb=()=>{}, allowedDevices=[], param={
         } else if(dictionaryInputTypeList.includes(param.name)) {
             return <DictionaryInput copiedPlan={copiedPlan} required={parameters[param.name].required} description={parameters[param.name].description} label={param.name} cb={handleDictionaryChange} dict={parameters[param.name].value} resetInputsTrigger={resetInputsTrigger}/>
         } else {
-            return <TextInput label={param.name} value={parameters[param.name].value} cb={handleInputChange} required={parameters[param.name].required} description={parameters[param.name].description} resetInputsTrigger={resetInputsTrigger}/>
+            return <TextInput copiedPlan={copiedPlan} label={param.name} value={parameters[param.name].value} cb={handleInputChange} required={parameters[param.name].required} description={parameters[param.name].description} resetInputsTrigger={resetInputsTrigger}/>
         }
     }
 }

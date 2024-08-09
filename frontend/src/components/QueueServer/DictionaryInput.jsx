@@ -25,7 +25,6 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
 
 
     const copyDictionary = () => {
-        console.log({dict})
         if (JSON.stringify(dict) !== '{}') {
             var inputKeys = Object.keys(inputDictDefault);
             var i = 0;
