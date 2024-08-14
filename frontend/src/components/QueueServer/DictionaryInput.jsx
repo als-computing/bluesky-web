@@ -80,7 +80,7 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
                 var dictionary = createJSON(stateCopy);
                 deleteParam = JSON.stringify(dictionary) === '{}'; //delete the param from the parameter state if it's empty
             }
-            setCallbackData({dictionary, deleteParam})
+            setCallbackData({dictionary, deleteParam});
             return stateCopy;
         });
     };
