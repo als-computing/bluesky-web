@@ -3,8 +3,6 @@ import QSList from "../components/QueueServer/QSList";
 import QSRunEngineWorker from "../components/QueueServer/QSRunEngineWorker";
 import QSAddItem from "../components/QueueServer/QSAddItem";
 import QItemPopup from "../components/QueueServer/QItemPopup";
-import SidePanel from "../components/QueueServer/SidePanel";
-import MainPanel from "../components/QueueServer/MainPanel";
 import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus, getQueueItem, getQueueHistory } from "../components/QueueServer/utils/apiClient";
 import { useState, Fragment, useEffect, useRef } from 'react';
 import { useQueueServer } from "../components/QueueServer/hooks/useQueueServer";
@@ -144,38 +142,53 @@ export default function QueueServer() {
         setCopiedPlan(plan);
     };
 
-    return (
-        <main className="max-w-screen-3xl w-full min-w-[52rem] temph-[calc(100vh-6rem)] tempmin-h-[50rem] h-[60rem] m-auto flex rounded-md relative bg-slate-400">
-            {/* ITEM POPUP  */}
-            {isQItemPopupVisible ? (
-                <QItemPopup 
-                    handleQItemPopupClose={handleQItemPopupClose} 
-                    popupItem={popupItem} 
-                    isItemDeleteButtonVisible={isItemDeleteButtonVisible} 
-                    handleCopyItemClick={handleCopyItemClick} 
-                    copyDictionaryTrigger={copyDictionaryTrigger}
-                />
-            ) : (
-                ''
-            )} 
-            <div className="w-1/4 3xl:w-1/6 bg-slate-200 rounded-md shadow-md drop-shadow h-full">
-                <SidePanel 
-                    queueData={queueData}
-                    queueHistoryData={queueHistoryData} 
-                    handleQItemClick={handleQItemClick}
-                    workerStatus={workerStatus} 
-                    runningItem={runningItem} 
-                    isREToggleOn={isREToggleOn} 
-                    setIsREToggleOn={setIsREToggleOn}
-                />
-            </div>
 
-            <div className="w-3/4 3xl:w-5/6 bg-slate-400 rounded-md">
-                <MainPanel 
-                    processConsoleMessage={processConsoleMessage}
-                    copiedPlan={copiedPlan}
-                />
+    //to do - refactor this so we can more easily set the size on different routes
+    return (
+        <Fragment>
+            <main className="bg-black shadow-lg max-w-screen-2xl m-auto flex flex-col rounded-md h-[40rem] 3xl:max-w-screen-xl relative">
+                {/* ITEM POPUP  */}
+                {isQItemPopupVisible ? (
+                    <QItemPopup handleQItemPopupClose={handleQItemPopupClose} popupItem={popupItem} isItemDeleteButtonVisible={isItemDeleteButtonVisible} handleCopyItemClick={handleCopyItemClick} copyDictionaryTrigger={copyDictionaryTrigger}/>
+                ) : (
+                    ''
+                )}  
+
+                {/* TOP */}
+                <div className="flex mx-4 border-b-white  h-2/6 items-center">
+                    <div className="w-5/6 px-2 mt-2">
+                        <QSList queueData={queueData} handleQItemClick={handleQItemClick} type='default'/>
+                    </div>
+                    <div className="w-1/6 mt-2">
+                        <QSRunEngineWorker 
+                            workerStatus={workerStatus} 
+                            runningItem={runningItem} 
+                            isREToggleOn={isREToggleOn} 
+                            setIsREToggleOn={setIsREToggleOn}
+                        />
+                    </div>
+                </div>
+
+                {/* BOTTOM */}
+                <div className="h-4/6 w-full flex">
+                    {/* BOTTOM LEFT */}
+                    <div className="h-full w-5/6">
+                        <QSConsole title={false} description={false} processConsoleMessage={processConsoleMessage}/>
+                    </div>
+                    {/* BOTTOM RIGHT */}
+                    {isHistoryVisible ? (
+                        <div className="h-full w-1/6 border-l-white  rounded-r-md">
+                            <QSList queueData={queueHistoryData} handleQItemClick={handleQItemClick}  type='history' />
+                        </div>
+                    ) : (
+                        ''
+                    )}
+                </div>
+            </main>
+
+            <div className="mt-16 mb-20 flex justify-center max-w-screen-2xl 3xl:max-w-screen-xl m-auto">
+                <QSAddItem copiedPlan={copiedPlan} />
             </div>
-        </main>
+        </Fragment>
     )
 }
