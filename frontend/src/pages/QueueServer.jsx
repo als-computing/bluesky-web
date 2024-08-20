@@ -7,6 +7,7 @@ import { getQServerKey } from "../utilities/connectionHelper";
 import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus, getQueueItem, getQueueHistory } from "../components/QueueServer/apiClient";
 import axios from "axios";
 import { useState, Fragment, useEffect, useRef } from 'react';
+import { useQueueServer } from "../components/QueueServer/hooks/useQueueServer";
 
 
 const sampleQueueData = [
@@ -69,15 +70,17 @@ export default function QueueServer() {
     const [ isQItemPopupVisible, setIsQItemPopupVisible ] = useState(false);
     const [ isHistoryVisible, setIsHistoryVisible ] = useState(true);
     const [ popupItem, setPopupItem ] = useState({});
-    const [ queueData, setQueueData ] = useState([]);
-    const queueDataRef = useRef(queueData);
-    const [queueHistoryData, setQueueHistoryData ] = useState([]);
-    const queueHistoryDataRef = useRef(queueHistoryData);
-    const planHistoryUidRef = useRef('');
-    const [ isREToggleOn, setIsREToggleOn ] = useState(false);
-    const runEngineToggleRef = useRef(isREToggleOn);
-    const [ runningItem, setRunningItem ] = useState({});
-    const runningItemRef = useRef(runningItem);
+
+/*     const [ queueData, setQueueData ] = useState([]); //in useQueueServer hook
+    const queueDataRef = useRef(queueData); //in useQueueServer hook
+    const [queueHistoryData, setQueueHistoryData ] = useState([]); //in useQueueServer hook
+    const queueHistoryDataRef = useRef(queueHistoryData); //in useQueueServer hook
+    const planHistoryUidRef = useRef(''); //in useQueueServer hook
+    const [ isREToggleOn, setIsREToggleOn ] = useState(false); //in useQueueServer hook
+    const runEngineToggleRef = useRef(isREToggleOn); //in useQueueServer hook
+    const [ runningItem, setRunningItem ] = useState({}); //in useQueueServer hook
+    const runningItemRef = useRef(runningItem); //in useQueueServer hook */
+
     const [ isItemDeleteButtonVisible, setIsItemDeleteButtonVisible ] = useState(true);
     const [ copiedPlan, setCopiedPlan ] = useState(false);
     const [ copyDictionaryTrigger, setCopyDictionaryTrigger ] = useState(false);
@@ -92,10 +95,22 @@ export default function QueueServer() {
         pollingInterval = thirtySeconds;
     }
 
+    const {
+        queueData,
+        queueHistoryData,
+        isREToggleOn,
+        runningItem,
+        runEngineToggleRef,
+        setIsREToggleOn,
+        handleQueueDataResponse,
+        handleQueueHistoryResponse
+    } = useQueueServer(pollingInterval);
+
 
     //use refs to allow for comparisons from GET requests to
     //only re-render when a change is detected
-    useEffect(() => {
+    //in useQueueServer hook
+/*     useEffect(() => {
         queueDataRef.current = queueData;
     }, [queueData]);
 
@@ -109,7 +124,7 @@ export default function QueueServer() {
 
     useEffect(() => {
         queueHistoryDataRef.current = queueHistoryData;
-    }, [queueHistoryData]);
+    }, [queueHistoryData]); */
     
 
 
@@ -133,6 +148,7 @@ export default function QueueServer() {
         }
     };
 
+/*     //in useQueueServer hook
     const handleQueueDataResponse =(res) => {
         //checks if UI update should occur and sends data to callback
         try {
@@ -163,6 +179,7 @@ export default function QueueServer() {
         }
     };
 
+    //in useQueueServer hook
     const handleQueueHistoryResponse = (res) => {
         if (res.success === true) {
             try {
@@ -180,6 +197,7 @@ export default function QueueServer() {
         }
     };
     
+    //in useQueueServer hook
     useEffect(() => {
         //get current queue
         //getQueue(setQueueData, queueDataRef, setRunningItem, runningItemRef); //we need to send in a handler for a running item
@@ -189,7 +207,7 @@ export default function QueueServer() {
         setInterval(()=> getQueue(handleQueueDataResponse), pollingInterval);
         setInterval(()=> getQueueHistory(handleQueueHistoryResponse), pollingInterval);
         console.log('page load')
-    }, []);
+    }, []); */
 
     const processConsoleMessage = (msg) => {
         //using the console log to trigger get requests has some issues with stale state, even with useRef
