@@ -24,13 +24,13 @@ function App() {
 
 
   return (
-    <main className="App bg-white h-screen px-12 sm:max-w-screen-2xl 3xl:max-w-full m-auto">
+    <main className="App bg-white h-screen px-12 sm:max-w-screen-3xl 3xl:max-w-full m-auto">
       <Header />
-      <div className="flex justify-center min-h-[calc(100%-4rem)] 3xl:justify-around">
+      <div className="flex justify-center min-h-[calc(100%-4rem)] 3xl:justify-around border border-red-500">
         <div className="md:hidden md:w-0 lg:block lg:w-1/6 h-full 3xl:w-36">
           <Sidebar />
         </div>
-        <div className={`md:w-full ${compressRightSide ? 'lg:w-5/6' : 'lg:w-4/6'} h-full 3xl:w-full`}>
+        <div className={`md:w-full ${compressRightSide ? 'lg:w-5/6' : 'lg:w-4/6'} h-full 3xl:w-full border border-red-500`}>
           <Routes>
             <Route path="/" element={<Home /> } />
             <Route path="/camera" element={<Camera />} />

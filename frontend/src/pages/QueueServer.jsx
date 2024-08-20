@@ -145,7 +145,7 @@ export default function QueueServer() {
     };
 
     return (
-        <main className="max-w-screen-3xl w-full min-w-[52rem] temph-[calc(100vh-6rem)] tempmin-h-[50rem] h-[60rem] m-auto flex rounded-md relative bg-slate-400">
+        <main className="max-w-screen-3xl w-full min-w-[52rem] h-[calc(100vh-6rem)] min-h-[50rem]  m-auto flex rounded-md relative bg-slate-400">
             {/* ITEM POPUP  */}
             {isQItemPopupVisible ? (
                 <QItemPopup 
@@ -158,7 +158,7 @@ export default function QueueServer() {
             ) : (
                 ''
             )} 
-            <div className="w-1/4 3xl:w-1/6 bg-slate-200 rounded-md shadow-md drop-shadow h-full">
+            <div className="w-1/5 lg:max-w-60 flex-shrink-0 bg-slate-200 rounded-md shadow-md drop-shadow h-full">
                 <SidePanel 
                     queueData={queueData}
                     queueHistoryData={queueHistoryData} 
@@ -170,7 +170,7 @@ export default function QueueServer() {
                 />
             </div>
 
-            <div className="w-3/4 3xl:w-5/6 bg-slate-400 rounded-md">
+            <div className="flex-grow bg-slate-400 rounded-md">
                 <MainPanel 
                     processConsoleMessage={processConsoleMessage}
                     copiedPlan={copiedPlan}

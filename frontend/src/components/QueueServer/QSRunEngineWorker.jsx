@@ -29,7 +29,7 @@ export default function QSRunEngineWorker({ isREToggleOn, setIsREToggleOn, runni
 
     const ToggleSlider = () => {
         return (
-            <div name="toggle" className="flex w-fit flex-col items-center space-y-2">
+            <div name="toggle" className="flex flex-grow text-right flex-col items-center space-y-2">
                 <p className={`${isREToggleOn ? 'text-white' : 'text-gray-400'} transition-colors duration-500`}>ON</p>
                 <button
                     onClick={toggleSwitch}
@@ -49,15 +49,10 @@ export default function QSRunEngineWorker({ isREToggleOn, setIsREToggleOn, runni
     }
 
     return (
-        <section>
-            <div className="flex items-center justify-center space-x-2">
-                <h2 className="text-white text-xl text-center pl-6">RE Worker</h2>
-                <div name="status icon" className="w-4 h-4 bg-yellow-300 rounded-lg"></div>
-            </div>
-            <div className="flex justify-center mt-2">
-                {ToggleSlider() }
-                <QItem item={runningItem} />
-            </div>
-        </section>
+        <div className="flex justify-center items-center mt-2 w-full">
+            <p className="flex-grow text-left">a</p>
+            <QItem item={runningItem} />
+            {ToggleSlider() }
+        </div>
     )
 }

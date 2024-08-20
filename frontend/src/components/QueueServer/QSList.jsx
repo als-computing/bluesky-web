@@ -42,8 +42,8 @@ export default function QSList({ queueData=[], handleQItemClick=()=>{}, type='de
         )
     } else if (type === 'short') {
         return (
-            <section className="h-full w-full flex flex-col ">
-                <ul className="flex flex-col-reverse mt-2 justify-evenly  ">
+            <section className="h-full w-full flex flex-col items-center">
+                <ul className="flex flex-col-reverse mt-2">
                     {queueData.map((item, index) => <QItem type="default" item={item} label={index} key={item.item_uid} handleClick={()=>handleQItemClick(item, true)}/>)}
                     {queueData.length < 14 ? [...new Array(14 - queueData.length)].map((item, index) => <QItem item={item} index={index} key={index}/>) : '' }
                 </ul>
