@@ -1,6 +1,6 @@
 import { tailwindIcons } from "../../assets/icons";
 import { useState, useEffect } from 'react';
-import { getDevicesAllowed, getPlansAllowed, postQueueItem, executeItem } from "./apiClient";
+import { getDevicesAllowed, getPlansAllowed, postQueueItem, executeItem } from "./utils/apiClient";
 import QSParameterInput from "./QSParameterInput";
 import AddQueueItemButton from "./AddQueueItemButton";
 import SubmissionResultPopup from "./SubmissionResultPopup";

@@ -3,66 +3,10 @@ import QSList from "../components/QueueServer/QSList";
 import QSRunEngineWorker from "../components/QueueServer/QSRunEngineWorker";
 import QSAddItem from "../components/QueueServer/QSAddItem";
 import QItemPopup from "../components/QueueServer/QItemPopup";
-import { getQServerKey } from "../utilities/connectionHelper";
-import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus, getQueueItem, getQueueHistory } from "../components/QueueServer/apiClient";
-import axios from "axios";
+import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus, getQueueItem, getQueueHistory } from "../components/QueueServer/utils/apiClient";
 import { useState, Fragment, useEffect, useRef } from 'react';
 import { useQueueServer } from "../components/QueueServer/hooks/useQueueServer";
 
-
-const sampleQueueData = [
-    {
-        "name": "count",
-        "args": [
-            [
-                "det1",
-                "det2"
-            ]
-        ],
-        "kwargs": {
-            "num": 10,
-            "delay": 1
-        },
-        "item_type": "plan",
-        "user": "qserver-cli",
-        "user_group": "primary",
-        "item_uid": "eb0c43a7-3227-450a-bbb1-260f1ee7a4dc"
-    },
-    {
-        "name": "count",
-        "args": [
-            [
-                "det1",
-                "det2"
-            ]
-        ],
-        "kwargs": {
-            "num": 10,
-            "delay": 1
-        },
-        "item_type": "plan",
-        "user": "qserver-cli",
-        "user_group": "primary",
-        "item_uid": "0462793a-b2ff-4d0f-94fe-9f496c179ec1"
-    },
-    {
-        "name": "spiral_count",
-        "args": [
-            [
-                "det1",
-                "det2"
-            ]
-        ],
-        "kwargs": {
-            "num": 10,
-            "delay": 1
-        },
-        "item_type": "plan",
-        "user": "qserver-cli",
-        "user_group": "primary",
-        "item_uid": "1462793a-b2ff-4d0f-94fe-9f496c179ec1"
-    }
-];
 
 export default function QueueServer() {
 
@@ -70,17 +14,6 @@ export default function QueueServer() {
     const [ isQItemPopupVisible, setIsQItemPopupVisible ] = useState(false);
     const [ isHistoryVisible, setIsHistoryVisible ] = useState(true);
     const [ popupItem, setPopupItem ] = useState({});
-
-/*     const [ queueData, setQueueData ] = useState([]); //in useQueueServer hook
-    const queueDataRef = useRef(queueData); //in useQueueServer hook
-    const [queueHistoryData, setQueueHistoryData ] = useState([]); //in useQueueServer hook
-    const queueHistoryDataRef = useRef(queueHistoryData); //in useQueueServer hook
-    const planHistoryUidRef = useRef(''); //in useQueueServer hook
-    const [ isREToggleOn, setIsREToggleOn ] = useState(false); //in useQueueServer hook
-    const runEngineToggleRef = useRef(isREToggleOn); //in useQueueServer hook
-    const [ runningItem, setRunningItem ] = useState({}); //in useQueueServer hook
-    const runningItemRef = useRef(runningItem); //in useQueueServer hook */
-
     const [ isItemDeleteButtonVisible, setIsItemDeleteButtonVisible ] = useState(true);
     const [ copiedPlan, setCopiedPlan ] = useState(false);
     const [ copyDictionaryTrigger, setCopyDictionaryTrigger ] = useState(false);
@@ -106,108 +39,6 @@ export default function QueueServer() {
         handleQueueHistoryResponse
     } = useQueueServer(pollingInterval);
 
-
-    //use refs to allow for comparisons from GET requests to
-    //only re-render when a change is detected
-    //in useQueueServer hook
-/*     useEffect(() => {
-        queueDataRef.current = queueData;
-    }, [queueData]);
-
-    useEffect(() => {
-        runningItemRef.current = runningItem;
-    }, [runningItem]);
-
-    useEffect(() => {
-        runEngineToggleRef.current = isREToggleOn;
-    }, [isREToggleOn]);
-
-    useEffect(() => {
-        queueHistoryDataRef.current = queueHistoryData;
-    }, [queueHistoryData]); */
-    
-
-
-    //not currently used
-    const getStatusCallback = (data) => {
-        // if RE worker is not running, set toggle off
-        console.log({data});
-        if (data.re_state !== "running") {
-            console.log("re is not running, check if toggle is on");
-            console.log(runEngineToggleRef.current);
-            if (runEngineToggleRef.current) {
-                console.log("toggle was on, now turn off toggle");
-                setIsREToggleOn(false);
-            }
-        } else {
-            console.log("re state is running. check if toggle is on");
-            if (!runEngineToggleRef.current) {
-                console.log("toggle was off, now turning on");
-                setIsREToggleOn(true);
-            }
-        }
-    };
-
-/*     //in useQueueServer hook
-    const handleQueueDataResponse =(res) => {
-        //checks if UI update should occur and sends data to callback
-        try {
-            if (res.success === true) {
-                if (JSON.stringify(res.items) !== JSON.stringify(queueDataRef.current)) { //we could also compare the plan_queue_uid which will change when the plan changes
-                    //console.log('different queue data, updating');
-                    setQueueData(res.items);
-                } else {
-                    //console.log('same queue data, do nothing');
-                }
-                if (JSON.stringify(res.running_item) !== JSON.stringify(runningItemRef.current)) {
-                    //console.log('different running item, updating');
-                    setRunningItem(res.running_item);
-                    if (Object.keys(res.running_item).length > 0) {
-                        setIsREToggleOn(true);
-                    } else {
-                        setIsREToggleOn(false);
-                    }
-                } else {
-                    //console.log('same running item, do nothing');
-                    if (Object.keys(res.running_item).length === 0) {
-                        setIsREToggleOn(false);
-                    }
-                }
-            }
-        } catch(error) {
-            console.log({error});
-        }
-    };
-
-    //in useQueueServer hook
-    const handleQueueHistoryResponse = (res) => {
-        if (res.success === true) {
-            try {
-                //only triggers render if the history uid changed
-                if (res.plan_history_uid !== planHistoryUidRef.current) {
-                    setQueueHistoryData(res.items);
-                    planHistoryUidRef.current = res.plan_history_uid;
-                }
-            } catch(e) {
-                console.log(e);
-            }
-        } else {
-            console.log('Error retrieving queue history');
-            console.log({res});
-        }
-    };
-    
-    //in useQueueServer hook
-    useEffect(() => {
-        //get current queue
-        //getQueue(setQueueData, queueDataRef, setRunningItem, runningItemRef); //we need to send in a handler for a running item
-        getQueue(handleQueueDataResponse);
-        getQueueHistory(handleQueueHistoryResponse);
-        //start polling at regular intervals
-        setInterval(()=> getQueue(handleQueueDataResponse), pollingInterval);
-        setInterval(()=> getQueueHistory(handleQueueHistoryResponse), pollingInterval);
-        console.log('page load')
-    }, []); */
 
     const processConsoleMessage = (msg) => {
         //using the console log to trigger get requests has some issues with stale state, even with useRef
@@ -357,96 +188,6 @@ export default function QueueServer() {
 
             <div className="mt-16 mb-20 flex justify-center max-w-screen-2xl 3xl:max-w-screen-xl m-auto">
                 <QSAddItem copiedPlan={copiedPlan} />
-            </div>
-        </Fragment>
-    )
-
-    // add history on the right side column
-    return (
-        <Fragment>
-            <main className="bg-black shadow-lg max-w-screen-2xl m-auto flex rounded-md h-[40rem] 3xl:max-w-screen-xl relative">
-                {/* ITEM POPUP  */}
-                {isQItemPopupVisible ? (
-                    <QItemPopup handleQItemPopupClose={handleQItemPopupClose} popupItem={popupItem} isItemDeleteButtonVisible={isItemDeleteButtonVisible} handleCopyItemClick={handleCopyItemClick} copyDictionaryTrigger={copyDictionaryTrigger}/>
-                ) : (
-                    ''
-                )}  
-
-                {/* LEFT SIDE */}
-                <div className="w-5/6">
-                    {/* TOP of LEFT SIDE  */}
-                    <div className="flex mx-4 border-b-white border-b h-2/6 items-center">
-                        <div className="w-9/12 px-2 mt-2">
-                            <QSList queueData={queueData} handleQItemClick={handleQItemClick} type='default'/>
-                        </div>
-                        <div className="w-3/12 mt-2">
-                            <QSRunEngineWorker 
-                                workerStatus={workerStatus} 
-                                runningItem={runningItem} 
-                                isREToggleOn={isREToggleOn} 
-                                setIsREToggleOn={setIsREToggleOn}
-                            />
-                        </div>
-                    </div>
-
-                    {/* BOTTOM of LEFT SIDE */}
-                    <div className={`h-4/6`}>
-                        <QSConsole title={false} description={false} processConsoleMessage={processConsoleMessage}/>
-                    </div>
-                </div>
-
-                {/* RIGHT SIDE */}
-                {isHistoryVisible ? (
-                    <div className="h-full w-1/6 border-l-white border-ddl rounded-r-md bg-slate-900">
-                        <QSList queueData={queueHistoryData} handleQItemClick={handleQItemClick}  type='history' />
-                    </div>
-                ) : (
-                    ''
-                )}
-            </main>
-
-            <div className="mt-16 mb-20 flex justify-center">
-                <QSAddItem copiedPlan={copiedPlan} />
-            </div>
-        </Fragment>
-    )            
-
-    //original prior to adding history feature , 07/29
-    return (
-        <Fragment>
-            <main className="bg-black shadow-lg max-w-screen-2xl m-auto rounded-md h-[45rem] 3xl:max-w-screen-xl relative">
-            {isQItemPopupVisible ? (
-                <QItemPopup handleQItemPopupClose={handleQItemPopupClose} popupItem={popupItem} />
-            ) : (
-                ''
-            )}
-                <div className="flex mx-4 border-b-white border-b h-2/6 items-center">
-                    <div className="w-9/12 px-2 mt-2">
-                        <QSList queueData={queueData} handleQItemClick={handleQItemClick}/>
-                    </div>
-                    <div className="w-3/12 mt-2">
-                        <QSRunEngineWorker 
-                            workerStatus={workerStatus} 
-                            runningItem={runningItem} 
-                            isREToggleOn={isREToggleOn} 
-                            setIsREToggleOn={setIsREToggleOn}
-                        />
-                    </div>
-                </div>
-                {isHistoryVisible ? (
-                    <div className="h-2/6 flex items-center border-b-white border-b mx-4">
-                        <QSList queueData={queueHistoryData} handleQItemClick={handleQItemClick} type='history' />
-                    </div>
-                ) : (
-                    ''
-                )}
-                <div className={`h-4/6`}>
-                    <QSConsole title={false} description={false} processConsoleMessage={processConsoleMessage}/>
-                </div>
-            </main>
-
-            <div className="mt-16 mb-20 flex justify-center">
-                <QSAddItem copiedPlan={copiedPlan}/>
             </div>
         </Fragment>
     )

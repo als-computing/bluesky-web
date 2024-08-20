@@ -1,6 +1,6 @@
 import { useState, Fragment } from 'react';
 import { tailwindIcons } from '../../assets/icons';
-import { getPlanColor } from './qItemColorData';
+import { getPlanColor } from './utils/qItemColorData';
 
 export default function QItem ({ item=false, label='', text='', styles='', clickable=true, handleClick=()=>{}, type="default" }) {
 

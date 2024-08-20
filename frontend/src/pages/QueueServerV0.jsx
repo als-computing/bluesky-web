@@ -4,7 +4,7 @@ import QSRunEngineWorker from "../components/QueueServer/QSRunEngineWorker";
 import QSAddItem from "../components/QueueServer/QSAddItem";
 import QItemPopup from "../components/QueueServer/QItemPopup";
 import { getQServerKey } from "../utilities/connectionHelper";
-import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus, getQueueItem, getQueueHistory } from "../components/QueueServer/apiClient";
+import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus, getQueueItem, getQueueHistory } from "../components/QueueServer/utils/apiClient";
 import axios from "axios";
 import { useState, Fragment, useEffect, useRef } from 'react';
 

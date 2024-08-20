@@ -1,11 +1,11 @@
 import { useState, Fragment } from "react";
 import DeleteResultPopup from "./DeleteResultPopup";
 import ConfirmDeleteItemPopup from "./ConfirmDeleteItemPopup";
-import { getPlanColor, getPlanColorOpacity } from "./qItemColorData";
+import { getPlanColor, getPlanColorOpacity } from "./utils/qItemColorData";
 import { tailwindIcons } from "../../assets/icons";
 import { Tooltip } from 'react-tooltip';
 import Button from "../library/Button";
-import { deleteQueueItem } from "./apiClient";
+import { deleteQueueItem } from "./utils/apiClient";
 
 import dayjs from "dayjs";
 

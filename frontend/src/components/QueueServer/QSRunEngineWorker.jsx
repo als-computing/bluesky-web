@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { startRE } from './apiClient';
+import { startRE } from './utils/apiClient';
 
 import QItem from "./QItem";
 
