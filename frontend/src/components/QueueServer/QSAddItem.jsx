@@ -311,11 +311,11 @@ export default function QSAddItem({copiedPlan=false, type='default'}) {
                         {Object.keys(parameters).map((param) => <QSParameterInput key={param} param={parameters[param]} parameters={parameters} updateBodyKwargs={updateBodyKwargs} setParameters={setParameters} allowedDevices={allowedDevices} plan={activePlan} resetInputsTrigger={resetInputsTrigger} copiedPlan={copiedPlan} />)}
                     </div>
                 </div>
-                <div name="REVIEW" className={`${activePlan ? 'w-3/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 flex flex-col`}>
+                <div name="SUMMARY" className={`${activePlan ? 'w-3/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 flex flex-col`}>
                     <div className="bg-gray-200 h-10 flex justify-center items-center shrink-0">
                         <h1 className="text-center">SUMMARY</h1>
                     </div>
-                    <div name="POST body" className="flex items-start py-4 px-2 overflow-auto flex-grow">
+                    <div name="POST body" className="flex items-start justify-center py-4 px-2 overflow-auto flex-grow">
                         <pre className="text-sm">{JSON.stringify(body, null, 2)}</pre>
                     </div>
                 </div>
