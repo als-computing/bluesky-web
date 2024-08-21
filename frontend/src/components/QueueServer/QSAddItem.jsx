@@ -283,12 +283,12 @@ export default function QSAddItem({copiedPlan=false, type='default'}) {
                 {isSubmissionPopupOpen ? <SubmissionResultPopup response={submissionResponse} cb={closeSubmissionPopup}/> : ''}
 
                 {/* Main Form */}
-                <div name="PLAN" className={`${activePlan ? 'w-2/12 border-r-2' : 'w-full border-none'} border-slate-300 `}>
-                    <div className="bg-gray-200 h-10 text-center flex justify-between items-center">
+                <div name="PLAN" className={`${activePlan ? 'w-2/12 border-r-2' : 'w-full border-none'} border-slate-300 flex flex-col`}>
+                    <div className="bg-gray-200 h-10 text-center flex justify-between items-center flex-shrink-0">
                         <h1 className="pl-3">PLAN</h1>
                         <div className={`${activePlan ? 'opacity-100 hover:cursor-pointer hover:text-slate-600' : 'opacity-0'} pr-2`} onClick={() => setActivePlan(false)}>{arrowLongLeft}</div>
                     </div>
-                    <ul className={`${activePlan ? '' : ''} h-[calc(100%-2.5rem)] duration-[1100ms] overflow-auto overflow-y-auto transition-all ease-in`}>
+                    <ul className={`${activePlan ? '' : ''} flex-grow duration-[1100ms] overflow-auto overflow-y-auto transition-all ease-in`}>
                         {Object.keys(allowedPlans).map((plan) => {
                             return (
                                 <li key={plan} 
@@ -301,29 +301,29 @@ export default function QSAddItem({copiedPlan=false, type='default'}) {
                         })}
                     </ul>
                 </div>
-                <div name="PARAMETERS" className={`${activePlan ? 'w-5/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 h-full`}>
-                    <div className="bg-gray-200 h-10 text-center flex justify-around items-center">
+                <div name="PARAMETERS" className={`${activePlan ? 'w-5/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 h-full flex flex-col`}>
+                    <div className="bg-gray-200 h-10 text-center flex justify-around items-center flex-shrink-0">
                         <h1>PARAMETERS</h1>
                         <div className="hover:cursor-pointer hover:text-slate-600" onClick={() => handleParameterRefreshClick(activePlan)}>{arrowRefresh}</div>
                     </div>
-                    <div name="parameter inputs" className="flex flex-wrap justify-center space-x-2 space-y-4 py-4 px-2 overflow-auto">
+                    <div name="parameter inputs" className="flex flex-wrap justify-center space-x-2 space-y-4 py-4 px-2 flex-grow overflow-auto overflow-y-auto">
                         {activePlan ? <h3>{activePlan}: {allowedPlans[activePlan].description}</h3> : ''}
                         {Object.keys(parameters).map((param) => <QSParameterInput key={param} param={parameters[param]} parameters={parameters} updateBodyKwargs={updateBodyKwargs} setParameters={setParameters} allowedDevices={allowedDevices} plan={activePlan} resetInputsTrigger={resetInputsTrigger} copiedPlan={copiedPlan} />)}
                     </div>
                 </div>
-                <div name="REVIEW" className={`${activePlan ? 'w-3/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 `}>
-                    <div className="bg-gray-200 h-10 flex justify-center items-center">
+                <div name="REVIEW" className={`${activePlan ? 'w-3/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 flex flex-col`}>
+                    <div className="bg-gray-200 h-10 flex justify-center items-center shrink-0">
                         <h1 className="text-center">SUMMARY</h1>
                     </div>
-                    <div name="POST body" className="flex items-start py-4 px-2 overflow-auto">
+                    <div name="POST body" className="flex items-start py-4 px-2 overflow-auto flex-grow">
                         <pre className="text-sm">{JSON.stringify(body, null, 2)}</pre>
                     </div>
                 </div>
-                <div name="SUBMIT" className={`${activePlan ? 'w-2/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 `}>
-                    <div className="bg-gray-200 h-10 text-center flex justify-center items-center">
+                <div name="SUBMIT" className={`${activePlan ? 'w-2/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 flex flex-col`}>
+                    <div className="bg-gray-200 h-10 text-center flex justify-center items-center flex-shrink-0">
                         <h1 className="">SUBMIT</h1>
                     </div>
-                    <div className="flex flex-col space-y-4 items-center py-4">
+                    <div className="flex flex-col space-y-4 items-center py-4 flex-grow">
                         <QItem item={body.item} text={body.name} clickable={false} styles={'hover:cursor-default hover:shadow-none'}/>
                         <label id="positionLabel" className="flex justify-center w-fit items-center">
                             Position: 
