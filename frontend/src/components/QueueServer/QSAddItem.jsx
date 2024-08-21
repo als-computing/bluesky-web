@@ -16,7 +16,7 @@ const sampleBody = {
     pos: 'back'
 }
 
-export default function QSAddItem({copiedPlan=false}) {
+export default function QSAddItem({copiedPlan=false, type='default'}) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isSubmissionPopupOpen, setIsSubmissionPopupOpen] = useState(false);
     const [submissionResponse, setSubmissionResponse] = useState({});
@@ -274,25 +274,21 @@ export default function QSAddItem({copiedPlan=false}) {
             initializeParameters( copiedPlan.name, copiedPlan.parameters);
             updateBodyName(copiedPlan.name);
         }
-    }, [copiedPlan])
+    }, [copiedPlan]);
 
-    return (
-        <section className={`${isExpanded ? 'w-full' : 'w-96'} border border-solid rounded-lg shadow-lg transition-width ease-in duration-1000`}>
-            <header onClick={() => isExpanded ? '' : setIsExpanded(true)} className={`${isExpanded ? 'w-full justify-between' : 'hover:cursor-pointer rounded-b-lg'} bg-[#213149] text-white text-2xl px-12 py-3 rounded-t-lg flex items-center space-x-2 justify-center `}>
-                {isExpanded ? <p></p> : ''}
-                <p>Add Queue Item</p>
-                <div onClick={handleExpandClick} className="hover:cursor-pointer">{isExpanded ? arrowsPointingIn : arrowsPointingOut}</div>
-            </header>
-            <form className={`${isExpanded ? 'opacity-100 h-96' : 'h-0 opacity-0'} flex transition-all duration-1000 ease-in relative`}>
+    if (type === 'default') {
+        return (
+            <form className={`w-full h-full flex transition-all duration-1000 ease-in relative`}>
                 {/* Popup after submit button clicked */}
                 {isSubmissionPopupOpen ? <SubmissionResultPopup response={submissionResponse} cb={closeSubmissionPopup}/> : ''}
+
                 {/* Main Form */}
                 <div name="PLAN" className={`${activePlan ? 'w-2/12 border-r-2' : 'w-full border-none'} border-slate-300 `}>
                     <div className="bg-gray-200 h-10 text-center flex justify-between items-center">
                         <h1 className="pl-3">PLAN</h1>
                         <div className={`${activePlan ? 'opacity-100 hover:cursor-pointer hover:text-slate-600' : 'opacity-0'} pr-2`} onClick={() => setActivePlan(false)}>{arrowLongLeft}</div>
                     </div>
-                    <ul className={`${activePlan ? '' : ''} ${isExpanded ? 'h-[calc(100%-2.5rem)] duration-[1100ms]' : 'h-0 duration-700'} overflow-auto overflow-y-auto transition-all ease-in`}>
+                    <ul className={`${activePlan ? '' : ''} h-[calc(100%-2.5rem)] duration-[1100ms] overflow-auto overflow-y-auto transition-all ease-in`}>
                         {Object.keys(allowedPlans).map((plan) => {
                             return (
                                 <li key={plan} 
@@ -310,7 +306,7 @@ export default function QSAddItem({copiedPlan=false}) {
                         <h1>PARAMETERS</h1>
                         <div className="hover:cursor-pointer hover:text-slate-600" onClick={() => handleParameterRefreshClick(activePlan)}>{arrowRefresh}</div>
                     </div>
-                    <div name="parameter inputs" className="flex flex-wrap justify-center space-x-2 space-y-4 py-4 px-2 overflow-auto h-[calc(100%-2.5rem)]">
+                    <div name="parameter inputs" className="flex flex-wrap justify-center space-x-2 space-y-4 py-4 px-2 overflow-auto">
                         {activePlan ? <h3>{activePlan}: {allowedPlans[activePlan].description}</h3> : ''}
                         {Object.keys(parameters).map((param) => <QSParameterInput key={param} param={parameters[param]} parameters={parameters} updateBodyKwargs={updateBodyKwargs} setParameters={setParameters} allowedDevices={allowedDevices} plan={activePlan} resetInputsTrigger={resetInputsTrigger} copiedPlan={copiedPlan} />)}
                     </div>
@@ -319,8 +315,8 @@ export default function QSAddItem({copiedPlan=false}) {
                     <div className="bg-gray-200 h-10 flex justify-center items-center">
                         <h1 className="text-center">SUMMARY</h1>
                     </div>
-                    <div name="POST body" className="flex items-start py-4 px-2 overflow-auto h-[calc(100%-2.5rem)]">
-                       <pre className="text-sm">{JSON.stringify(body, null, 2)}</pre>
+                    <div name="POST body" className="flex items-start py-4 px-2 overflow-auto">
+                        <pre className="text-sm">{JSON.stringify(body, null, 2)}</pre>
                     </div>
                 </div>
                 <div name="SUBMIT" className={`${activePlan ? 'w-2/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 `}>
@@ -348,6 +344,83 @@ export default function QSAddItem({copiedPlan=false}) {
                     </div>
                 </div>
             </form>
-        </section>
-    )
+        )
+    } else {
+        //the original
+        return (
+            <section className={`${isExpanded ? 'w-full' : 'w-96'} border border-solid rounded-lg shadow-lg transition-width ease-in duration-1000`}>
+                <header onClick={() => isExpanded ? '' : setIsExpanded(true)} className={`${isExpanded ? 'w-full justify-between' : 'hover:cursor-pointer rounded-b-lg'} bg-[#213149] text-white text-2xl px-12 py-3 rounded-t-lg flex items-center space-x-2 justify-center `}>
+                    {isExpanded ? <p></p> : ''}
+                    <p>Add Queue Item</p>
+                    <div onClick={handleExpandClick} className="hover:cursor-pointer">{isExpanded ? arrowsPointingIn : arrowsPointingOut}</div>
+                </header>
+                <form className={`${isExpanded ? 'opacity-100 h-96' : 'h-0 opacity-0'} flex transition-all duration-1000 ease-in relative`}>
+                    {/* Popup after submit button clicked */}
+                    {isSubmissionPopupOpen ? <SubmissionResultPopup response={submissionResponse} cb={closeSubmissionPopup}/> : ''}
+                    {/* Main Form */}
+                    <div name="PLAN" className={`${activePlan ? 'w-2/12 border-r-2' : 'w-full border-none'} border-slate-300 `}>
+                        <div className="bg-gray-200 h-10 text-center flex justify-between items-center">
+                            <h1 className="pl-3">PLAN</h1>
+                            <div className={`${activePlan ? 'opacity-100 hover:cursor-pointer hover:text-slate-600' : 'opacity-0'} pr-2`} onClick={() => setActivePlan(false)}>{arrowLongLeft}</div>
+                        </div>
+                        <ul className={`${activePlan ? '' : ''} ${isExpanded ? 'h-[calc(100%-2.5rem)] duration-[1100ms]' : 'h-0 duration-700'} overflow-auto overflow-y-auto transition-all ease-in`}>
+                            {Object.keys(allowedPlans).map((plan) => {
+                                return (
+                                    <li key={plan} 
+                                        className={`${activePlan === plan ? 'bg-indigo-200' : ''} hover:cursor-pointer group leading-tight flex`} 
+                                        onClick={() => handlePlanSelect(plan)}>
+                                            <p className={`${activePlan ? 'w-full': 'w-2/12 border-r-2 border-slate-300'} group-hover:bg-indigo-300 px-2 py-1`}>{plan.replaceAll('_', ' ')}</p>
+                                            <p className={`${activePlan ? 'hidden w-0' : 'w-10/12 pl-4 group-hover:bg-indigo-50'} py-1`}>{allowedPlans[plan].description}</p>
+                                    </li>
+                                )
+                            })}
+                        </ul>
+                    </div>
+                    <div name="PARAMETERS" className={`${activePlan ? 'w-5/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 h-full`}>
+                        <div className="bg-gray-200 h-10 text-center flex justify-around items-center">
+                            <h1>PARAMETERS</h1>
+                            <div className="hover:cursor-pointer hover:text-slate-600" onClick={() => handleParameterRefreshClick(activePlan)}>{arrowRefresh}</div>
+                        </div>
+                        <div name="parameter inputs" className="flex flex-wrap justify-center space-x-2 space-y-4 py-4 px-2 overflow-auto h-[calc(100%-2.5rem)]">
+                            {activePlan ? <h3>{activePlan}: {allowedPlans[activePlan].description}</h3> : ''}
+                            {Object.keys(parameters).map((param) => <QSParameterInput key={param} param={parameters[param]} parameters={parameters} updateBodyKwargs={updateBodyKwargs} setParameters={setParameters} allowedDevices={allowedDevices} plan={activePlan} resetInputsTrigger={resetInputsTrigger} copiedPlan={copiedPlan} />)}
+                        </div>
+                    </div>
+                    <div name="REVIEW" className={`${activePlan ? 'w-3/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 `}>
+                        <div className="bg-gray-200 h-10 flex justify-center items-center">
+                            <h1 className="text-center">SUMMARY</h1>
+                        </div>
+                        <div name="POST body" className="flex items-start py-4 px-2 overflow-auto h-[calc(100%-2.5rem)]">
+                           <pre className="text-sm">{JSON.stringify(body, null, 2)}</pre>
+                        </div>
+                    </div>
+                    <div name="SUBMIT" className={`${activePlan ? 'w-2/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 `}>
+                        <div className="bg-gray-200 h-10 text-center flex justify-center items-center">
+                            <h1 className="">SUBMIT</h1>
+                        </div>
+                        <div className="flex flex-col space-y-4 items-center py-4">
+                            <QItem item={body.item} text={body.name} clickable={false} styles={'hover:cursor-default hover:shadow-none'}/>
+                            <label id="positionLabel" className="flex justify-center w-fit items-center">
+                                Position: 
+                                <input 
+                                    className="w-12 border border-slate-200 rounded-sm bg-slate-50 text-center ml-2"
+                                    value={positionInput}
+                                    onChange={e => handlePositionInputChange(e.target.value)}
+                                />
+                            </label>
+                            <Tooltip anchorSelect={'#positionLabel'} children={<p className="whitespace-pre-wrap">{positionTooltipMessage}</p>} offset={25} place="top" variant="info" style={{'maxWidth' : "500px", 'height': 'fit-content'}} delayShow='400'/>
+                            <AddQueueItemButton text={'Add To Queue'} isButtonEnabled={checkRequiredParameters} styles={'drop-shadow-md'} cb={() => submitPlan(body)}/>
+                            <span className="flex w-4/5 items-center">
+                                <div className="h-1 border-b border-slate-300 w-2/5"></div>
+                                <p className="text-slate-300 w-1/5 text-center">or</p>
+                                <div className="h-1 border-b border-slate-300 w-2/5"></div>
+                            </span>
+                            <AddQueueItemButton text={'Execute Now'} isButtonEnabled={checkRequiredParameters} styles={'drop-shadow-md'} cb={() => executePlan(body)}/>
+                        </div>
+                    </div>
+                </form>
+            </section>
+        )
+    }
+
 }

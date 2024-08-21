@@ -8,13 +8,13 @@ export default function MainPanel({
     copiedPlan={}
 }) {
     return (
-        <div className="w-full h-full px-4 py-4 flex flex-col space-y-3">
-            <Widget title="Settings" icon={tailwindIcons.cog}>
+        <div className="w-full h-full px-4 py-4 flex flex-col space-y-3 overflow-auto">
+            <Widget title="Settings" icon={tailwindIcons.cog} height="h-1/4">
             </Widget>
-            <Widget title="Add Item" icon={tailwindIcons.plus}>
-                <QSAddItem /> 
+            <Widget title="Add Item" icon={tailwindIcons.plus} height="h-1/2">
+                <QSAddItem copiedPlan={copiedPlan}/> 
             </Widget>
-            <Widget title="Console" icon={tailwindIcons.commandLine}>
+            <Widget title="Console" icon={tailwindIcons.commandLine} height="h-1/4">
                 <QSConsole /> 
             </Widget>
         </div>
