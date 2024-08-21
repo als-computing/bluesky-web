@@ -306,16 +306,16 @@ export default function QSAddItem({copiedPlan=false, type='default'}) {
                         <h1>PARAMETERS</h1>
                         <div className="hover:cursor-pointer hover:text-slate-600" onClick={() => handleParameterRefreshClick(activePlan)}>{arrowRefresh}</div>
                     </div>
-                    <div name="parameter inputs" className="flex flex-wrap justify-center space-x-2 space-y-4 py-4 px-2 flex-grow overflow-auto overflow-y-auto">
+                    <div name="parameter inputs" className="flex flex-wrap content-start justify-center space-x-2 space-y-4 py-4 px-2 flex-grow overflow-auto overflow-y-auto">
                         {activePlan ? <h3>{activePlan}: {allowedPlans[activePlan].description}</h3> : ''}
-                        {Object.keys(parameters).map((param) => <QSParameterInput key={param} param={parameters[param]} parameters={parameters} updateBodyKwargs={updateBodyKwargs} setParameters={setParameters} allowedDevices={allowedDevices} plan={activePlan} resetInputsTrigger={resetInputsTrigger} copiedPlan={copiedPlan} />)}
+                            {Object.keys(parameters).map((param) => <QSParameterInput key={param} param={parameters[param]} parameters={parameters} updateBodyKwargs={updateBodyKwargs} setParameters={setParameters} allowedDevices={allowedDevices} plan={activePlan} resetInputsTrigger={resetInputsTrigger} copiedPlan={copiedPlan} />)}
                     </div>
                 </div>
-                <div name="SUMMARY" className={`${activePlan ? 'w-3/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 flex flex-col`}>
+                <div name="SUMMARY" className={`${activePlan ? 'w-3/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 flex flex-col overflow-x-auto`}>
                     <div className="bg-gray-200 h-10 flex justify-center items-center shrink-0">
                         <h1 className="text-center">SUMMARY</h1>
                     </div>
-                    <div name="POST body" className="flex items-start justify-center py-4 px-2 overflow-auto flex-grow">
+                    <div name="POST body" className="flex items-start justify-start 3xl:justify-center py-4 px-2 flex-grow w-full">
                         <pre className="text-sm">{JSON.stringify(body, null, 2)}</pre>
                     </div>
                 </div>
