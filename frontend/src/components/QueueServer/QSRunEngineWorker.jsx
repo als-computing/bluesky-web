@@ -29,8 +29,8 @@ export default function QSRunEngineWorker({ isREToggleOn, setIsREToggleOn, runni
 
     const ToggleSlider = () => {
         return (
-            <div name="toggle" className="flex flex-grow text-right flex-col items-center space-y-2">
-                <p className={`${isREToggleOn ? 'text-white' : 'text-gray-400'} transition-colors duration-500`}>ON</p>
+            <div name="toggle" className="flex flex-grow text-right flex-col items-center space-y-2 absolute right-2">
+                <p className={`${isREToggleOn ? 'text-green-600' : 'text-gray-500'} transition-colors duration-500`}>ON</p>
                 <button
                     onClick={toggleSwitch}
                     className={`w-6 h-16 flex items-center justify-center bg-gray-400 rounded-full cursor-pointer ${
@@ -43,16 +43,15 @@ export default function QSRunEngineWorker({ isREToggleOn, setIsREToggleOn, runni
                         }`}
                     ></div>
                 </button>
-                <p className={`${isREToggleOn ? 'text-gray-400' : 'text-white'} transition-colors duration-500`}>OFF</p>
+                <p className={`${isREToggleOn ? 'text-gray-500' : 'text-grey-600'} transition-colors duration-500`}>OFF</p>
             </div>
         )
     }
 
     return (
-        <div className="flex justify-center items-center mt-2 w-full">
-            <p className="flex-grow text-left">a</p>
+        <div className="flex justify-center items-center mt-2 w-full relative">
             <QItem item={runningItem} />
-            {ToggleSlider() }
+            <ToggleSlider />
         </div>
     )
 }
