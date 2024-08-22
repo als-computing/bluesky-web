@@ -33,19 +33,18 @@ export default function QSList({ queueData=[], handleQItemClick=()=>{}, type='de
     } else if (type === 'history') {
         const showDeleteButton = false;
         return (
-            <section className="h-full w-full flex flex-col ">
-                <h2 className="h-[10%] text-white text-xl text-center flex items-end justify-center ">History</h2>
-                <ul ref={listRef} className="flex flex-col-reverse space-y-12 h-[90%] scrollbar-always-visible scrollbar-track-black overflow-auto ">
+            <section className="w-full flex flex-col ">
+                <ul ref={listRef} className="flex flex-col-reverse">
                     {queueData.map((item, index) => <QItem type="history" item={item} label={dayjs(item.result.time_stop * 1000).format('MM/DD hh:mm a')} key={item.item_uid} handleClick={()=>handleQItemClick(item, showDeleteButton)}/>)}
                 </ul>
             </section>
         )
     } else if (type === 'short') {
         return (
-            <section className="h-full w-full flex flex-col items-center">
-                <ul className="flex flex-col-reverse mt-2">
+            <section className="w-full">
+                <ul className="flex flex-col-reverse">
                     {queueData.map((item, index) => <QItem type="default" item={item} label={index} key={item.item_uid} handleClick={()=>handleQItemClick(item, true)}/>)}
-                    {queueData.length < 14 ? [...new Array(14 - queueData.length)].map((item, index) => <QItem item={item} index={index} key={index}/>) : '' }
+                    {queueData.length < 8 ? [...new Array(8 - queueData.length)].map((item, index) => <QItem type="blank" item={item} index={index} key={index}/>) : '' }
                 </ul>
             </section>
         );

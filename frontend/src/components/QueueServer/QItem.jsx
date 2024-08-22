@@ -21,9 +21,9 @@ export default function QItem ({ item=false, label='', text='', styles='', click
             //Queue History
             const failed = item.result.exit_status === 'failed';
             return (
-                <div className="flex flex-col items-center relative h-16">
+                <div className={`${failed ? 'mt-12' : 'mt-6'} flex flex-col items-center relative h-16`}>
                     {failed ? <div name="warning symbol" className="text-red-500 absolute left-1/2 transform -translate-x-1/2 -translate-y-full aspect-square h-6">{tailwindIcons.exclamationTriangle}</div> : ''}                    
-                    <li name="item"  className={`${commonStyles} border ${item.result.exit_status === 'failed' ? 'border-red-600' : 'border-slate-500'}  bg-slate-400 overflow-clip rounded-t-md h-16 ${styles}`} onClick={handleClick}>
+                    <li name="item"  className={`${commonStyles} border ${item.result.exit_status === 'failed' ? 'border-red-600 border-2' : 'border-slate-500'}  bg-slate-400 overflow-clip rounded-t-md h-16 ${styles}`} onClick={handleClick}>
                         <span className={`${getPlanColor(item.name)} flex items-center justify-around rounded-t-md opacity-80`}>
                             <p className={` text-white text-center `}>{item.name}</p>
                         </span>
@@ -39,7 +39,7 @@ export default function QItem ({ item=false, label='', text='', styles='', click
                             })}
                         </div>
                     </li>
-                    <p name="bottom label" className="text-slate-300 font-bold text-xs mt-1">{label}</p>
+                    <p name="bottom label" className="text-slate-700 font-bold text-xs mt-1">{label}</p>
                 </div>
             )
         } else {
@@ -60,12 +60,21 @@ export default function QItem ({ item=false, label='', text='', styles='', click
                             })}
                         </div>
                     </li>
-                    <p className="text-slate-300 font-bold text-xs mt-1">{label}</p>
+                    <p className="text-slate-600 font-bold text-xs">{label}</p>
                 </div>
             )
         }
 
     } else {
+        if (type==="blank") {
+            return (
+                <div className="flex flex-col items-center pb-2">
+                    <li className={`${commonStyles} h-16 border border-dashed border-slate-400 min-w-32 bg-slate-700 ${styles}`}>
+                        <p className="text-center text-slate-400">{text}</p>
+                    </li>
+                </div>
+            )
+        }
         //empty item as visual placeholder
         return (
             <li className={`${commonStyles} h-16 border border-dashed border-slate-400 min-w-32 bg-slate-700 ${styles}`}>

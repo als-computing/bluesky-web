@@ -3,7 +3,7 @@ import { startRE } from './utils/apiClient';
 
 import QItem from "./QItem";
 
-export default function QSRunEngineWorker({ isREToggleOn, setIsREToggleOn, runningItem }) {
+export default function QSRunEngineWorker({ isREToggleOn=false, setIsREToggleOn=()=>{}, runningItem={} }) {
     //const [ isREToggleOn, setIsREToggleOn ] = useState(false);
 
     //TO DO : the toggle switch needs to listen to the GET requests for the queue status
