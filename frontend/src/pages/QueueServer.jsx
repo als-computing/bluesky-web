@@ -19,6 +19,7 @@ export default function QueueServer() {
     const [ isItemDeleteButtonVisible, setIsItemDeleteButtonVisible ] = useState(true);
     const [ copiedPlan, setCopiedPlan ] = useState(false);
     const [ copyDictionaryTrigger, setCopyDictionaryTrigger ] = useState(false);
+    const [ isSidepanelExpanded, setIsSidepanelExpanded ] = useState(false);
 
     //setup polling interval for getting regular updates from the http server
     var pollingInterval;
@@ -167,6 +168,8 @@ export default function QueueServer() {
                     runningItem={runningItem} 
                     isREToggleOn={isREToggleOn} 
                     setIsREToggleOn={setIsREToggleOn}
+                    isSidepanelExpanded={isSidepanelExpanded}
+                    setIsSidepanelExpanded={setIsSidepanelExpanded}
                 />
             </div>
 
@@ -174,6 +177,8 @@ export default function QueueServer() {
                 <MainPanel 
                     processConsoleMessage={processConsoleMessage}
                     copiedPlan={copiedPlan}
+                    isSidepanelExpanded={isSidepanelExpanded}
+                    setIsSidepanelExpanded={setIsSidepanelExpanded}
                 />
             </div>
         </main>
