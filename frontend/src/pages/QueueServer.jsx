@@ -20,6 +20,8 @@ export default function QueueServer() {
     const [ copiedPlan, setCopiedPlan ] = useState(false);
     const [ copyDictionaryTrigger, setCopyDictionaryTrigger ] = useState(false);
     const [ isSidepanelExpanded, setIsSidepanelExpanded ] = useState(false);
+    const [ minimizeAllWidgets, setMinimizeAllWidgets ] = useState(false);
+    const [ expandQueueList, setExpandQueueList ] = useState(false); //controls the QS list between single column
 
     //setup polling interval for getting regular updates from the http server
     var pollingInterval;
@@ -128,6 +130,18 @@ export default function QueueServer() {
         setPopupItem({});
     };
 
+    const handleSidepanelExpandClick = (isSidepanelExpanded) => {
+        if (isSidepanelExpanded) {
+            setIsSidepanelExpanded(false);
+            //expand all widgets on the main panel
+            setMinimizeAllWidgets(false);
+        } else {
+            setIsSidepanelExpanded(true);
+            //minimize all widgets on the main panel
+            setMinimizeAllWidgets(true);
+        }
+    };
+
 /**
  * Sets the copiedPlan state variable which triggers the plan and parameters to be updated in QSAddItem
  * 
@@ -159,7 +173,7 @@ export default function QueueServer() {
             ) : (
                 ''
             )} 
-            <div className="w-1/5 lg:max-w-60 flex-shrink-0 bg-slate-200 rounded-md shadow-md drop-shadow h-full">
+            <div className={`${isSidepanelExpanded ? 'w-4/5' : 'w-1/5 '}  flex-shrink-0 transition-all duration-300 ease-in-out bg-slate-200 rounded-md shadow-md drop-shadow h-full`}>
                 <SidePanel 
                     queueData={queueData}
                     queueHistoryData={queueHistoryData} 
@@ -168,8 +182,8 @@ export default function QueueServer() {
                     runningItem={runningItem} 
                     isREToggleOn={isREToggleOn} 
                     setIsREToggleOn={setIsREToggleOn}
+                    handleSidepanelExpandClick={handleSidepanelExpandClick}
                     isSidepanelExpanded={isSidepanelExpanded}
-                    setIsSidepanelExpanded={setIsSidepanelExpanded}
                 />
             </div>
 
@@ -177,8 +191,7 @@ export default function QueueServer() {
                 <MainPanel 
                     processConsoleMessage={processConsoleMessage}
                     copiedPlan={copiedPlan}
-                    isSidepanelExpanded={isSidepanelExpanded}
-                    setIsSidepanelExpanded={setIsSidepanelExpanded}
+                    minimizeAllWidgets={minimizeAllWidgets}
                 />
             </div>
         </main>
