@@ -48,7 +48,7 @@ export default function SubmissionResultPopup( {isVisible=false, cb=()=>{}, resp
     };
 
     return (
-        <div className={` absolute z-20 top-0 h-96 w-full bg-slate-100/90 flex items-center justify-center`}>
+        <div className={` absolute z-20 top-0 h-full w-full bg-slate-100/90 flex items-center justify-center`}>
             <div className="bg-white z-30 rounded-lg shadow-lg w-7/12 h-64 flex flex-col items-center justify-center space-y-2 text-slate-500">
                 <div className={`${response.success ? 'text-green-600' : 'text-red-600'} h-16 w-16`}>{response.success === true ? tailwindIcons.checkmarkInCircle : tailwindIcons.exclamationTriangle}</div>
                 {response.success ? <SuccessMessage /> : <FailureMessage />}
