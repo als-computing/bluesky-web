@@ -15,7 +15,7 @@ export default function MainPanel({
             <Widget title="Add Item" icon={tailwindIcons.plus} expandedHeight="h-5/6" defaultHeight="h-1/2" maxHeight="max-h-[50rem]" minimizeAllWidgets={minimizeAllWidgets}>
                 <QSAddItem copiedPlan={copiedPlan}/> 
             </Widget>
-            <Widget title="Console" icon={tailwindIcons.commandLine} expandedHeight="h-3/4" defaultHeight="h-[22%]" minimizeAllWidgets={minimizeAllWidgets}>
+            <Widget title="Console Output" icon={tailwindIcons.commandLine} expandedHeight="h-3/4" defaultHeight="h-[22%]" minimizeAllWidgets={minimizeAllWidgets}>
                 <QSConsole /> 
             </Widget>
         </div>
