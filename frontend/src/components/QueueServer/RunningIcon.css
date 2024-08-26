@@ -1,0 +1,18 @@
+@keyframes running-animation {
+    0% { background-image: url('./images/runningIcon1.png'); }
+    16% { background-image: url('./images/runningIcon2.png'); }
+    33% { background-image: url('./images/runningIcon3.png'); }
+    50% { background-image: url('./images/runningIcon4.png'); }
+    66% { background-image: url('./images/runningIcon5.png'); }
+    83% { background-image: url('./images/runningIcon6.png'); }
+    100% { background-image: url('./images/runningIcon1.png'); }
+  }
+  
+  .running-icon {
+    animation: running-animation 0.6s steps(6) infinite;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    mix-blend-mode: multiply; 
+  }
