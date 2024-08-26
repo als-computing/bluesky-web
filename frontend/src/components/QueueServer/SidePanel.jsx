@@ -26,7 +26,7 @@ export default function SidePanel({
                     <p className="text-xl font-semibold text-center">Queue</p>
                     <div className="aspect-square h-6 hover:cursor-pointer absolute right-2 -top-1" onClick={()=>handleSidepanelExpandClick(isSidepanelExpanded)}>{isSidepanelExpanded ? tailwindIcons.arrowsPointingIn : tailwindIcons.arrowsPointingOut}</div>
                 </span>
-                <div className=" flex-grow overflow-y-scroll scrollbar-always-visible pt-2">
+                <div className=" flex-grow overflow-y-scroll scrollbar-always-visible pt-2 mx-1">
                     <QSList type="short" queueData={queueData} handleQItemClick={handleQItemClick}/>
                 </div>
             </div>
@@ -64,7 +64,7 @@ export default function SidePanel({
                     </span>
                     <p className="text-xl font-semibold text-center">History</p>
                 </span>
-                <div className=" flex-grow overflow-y-scroll scrollbar-always-visible">
+                <div className=" flex-grow overflow-y-scroll scrollbar-always-visible mx-1">
                     <QSList type="history" queueData={queueHistoryData} handleQItemClick={handleQItemClick}/>
                 </div>
             </div>
