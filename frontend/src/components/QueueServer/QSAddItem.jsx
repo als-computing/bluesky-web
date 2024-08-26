@@ -108,7 +108,13 @@ export default function QSAddItem({copiedPlan=false, type='default'}) {
         if ('success' in data) {
             if (data.success === true) {
                 if ('devices_allowed' in data) {
-                    setAllowedDevices(data.devices_allowed);
+                    const sortedDevices = Object.keys(data.devices_allowed)
+                        .sort()
+                        .reduce((acc, key) => {
+                            acc[key] = data.devices_allowed[key];
+                            return acc;
+                        }, {});
+                    setAllowedDevices(sortedDevices);
                 } else {
                     console.log('No devices_allowed key found in response object from allowed devices')
                 }
