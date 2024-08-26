@@ -2,6 +2,7 @@ import QSList from "./QSList";
 import QSRunEngineWorker from "./QSRunEngineWorker";
 import { tailwindIcons, customIcons } from "../../assets/icons";
 import '../../App.css';
+import './RunningIcon.css';
 
 export default function SidePanel({
     queueData=[],
@@ -39,7 +40,7 @@ export default function SidePanel({
                         <span className="absolute left-2 flex">
                             <div className="aspect-square w-10 fill-slate-600">
                                 {isREToggleOn ? 
-                                    <img width="50" height="50" src="https://img.icons8.com/ios-filled/50/exercise.png" alt="exercise"/> 
+                                    <div className="running-icon"></div> 
                                     : 
                                     customIcons.waitingRoom 
                                 }
