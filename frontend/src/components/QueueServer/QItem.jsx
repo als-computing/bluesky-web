@@ -15,7 +15,7 @@ export default function QItem ({ item=false, label='', text='', styles='', click
         }
     };
     
-    const commonStyles = 'w-32 rounded-md mx-2 hover:cursor-pointer hover:shadow-lg hover:shadow-gray-500 list-none overflow-auto';
+    const commonStyles = 'w-32 rounded-md mx-2  hover:shadow-lg hover:shadow-gray-500 list-none overflow-auto';
 
     if (item!== false && Object.keys(item).length > 0 ) {
         if (type === 'history') {
@@ -24,7 +24,7 @@ export default function QItem ({ item=false, label='', text='', styles='', click
             return (
                 <div className={`${failed ? 'mt-12' : 'mt-6'} flex flex-col items-center relative h-16`}>
                     {failed ? <div name="warning symbol" className="text-red-500 absolute left-1/2 transform -translate-x-1/2 -translate-y-full aspect-square h-6">{tailwindIcons.exclamationTriangle}</div> : ''}                    
-                    <li name="item"  className={`${commonStyles} border ${item.result.exit_status === 'failed' ? 'border-red-600 border-2' : 'border-slate-500'}  bg-slate-400 overflow-clip rounded-t-md h-16 ${styles}`} onClick={handleClick}>
+                    <li name="item"  className={`${commonStyles} hover:cursor-pointer border ${item.result.exit_status === 'failed' ? 'border-red-600 border-2' : 'border-slate-500'}  bg-slate-400 overflow-clip rounded-t-md h-16 ${styles}`} onClick={handleClick}>
                         <span className={`${getPlanColor(item.name)} flex items-center justify-around rounded-t-md opacity-80`}>
                             <p className={` text-white text-center `}>{item.name}</p>
                         </span>
@@ -47,7 +47,7 @@ export default function QItem ({ item=false, label='', text='', styles='', click
             //Current Queue Item
             return (
                 <div className="flex flex-col items-center rounded-t-md">
-                    <li  className={`${commonStyles} h-16 border border-slate-500 bg-white overflow-clip rounded-t-md ${styles}`} onClick={handleClick}>
+                    <li  className={`${commonStyles} hover:cursor-pointer h-16 border border-slate-500 bg-white overflow-clip rounded-t-md ${styles}`} onClick={handleClick}>
                         <p className={`${getPlanColor(item.name)} text-white text-center rounded-t-md`}>{item.name}</p>
                         {item.item_uid ? <p className="text-xs truncate ml-2">{item.item_uid}</p> : ''}
                         <div className="text-xs text-slate-500 ml-2 mt-2">
@@ -70,7 +70,7 @@ export default function QItem ({ item=false, label='', text='', styles='', click
         if (type==="blank") {
             return (
                 <div className="flex flex-col items-center pb-2">
-                    <li className={`${commonStyles} hover:cursor-auto hover:shadow-none h-16 border border-dashed border-slate-500 min-w-32 bg-slate-400 ${styles}`}>
+                    <li className={`${commonStyles} hover:shadow-none h-16 border border-dashed border-slate-500 min-w-32 bg-slate-400 ${styles}`}>
                         <p className="text-center text-slate-400">{text}</p>
                     </li>
                 </div>
@@ -78,7 +78,7 @@ export default function QItem ({ item=false, label='', text='', styles='', click
         }
         //empty item as visual placeholder
         return (
-            <li className={`${commonStyles} hover:cursor-auto hover:shadow-none h-16 border border-dashed border-slate-500 min-w-32 bg-slate-400 ${styles}`}>
+            <li className={`${commonStyles} hover:shadow-none h-16 border border-dashed border-slate-500 min-w-32 bg-slate-400 ${styles}`}>
                 <p className="text-center text-slate-400">{text}</p>
             </li>
         )

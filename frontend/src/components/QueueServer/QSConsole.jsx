@@ -179,13 +179,13 @@ export default function QSConsole({type="default", title=true, description = tru
                         <p className={`${isToggleOn ? 'text-gray-400' : 'text-gray-800'}`}>OFF</p>
                         <button
                             onClick={toggleSwitch}
-                            className={`w-16 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer ${
+                            className={`w-16 h-5 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer ${
                                 isToggleOn ? 'bg-green-600' : 'bg-gray-300'
                             }`}
                             >
                             <div
-                                className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${
-                                    isToggleOn ? 'translate-x-9' : 'translate-x-0'
+                                className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${
+                                    isToggleOn ? 'translate-x-10' : 'translate-x-0'
                                 }`}
                             ></div>
                         </button>

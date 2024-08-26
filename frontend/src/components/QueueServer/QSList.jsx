@@ -44,7 +44,8 @@ export default function QSList({ queueData=[], handleQItemClick=()=>{}, type='de
             <section className="w-full">
                 <ul className="flex flex-wrap-reverse justify-center items-end">
                     {queueData.map((item, index) => <QItem type="default" item={item} label={index} key={item.item_uid} handleClick={()=>handleQItemClick(item, true)}/>)}
-                    {queueData.length < 8 ? [...new Array(8 - queueData.length)].map((item, index) => <QItem type="blank" item={item} index={index} key={index}/>) : '' }
+                    {queueData.length < 0 ? [...new Array(0 - queueData.length)].map((item, index) => <QItem type="blank" item={item} index={index} key={index}/>) : '' }
+                    <QItem type="blank"/>
                 </ul>
             </section>
         );
