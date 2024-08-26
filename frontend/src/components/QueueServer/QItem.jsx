@@ -70,7 +70,7 @@ export default function QItem ({ item=false, label='', text='', styles='', click
         if (type==="blank") {
             return (
                 <div className="flex flex-col items-center pb-2">
-                    <li className={`${commonStyles} h-16 border border-dashed border-slate-500 min-w-32 bg-slate-400 ${styles}`}>
+                    <li className={`${commonStyles} hover:cursor-auto hover:shadow-none h-16 border border-dashed border-slate-500 min-w-32 bg-slate-400 ${styles}`}>
                         <p className="text-center text-slate-400">{text}</p>
                     </li>
                 </div>
@@ -78,7 +78,7 @@ export default function QItem ({ item=false, label='', text='', styles='', click
         }
         //empty item as visual placeholder
         return (
-            <li className={`${commonStyles} h-16 border border-dashed border-slate-500 min-w-32 bg-slate-400 ${styles}`}>
+            <li className={`${commonStyles} hover:cursor-auto hover:shadow-none h-16 border border-dashed border-slate-500 min-w-32 bg-slate-400 ${styles}`}>
                 <p className="text-center text-slate-400">{text}</p>
             </li>
         )
