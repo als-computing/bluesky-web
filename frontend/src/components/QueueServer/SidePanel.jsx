@@ -64,7 +64,7 @@ export default function SidePanel({
                     </span>
                     <p className="text-xl font-semibold text-center">History</p>
                 </span>
-                <div className=" flex-grow overflow-y-scroll scrollbar-always-visible mx-1">
+                <div className=" flex-grow overflow-y-scroll scrollbar-always-visible mx-1 mb-1">
                     <QSList type="history" queueData={queueHistoryData} handleQItemClick={handleQItemClick}/>
                 </div>
             </div>

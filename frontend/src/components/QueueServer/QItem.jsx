@@ -16,6 +16,7 @@ export default function QItem ({ item=false, label='', text='', styles='', click
     };
     
     const commonStyles = 'w-32 rounded-md mx-2 hover:cursor-pointer hover:shadow-lg hover:shadow-gray-500 list-none overflow-auto';
+
     if (item!== false && Object.keys(item).length > 0 ) {
         if (type === 'history') {
             //Queue History
@@ -69,7 +70,7 @@ export default function QItem ({ item=false, label='', text='', styles='', click
         if (type==="blank") {
             return (
                 <div className="flex flex-col items-center pb-2">
-                    <li className={`${commonStyles} h-16 border border-dashed border-slate-400 min-w-32 bg-slate-700 ${styles}`}>
+                    <li className={`${commonStyles} h-16 border border-dashed border-slate-500 min-w-32 bg-slate-400 ${styles}`}>
                         <p className="text-center text-slate-400">{text}</p>
                     </li>
                 </div>
@@ -77,7 +78,7 @@ export default function QItem ({ item=false, label='', text='', styles='', click
         }
         //empty item as visual placeholder
         return (
-            <li className={`${commonStyles} h-16 border border-dashed border-slate-400 min-w-32 bg-slate-700 ${styles}`}>
+            <li className={`${commonStyles} h-16 border border-dashed border-slate-500 min-w-32 bg-slate-400 ${styles}`}>
                 <p className="text-center text-slate-400">{text}</p>
             </li>
         )
