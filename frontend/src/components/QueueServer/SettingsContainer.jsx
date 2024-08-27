@@ -30,7 +30,7 @@ export default function SettingsContainer() {
             <li
                 key={setting}
                 onClick={() => setSelectedSetting(setting)}
-                className={`p-2 cursor-pointer font-semibold text-black ${selectedSetting === setting ? 'bg-indigo-200 rounded-md' : ''} hover:bg-indigo-100`}
+                className={`p-2 cursor-pointer font-medium text-black ${selectedSetting === setting ? 'bg-indigo-200 rounded-md' : ''} hover:bg-indigo-100`}
             >
                 {setting}
             </li>

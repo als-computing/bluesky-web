@@ -7,7 +7,8 @@ import SettingsContainer from "./SettingsContainer";
 export default function MainPanel({
     processConsoleMessage=()=>{},
     copiedPlan={},
-    minimizeAllWidgets=false
+    minimizeAllWidgets=false,
+    copyDictionaryTrigger=false
 }) {
     return (
         <div className="w-full h-full px-4 py-4 flex flex-col space-y-3 overflow-auto">
@@ -15,7 +16,7 @@ export default function MainPanel({
                 <SettingsContainer />
             </Widget>
             <Widget title="Add Item" icon={tailwindIcons.plus} expandedHeight="h-5/6" defaultHeight="h-1/2" maxHeight="max-h-[50rem]" minimizeAllWidgets={minimizeAllWidgets}>
-                <QSAddItem copiedPlan={copiedPlan}/> 
+                <QSAddItem copiedPlan={copiedPlan} copyDictionaryTrigger={copyDictionaryTrigger}/> 
             </Widget>
             <Widget title="Console Output" icon={tailwindIcons.commandLine} expandedHeight="h-3/4" defaultHeight="h-[22%]" minimizeAllWidgets={minimizeAllWidgets}>
                 <QSConsole processConsoleMessage={processConsoleMessage}/> 

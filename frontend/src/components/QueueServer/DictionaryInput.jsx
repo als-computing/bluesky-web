@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Tooltip } from "react-tooltip";
-export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required=true, description='', styles='', resetInputsTrigger=false, copyDictionaryTrigger=false, copiedPlan=false }) {
+export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required=true, description='', styles='', resetInputsTrigger=false, copiedPlan=false }) {
 
     //hardcode the number of possible key value input pairs
     //this does not allow the user to add more, but better controls the UI
@@ -24,7 +24,7 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
 
 
 
-    const copyDictionary = () => {
+    const copyDictionary = (dict) => {
         if (JSON.stringify(dict) !== '{}') {
             var inputKeys = Object.keys(inputDictDefault);
             var i = 0;
@@ -51,13 +51,12 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
                 JSONObject[nestedObject[key].key] = nestedObject[key].val;
             }
         }
-
         return JSONObject;
+    };
 
-    }
     const handleChange = (inputNum, type, newValue) => {
         //if key is empty but value is not, invalid object
-        console.log('handleChange')
+        //console.log('handleChange')
 
         var stateCopy = '';
         var dictionary = {};
@@ -87,10 +86,11 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
 
     useEffect(() => {
         setInputDict(inputDictDefault);
+        console.log('reset inputs trigger')
     }, [resetInputsTrigger]);
 
     useEffect(() => {
-        copyDictionary();
+        copyDictionary(copiedPlan.parameters.md);
     }, [copiedPlan]);
 
     useEffect(() => {

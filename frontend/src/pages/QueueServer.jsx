@@ -18,7 +18,7 @@ export default function QueueServer() {
     const [ popupItem, setPopupItem ] = useState({});
     const [ isItemDeleteButtonVisible, setIsItemDeleteButtonVisible ] = useState(true);
     const [ copiedPlan, setCopiedPlan ] = useState(false);
-    const [ copyDictionaryTrigger, setCopyDictionaryTrigger ] = useState(false);
+    const [ copyDictionaryTrigger, setCopyDictionaryTrigger ] = useState(0);
     const [ isSidepanelExpanded, setIsSidepanelExpanded ] = useState(false);
     const [ minimizeAllWidgets, setMinimizeAllWidgets ] = useState(false);
     const [ expandQueueList, setExpandQueueList ] = useState(false); //controls the QS list between single column
@@ -95,7 +95,6 @@ export default function QueueServer() {
     };
 
     const handleOpenQItemPopup = (data, showDeleteButton=true) => {
-        console.log({showDeleteButton})
         if (data.success !== false) {
             //set popup to visible
             if (data.item) {
@@ -155,7 +154,6 @@ export default function QueueServer() {
             name: name,
             parameters: parameters
         };
-        setCopyDictionaryTrigger(prev => !prev);
         setCopiedPlan(plan);
     };
 

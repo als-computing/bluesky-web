@@ -3,7 +3,7 @@ import MultiSelectInput from "./MulitSelectInput";
 import SingleSelectInput from "./SingleSelectInput";
 import DictionaryInput from "./DictionaryInput";
 
-export default function QSParameterInput( {cb=()=>{}, allowedDevices=[], param={'name': 'blank'}, updateBodyKwargs=()=>{}, parameters={}, setParameters=()=>{}, plan={plan}, styles='', resetInputsTrigger=false}, copiedPlan=false ) {
+export default function QSParameterInput( {cb=()=>{}, allowedDevices=[], param={'name': 'blank'}, updateBodyKwargs=()=>{}, parameters={}, setParameters=()=>{}, plan={plan}, styles='', resetInputsTrigger=false, copiedPlan=false, copyDictionaryTrigger=false} ) {
     //to do: refactor to remove param.name and change param to a string
 
     //-----Functions for MultiSelectInput ---------------
