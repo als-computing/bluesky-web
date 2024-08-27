@@ -39,7 +39,7 @@ export default function SettingsContainer() {
 
 
       {/* Content Area */}
-      <div className="flex-grow p-4 h-full overflow-y-scroll">
+      <div className="flex-grow h-full overflow-y-scroll pt-2">
         {renderSettingContent()}
       </div>
     </div>

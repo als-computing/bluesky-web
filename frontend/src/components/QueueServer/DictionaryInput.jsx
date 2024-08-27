@@ -105,7 +105,7 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
             <Tooltip anchorSelect={'#' + label + 'ParamInputTooltip'} children={<p className="whitespace-pre-wrap">{description}</p>} place="top" variant="info" style={{'maxWidth' : "500px", 'height': 'fit-content'}} delayShow='400'/>
             <div className="">
                 <ul className="w-full">
-                    <li className="flex text-center">
+                    <li className="flex text-center items-center">
                         <p className="mx-2 basis-5/12">key</p>
                         <p className="basis-1/12">:</p>
                         <p className="mx-2 basis-5/12">value</p>
