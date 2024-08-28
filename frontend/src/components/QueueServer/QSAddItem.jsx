@@ -10,13 +10,13 @@ import { Tooltip } from "react-tooltip";
 const sampleBody = {
     item: {
     'name': '',
-    'kwargs': '',
+    'kwargs': {},
     'item_type': 'plan'
     },
     pos: 'back'
 };
 
-export default function QSAddItem({copiedPlan=false, type='default', copyDictionaryTrigger=false, isGlobalMetadataChecked=true, globalMetadata={'testKey':'testVal'}}) {
+export default function QSAddItem({copiedPlan=false, type='default', copyDictionaryTrigger=false, isGlobalMetadataChecked=false, globalMetadata={}}) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isSubmissionPopupOpen, setIsSubmissionPopupOpen] = useState(false);
     const [submissionResponse, setSubmissionResponse] = useState({});
@@ -177,7 +177,6 @@ export default function QSAddItem({copiedPlan=false, type='default', copyDiction
                 parametersCopy.md.value = {...globalMetadata, ...parametersCopy.md.value};
             }
         }
-        console.log({parametersCopy})
 
         setBody(state => {
             var stateCopy = JSON.parse(JSON.stringify(state));
@@ -194,6 +193,35 @@ export default function QSAddItem({copiedPlan=false, type='default', copyDiction
             return stateCopy;
         })
     };
+
+    //this doesn't work because we must know the difference between the globalMetadata and the metadataInput
+/*     const handleGlobalMetadataChange = () => {
+        //adds or removes the global metadata from the body kwargs
+        setBody(state => {
+            var stateCopy = JSON.parse(JSON.stringify(state));
+            console.log({state});
+            if (isGlobalMetadataChecked) {
+                //checkmark turned on, add any global md to body
+                if (!('md' in stateCopy.item.kwargs)) {
+                    stateCopy.item.kwargs.md = {};
+                }
+                console.log({globalMetadata})
+                stateCopy.item.kwargs.md = { ...globalMetadata, ...stateCopy.item.kwargs.md};
+            } else {
+                //checkmark turned off, delete matching key/value pairs in body md
+                for (var key in globalMetadata) {
+                    if (key in stateCopy.item.kwargs.md) {
+                        if (stateCopy.item.kwargs.md[key] === globalMetadata[key]) {
+                            //body md matches global md, must delete it
+                            delete stateCopy.item.kwargs.md[key];
+                        }
+                    }
+                }
+            }
+            console.log({stateCopy})
+            return stateCopy;
+        })
+    } */
 
     const updateBodyName = (name) => {
         setBody(state => {
@@ -295,6 +323,10 @@ export default function QSAddItem({copiedPlan=false, type='default', copyDiction
         }
     }, [copiedPlan]);
 
+/*     useEffect(() => {
+        handleGlobalMetadataChange();
+    }, [globalMetadata, isGlobalMetadataChecked]) */
+
     if (type === 'default') {
         return (
             <form className={`w-full h-full flex transition-all duration-1000 ease-in relative`}>
@@ -327,7 +359,18 @@ export default function QSAddItem({copiedPlan=false, type='default', copyDiction
                     </div>
                     <div name="parameter inputs" className="flex flex-wrap content-start justify-center space-x-2 space-y-4 py-4 px-2 flex-grow overflow-auto overflow-y-auto">
                         {activePlan ? <h3>{activePlan}: {allowedPlans[activePlan].description}</h3> : ''}
-                            {Object.keys(parameters).map((param) => <QSParameterInput key={param} param={parameters[param]} parameters={parameters} updateBodyKwargs={updateBodyKwargs} setParameters={setParameters} allowedDevices={allowedDevices} plan={activePlan} resetInputsTrigger={resetInputsTrigger} copiedPlan={copiedPlan} />)}
+                            {Object.keys(parameters).map((param) => 
+                                <QSParameterInput 
+                                    key={param} param={parameters[param]} 
+                                    parameters={parameters} 
+                                    updateBodyKwargs={updateBodyKwargs} 
+                                    setParameters={setParameters} 
+                                    allowedDevices={allowedDevices} 
+                                    plan={activePlan} 
+                                    resetInputsTrigger={resetInputsTrigger} 
+                                    copiedPlan={copiedPlan} 
+                                    isGlobalMetadataChecked={isGlobalMetadataChecked}
+                                    globalMetadata={globalMetadata} />)}
                     </div>
                 </div>
                 <div name="SUMMARY" className={`${activePlan ? 'w-3/12 border-r-2' : 'w-0 hidden border-none'} border-slate-300 flex flex-col overflow-x-auto`}>

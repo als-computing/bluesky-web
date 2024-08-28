@@ -20,7 +20,7 @@ export default function MainPanel({
                 <SettingsContainer isGlobalMetadataChecked={isGlobalMetadataChecked} handleGlobalMetadataCheckboxChange={handleGlobalMetadataCheckboxChange} globalMetadata={globalMetadata} updateGlobalMetadata={updateGlobalMetadata}/>
             </Widget>
             <Widget title="Add Item" icon={tailwindIcons.plus} expandedHeight="h-5/6" defaultHeight="h-1/2" maxHeight="max-h-[50rem]" minimizeAllWidgets={minimizeAllWidgets}>
-                <QSAddItem copiedPlan={copiedPlan} copyDictionaryTrigger={copyDictionaryTrigger}/> 
+                <QSAddItem copiedPlan={copiedPlan} copyDictionaryTrigger={copyDictionaryTrigger} isGlobalMetadataChecked={isGlobalMetadataChecked} globalMetadata={globalMetadata}/> 
             </Widget>
             <Widget title="Console Output" icon={tailwindIcons.commandLine} expandedHeight="h-3/4" defaultHeight="h-[22%]" minimizeAllWidgets={minimizeAllWidgets}>
                 <QSConsole processConsoleMessage={processConsoleMessage}/> 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Tooltip } from "react-tooltip";
-export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required=true, description='', styles='', resetInputsTrigger=false, copiedPlan=false, isGlobalMetadataChecked=true, globalMetadata={'sample': 'A', 'user': 'Seij'} }) {
+export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required=true, description='', styles='', resetInputsTrigger=false, copiedPlan=false, isGlobalMetadataChecked=false, globalMetadata={} }) {
 
     //hardcode the number of possible key value input pairs
     //this does not allow the user to add more, but better controls the UI
@@ -64,28 +64,6 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
         var dictionary = {};
         var deleteParam = false;
 
-/*         setInputDict(state => {
-            stateCopy = JSON.parse(JSON.stringify(state));
-            
-            stateCopy[inputNum][type] = newValue;
-            if (stateCopy[inputNum].key === '' & stateCopy[inputNum].val !== '') {
-                //warn that we need a key entered for the value.
-                stateCopy[inputNum].msg = 'Provide a key';
-                //wipe the value in the parameter state with callback to prevent submission of invalid JSON
-                var wipedDictionary = JSON.parse(JSON.stringify(stateCopy));
-                wipedDictionary[inputNum].val = '';
-                wipedDictionary[inputNum].key = '';
-                dictionary = createJSON(wipedDictionary);
-            } else {
-                stateCopy[inputNum].msg = '';
-                var dictionary = createJSON(stateCopy);
-                deleteParam = JSON.stringify(dictionary) === '{}'; //delete the param from the parameter state if it's empty
-            }
-            //setCallbackData({dictionary, deleteParam});
-            cb(dictionary, deleteParam);
-            return stateCopy;
-        }); */
-
         //remove the nested cb inside the setState function
         stateCopy = JSON.parse(JSON.stringify(state));
             
@@ -103,12 +81,10 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
             var dictionary = createJSON(stateCopy);
             deleteParam = JSON.stringify(dictionary) === '{}'; //delete the param from the parameter state if it's empty
         }
-        //setCallbackData({dictionary, deleteParam});
         cb(dictionary, deleteParam);
         setInputDict(stateCopy);
-
-
     };
+
 
     useEffect(() => {
         setInputDict(inputDictDefault);
@@ -124,11 +100,23 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
         }
     }, [copiedPlan]);
 
-/*     useEffect(() => {
-        if (callbackData) {
-            cb(callbackData.dictionary, callbackData.deleteParam);
+    useEffect(() => {
+        var inputDictionary = {};
+        //loop through inputs and add anything that's valid JSON
+        for (var key in inputDict) {
+            if (inputDict[key].key !== '') {
+                inputDictionary[inputDict[key].key] = inputDict[key].val;
+            }
         }
-    }, [callbackData]); */
+
+        if (isGlobalMetadataChecked) {
+            //set the dictionary by adding the global metadata
+            cb({...globalMetadata, ...inputDictionary});
+        } else {
+            cb(inputDictionary);
+        }
+    }, [isGlobalMetadataChecked, globalMetadata])
+
 
     return (
         <div className={`border-2 border-slate-300 rounded-lg w-11/12 max-w-96 min-w-72 mt-2 h-fit ${styles}`}>
