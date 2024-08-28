@@ -1,7 +1,3 @@
-import QSConsole from "../components/QueueServer/QSConsole";
-import QSList from "../components/QueueServer/QSList";
-import QSRunEngineWorker from "../components/QueueServer/QSRunEngineWorker";
-import QSAddItem from "../components/QueueServer/QSAddItem";
 import QItemPopup from "../components/QueueServer/QItemPopup";
 import SidePanel from "../components/QueueServer/SidePanel";
 import MainPanel from "../components/QueueServer/MainPanel";
@@ -22,6 +18,8 @@ export default function QueueServer() {
     const [ isSidepanelExpanded, setIsSidepanelExpanded ] = useState(false);
     const [ minimizeAllWidgets, setMinimizeAllWidgets ] = useState(false);
     const [ expandQueueList, setExpandQueueList ] = useState(false); //controls the QS list between single column
+    const [ isGlobalMetadataChecked, setIsGlobalMetadataChecked ] = useState(true);
+    const [ globalMetadata, setGlobalMetadata ] = useState({});
 
     //setup polling interval for getting regular updates from the http server
     var pollingInterval;
@@ -141,6 +139,14 @@ export default function QueueServer() {
         }
     };
 
+    const handleGlobalMetadataCheckboxChange = (isChecked) => {
+        setIsGlobalMetadataChecked(isChecked);
+    };
+
+    const updateGlobalMetadata = (dict) => {
+        setGlobalMetadata(dict);
+    }
+
 /**
  * Sets the copiedPlan state variable which triggers the plan and parameters to be updated in QSAddItem
  * 
@@ -190,6 +196,10 @@ export default function QueueServer() {
                     processConsoleMessage={processConsoleMessage}
                     copiedPlan={copiedPlan}
                     minimizeAllWidgets={minimizeAllWidgets}
+                    isGlobalMetadataChecked={isGlobalMetadataChecked}
+                    handleGlobalMetadataCheckboxChange={handleGlobalMetadataCheckboxChange}
+                    globalMetadata={globalMetadata}
+                    updateGlobalMetadata={updateGlobalMetadata}
                 />
             </div>
         </main>

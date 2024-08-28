@@ -4,13 +4,13 @@ import SettingsAudioAlert from './SettingsAudioAlert';
 import SettingsScreenLock from './SettingsScreenLock';
 import SettingsAuthentication from './SettingsAuthentication';
 
-export default function SettingsContainer() {
+export default function SettingsContainer({isGlobalMetadataChecked=false, handleGlobalMetadataCheckboxChange=()=>{}, globalMetadata={}, updateGlobalMetadata=()=>{}}) {
   const [selectedSetting, setSelectedSetting] = useState('Metadata');
 
   const renderSettingContent = () => {
     switch (selectedSetting) {
       case 'Metadata':
-        return <SettingsMetadata />;
+        return <SettingsMetadata isGlobalMetadataChecked={isGlobalMetadataChecked} handleGlobalMetadataCheckboxChange={handleGlobalMetadataCheckboxChange} globalMetadata={globalMetadata} updateGlobalMetadata={updateGlobalMetadata}/>;
       case 'Authentication':
         return <SettingsAuthentication />;
       case 'Audio Alerts':

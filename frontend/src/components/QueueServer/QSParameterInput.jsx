@@ -80,7 +80,7 @@ export default function QSParameterInput( {cb=()=>{}, allowedDevices=[], param={
             if (deleteParam) {
                 var removedBodyParams = JSON.parse(JSON.stringify(state));
                 delete removedBodyParams[param.name];
-                updateBodyKwargs(removedBodyParams)
+                updateBodyKwargs(removedBodyParams);
             } else {
                 updateBodyKwargs(stateCopy);
             }

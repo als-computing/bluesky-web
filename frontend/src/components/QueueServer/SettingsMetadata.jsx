@@ -14,15 +14,14 @@ var inputDictDefault = {
     },
 };
 
-export default function SettingsMetadata({}) {
+export default function SettingsMetadata({isGlobalMetadataChecked=false, handleGlobalMetadataCheckboxChange=()=>{}, globalMetadata={}, updateGlobalMetadata=()=>{}}) {
 
     const [inputDict, setInputDict] = useState(inputDictDefault);
 
     const handleChange = (inputNum, type, newValue) => {
-        //if key is empty but value is not, invalid object
         var stateCopy = '';
         var dictionary = {};
-        var deleteParam = false;
+        //var deleteParam = false;
         stateCopy = JSON.parse(JSON.stringify(inputDict));
         stateCopy[inputNum][type] = newValue;
         if (stateCopy[inputNum].key === '' & stateCopy[inputNum].val !== '') {
@@ -36,10 +35,11 @@ export default function SettingsMetadata({}) {
         } else {
             stateCopy[inputNum].msg = '';
             var dictionary = createJSON(stateCopy);
-            deleteParam = JSON.stringify(dictionary) === '{}'; //delete the param from the parameter state if it's empty
+            //deleteParam = JSON.stringify(dictionary) === '{}'; //delete the param from the parameter state if it's empty
         }
         //setCallbackData({dictionary, deleteParam});
-        setInputDict(stateCopy)
+        setInputDict(stateCopy);
+        updateGlobalMetadata(dictionary);
     };
 
     const createJSON = (nestedObject) => {

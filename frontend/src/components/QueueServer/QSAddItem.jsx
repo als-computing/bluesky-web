@@ -14,9 +14,9 @@ const sampleBody = {
     'item_type': 'plan'
     },
     pos: 'back'
-}
+};
 
-export default function QSAddItem({copiedPlan=false, type='default', copyDictionaryTrigger=false}) {
+export default function QSAddItem({copiedPlan=false, type='default', copyDictionaryTrigger=false, isGlobalMetadataChecked=true, globalMetadata={'testKey':'testVal'}}) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isSubmissionPopupOpen, setIsSubmissionPopupOpen] = useState(false);
     const [submissionResponse, setSubmissionResponse] = useState({});
@@ -166,15 +166,28 @@ export default function QSAddItem({copiedPlan=false, type='default', copyDiction
  * // The values may be string, array, or objects
  */
     const updateBodyKwargs = (parameters) => {
+        var parametersCopy = JSON.parse(JSON.stringify(parameters));
+        //copy over any global metadata
+        if (isGlobalMetadataChecked) {
+            if (globalMetadata) {
+                if (!('md' in parametersCopy)) {
+                    parametersCopy.md = {};
+                }
+                //ensure that global metadata appears 'first' in the md list
+                parametersCopy.md.value = {...globalMetadata, ...parametersCopy.md.value};
+            }
+        }
+        console.log({parametersCopy})
+
         setBody(state => {
-            var stateCopy = state;
+            var stateCopy = JSON.parse(JSON.stringify(state));
             var newKwargs = {};
-            for (var key in parameters) {
-                let val = parameters[key].value;
+            for (var key in parametersCopy) {
+                let val = parametersCopy[key].value;
                 if (val === '' || (Array.isArray(val) && val.length === 0)) {
                     //value is empty, do not add to kwargs
                 } else {
-                    newKwargs[key] = parameters[key].value;
+                    newKwargs[key] = parametersCopy[key].value;
                 }
             }
             stateCopy.item.kwargs = newKwargs;
