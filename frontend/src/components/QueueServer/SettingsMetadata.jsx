@@ -55,7 +55,7 @@ export default function SettingsMetadata({}) {
     };
 
     return (
-        <div className="w-full h-full flex flex-col justify-start overflow-y-scroll">
+        <div className="w-full h-full flex flex-col space-y-4 justify-start overflow-y-scroll">
             <div className="w-full h-fit flex  ">
                 <div className="w-16 h-10 flex justify-center items-center flex-shrink-0 ">
                     <Checkbox />

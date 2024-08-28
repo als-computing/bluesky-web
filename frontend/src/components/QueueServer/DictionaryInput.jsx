@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Tooltip } from "react-tooltip";
-export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required=true, description='', styles='', resetInputsTrigger=false, copiedPlan=false }) {
+export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required=true, description='', styles='', resetInputsTrigger=false, copiedPlan=false, isGlobalMetadataChecked=true, globalMetadata={'sample': 'A', 'user': 'Seij'} }) {
 
     //hardcode the number of possible key value input pairs
     //this does not allow the user to add more, but better controls the UI
@@ -42,7 +42,7 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
 
 
     const [inputDict, setInputDict] = useState(inputDictDefault);
-    const [callbackData, setCallbackData] = useState(null);
+    //const [callbackData, setCallbackData] = useState(null);
 
     const createJSON = (nestedObject) => {
         //transform the nested inputDict used for the form
@@ -89,7 +89,6 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
 
     useEffect(() => {
         setInputDict(inputDictDefault);
-        console.log('reset inputs trigger')
     }, [resetInputsTrigger]);
 
     useEffect(() => {
@@ -119,6 +118,22 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
                         <p className="basis-1/12">:</p>
                         <p className="mx-2 basis-5/12">value</p>
                     </li>
+
+                    {isGlobalMetadataChecked ? 
+                        Object.keys(globalMetadata).map(key => {
+                            const item = globalMetadata[key];
+                            return (
+                                <li key={key} className="flex text-center w-full relative hover:cursor-not-allowed">
+                                    <p className="border-slate-400 w-5/12 border mx-2 my-1 text-center bg-slate-100 text-slate-600">{key}</p>
+                                    <p className="w-1/12">:</p>
+                                    <p className="w-5/12 border border-slate-400 mx-2 my-1 text-center hover:cursor-not-allowed bg-slate-100 text-slate-600">{globalMetadata[key]}</p>
+                                </li>
+                            )
+                        }) 
+                    : 
+                        ''
+                    }
+
                     {Object.keys(inputDict).map(key => {
                         const item = inputDict[key];
                         return (
