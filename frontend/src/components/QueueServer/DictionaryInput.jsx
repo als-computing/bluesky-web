@@ -35,6 +35,8 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
                 i++;
             }
             setInputDict(newDict);
+        } else {
+            setInputDict(inputDictDefault);
         }
     }
 
@@ -79,7 +81,8 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
                 var dictionary = createJSON(stateCopy);
                 deleteParam = JSON.stringify(dictionary) === '{}'; //delete the param from the parameter state if it's empty
             }
-            setCallbackData({dictionary, deleteParam});
+            //setCallbackData({dictionary, deleteParam});
+            cb(dictionary, deleteParam);
             return stateCopy;
         });
     };
@@ -90,14 +93,20 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
     }, [resetInputsTrigger]);
 
     useEffect(() => {
-        copyDictionary(copiedPlan.parameters.md);
+        if (copiedPlan) {
+            if ('md' in copiedPlan.parameters) {
+                copyDictionary(copiedPlan.parameters.md);
+            } else {
+                copyDictionary({});
+            }
+        }
     }, [copiedPlan]);
 
-    useEffect(() => {
+/*     useEffect(() => {
         if (callbackData) {
             cb(callbackData.dictionary, callbackData.deleteParam);
         }
-    }, [callbackData]);
+    }, [callbackData]); */
 
     return (
         <div className={`border-2 border-slate-300 rounded-lg w-11/12 max-w-96 min-w-72 mt-2 h-fit ${styles}`}>
