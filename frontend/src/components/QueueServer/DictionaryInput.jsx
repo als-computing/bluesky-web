@@ -56,7 +56,7 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
         return JSONObject;
     };
 
-    const handleChange = (inputNum, type, newValue) => {
+    const handleChange = (inputNum, type, newValue, state) => {
         //if key is empty but value is not, invalid object
         //console.log('handleChange')
 
@@ -64,7 +64,7 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
         var dictionary = {};
         var deleteParam = false;
 
-        setInputDict(state => {
+/*         setInputDict(state => {
             stateCopy = JSON.parse(JSON.stringify(state));
             
             stateCopy[inputNum][type] = newValue;
@@ -84,7 +84,30 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
             //setCallbackData({dictionary, deleteParam});
             cb(dictionary, deleteParam);
             return stateCopy;
-        });
+        }); */
+
+        //remove the nested cb inside the setState function
+        stateCopy = JSON.parse(JSON.stringify(state));
+            
+        stateCopy[inputNum][type] = newValue;
+        if (stateCopy[inputNum].key === '' & stateCopy[inputNum].val !== '') {
+            //warn that we need a key entered for the value.
+            stateCopy[inputNum].msg = 'Provide a key';
+            //wipe the value in the parameter state with callback to prevent submission of invalid JSON
+            var wipedDictionary = JSON.parse(JSON.stringify(stateCopy));
+            wipedDictionary[inputNum].val = '';
+            wipedDictionary[inputNum].key = '';
+            dictionary = createJSON(wipedDictionary);
+        } else {
+            stateCopy[inputNum].msg = '';
+            var dictionary = createJSON(stateCopy);
+            deleteParam = JSON.stringify(dictionary) === '{}'; //delete the param from the parameter state if it's empty
+        }
+        //setCallbackData({dictionary, deleteParam});
+        cb(dictionary, deleteParam);
+        setInputDict(stateCopy);
+
+
     };
 
     useEffect(() => {
@@ -142,13 +165,13 @@ export default function DictionaryInput({ cb=()=>{}, dict={}, label='', required
                                 <input
                                     className={`${item.key.length === 0 && item.val.length > 0 ? 'border-red-500' : 'border-slate-400'} w-5/12 border mx-2 my-1 text-center`} 
                                     value={item.key}
-                                    onChange={(e) => handleChange(key, 'key', e.target.value)}
+                                    onChange={(e) => handleChange(key, 'key', e.target.value, inputDict)}
                                 />
                                 <p className="w-1/12">:</p>
                                 <input
                                     className="w-5/12 border border-slate-400 mx-2 my-1 text-center" 
                                     value={item.val}
-                                    onChange={(e) => handleChange(key, 'val', e.target.value)}
+                                    onChange={(e) => handleChange(key, 'val', e.target.value, inputDict)}
                                 />
                             </li>
                         )
