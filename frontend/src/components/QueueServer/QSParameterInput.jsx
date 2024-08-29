@@ -75,7 +75,6 @@ export default function QSParameterInput( {cb=()=>{}, allowedDevices=[], param={
 
     const handleDictionaryChange = (dict, deleteParam=false) => {
         setParameters(state => {
-            console.log({dict})
             var stateCopy = JSON.parse(JSON.stringify(state));
             stateCopy[param.name].value = dict;
             if (deleteParam) {
