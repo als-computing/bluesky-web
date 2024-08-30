@@ -128,11 +128,13 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
             name:'Parameters',
             icon: tailwindIcons.adjustmentsVertical,
             content: 
+                ('kwarg' in popupItem) ?
                 <Fragment>
                     {Object.keys(popupItem.kwargs).map((kwarg) => printParameter(kwarg))}
-                    
                     <div className="flex justify-center py-4"><Button text='Copy Plan' cb={()=> handleCopyItemClick(popupItem.name, popupItem.kwargs)} styles={`m-auto ${isDeleteModeVisible ? 'opacity-0' : ''}`}/></div>
                 </Fragment>
+                :
+                <p>args: {popupItem.args}</p>
         },
         {
             name:'UID',

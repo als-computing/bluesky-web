@@ -30,7 +30,7 @@ export default function QItem ({ item=false, label='', text='', styles='', click
                         </span>
                         
                         <div className="text-xs ml-2">
-                            {('md' in item.kwargs) ? 
+                            {('kwargs' in item && 'md' in item.kwargs) ? 
                                 Object.keys(item.kwargs.md).map((key) => {
                                     return (
                                         <div className="flex flex-wrap" key={key}>
@@ -40,15 +40,18 @@ export default function QItem ({ item=false, label='', text='', styles='', click
                                         </div>
                                     )
                                 })
-                            : 
-                                Object.keys(item.kwargs).map((kwarg) => {
-                                    return (
-                                        <div key={kwarg}>
-                                            <p className="text-black">{kwarg} </p>
-                                            <p className="ml-2 text-wrap text-clip">{displayKwarg(item.kwargs[kwarg])}</p>
-                                        </div>
-                                    )
-                                })
+                            :
+                                ('kwargs' in item) ? 
+                                    Object.keys(item.kwargs).map((kwarg) => {
+                                        return (
+                                            <div key={kwarg}>
+                                                <p className="text-black">{kwarg} </p>
+                                                <p className="ml-2 text-wrap text-clip">{displayKwarg(item.kwargs[kwarg])}</p>
+                                            </div>
+                                        )
+                                    })
+                                :
+                                    ''
                             }
                         </div>
                     </li>
@@ -62,7 +65,7 @@ export default function QItem ({ item=false, label='', text='', styles='', click
                     <li  className={`${commonStyles} hover:cursor-pointer h-16 border border-slate-500 bg-white overflow-clip rounded-t-md ${styles}`} onClick={handleClick}>
                         <p className={`${getPlanColor(item.name)} text-white text-center rounded-t-md`}>{item.name}</p>
                         <div className="text-xs ml-2">
-                            {('md' in item.kwargs) ? 
+                            {('kwargs' in item && 'md' in item.kwargs) ? 
                                 Object.keys(item.kwargs.md).map((key) => {
                                     return (
                                         <div className="flex flex-wrap" key={key}>
@@ -72,15 +75,18 @@ export default function QItem ({ item=false, label='', text='', styles='', click
                                         </div>
                                     )
                                 })
-                            : 
-                                Object.keys(item.kwargs).map((kwarg) => {
-                                    return (
-                                        <div key={kwarg}>
-                                            <p className="text-black">{kwarg} </p>
-                                            <p className="ml-2 text-wrap text-clip">{displayKwarg(item.kwargs[kwarg])}</p>
-                                        </div>
-                                    )
-                                })
+                            :
+                                ('kwargs' in item) ? 
+                                    Object.keys(item.kwargs).map((kwarg) => {
+                                        return (
+                                            <div key={kwarg}>
+                                                <p className="text-black">{kwarg} </p>
+                                                <p className="ml-2 text-wrap text-clip">{displayKwarg(item.kwargs[kwarg])}</p>
+                                            </div>
+                                        )
+                                    })
+                                :
+                                    ''
                             }
                         </div>
                     </li>
