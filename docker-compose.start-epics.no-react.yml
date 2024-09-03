@@ -23,6 +23,28 @@ services:
       - "8888:8888"
     networks:
       - epicsnet
+    environment:
+      - ZMQ_HOST=qserver
+      - ZMQ_PORT=60625
+  qserver:
+    build: ./server/queue-server-configuration
+    networks: 
+      - epicsnet
+    command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "redis:6379"]
+  httpserver:
+    build: ./server/queue-server-configuration/httpserver
+    environment:
+      - QSERVER_ZMQ_CONTROL_ADDRESS=tcp://qserver:60615
+      - QSERVER_ZMQ_INFO_ADDRESS=tcp://qserver:60625
+    networks: 
+      - epicsnet
+    command: ["uvicorn", "--host", "0.0.0.0", "--port", "60610", "bluesky_httpserver.server:app"]
+    ports:
+      - "60610:60610"
+  redis:
+    image: redis:7.4-rc2-alpine
+    networks: 
+      - epicsnet
 
 networks:
   epicsnet:

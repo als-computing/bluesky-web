@@ -7,7 +7,7 @@ A Bluesky web interface built with React, Python FastAPI, Bluesky, OPHYD, PV Web
 <h2 style="margin: auto; text-align:center; border-bottom: none">Contents</h2>
 
 - [User Setup](#user-setup)
-  - [Required: Install PV Web Scoket](#isntall-pv-web-socket)
+  - [Required: Install PV Web Scoket](#install-pv-web-socket)
   - [Required: Run Application](#run-application)
   - [Optional: Run EPICS-Docker](#run-epics-docker)
     - [Use Image Directly](#use-image-directly)
@@ -98,7 +98,7 @@ docker-compose up -d --build
 <mark>Run Web Application + EPICS (starts EPICS service in container)</mark>
 ```
 #ophyd-api/
-docker-compose -f docker-compose.start-epics.yml -d --build
+docker-compose -f docker-compose.start-epics.yml up -d --build
 ```
 Navigate to port 8081 in a web browser to view the application
 
