@@ -59,7 +59,28 @@ export PV_WRITE_SUPPORT=true # <------ This must be set to true
 ```
 
 
-If you already have a running instance of EPICS on a computer and use custom EPICS environment variables, then edit the other environment variables for PVWS as required. 
+If you already have a running instance of EPICS on a computer and use custom EPICS environment variables, then edit the other environment variables for PVWS as required. Here is an example of a typical beamline configuration where EPICS is run within a subnet.
+
+```
+## ----- pvws/docker/setenv.sh  ----- ##
+
+# Web Socket Settings
+#export PV_DEFAULT_TYPE=ca
+#export PV_THROTTLE_MS=1000
+#export PV_ARRAY_THROTTLE_MS=10000
+export PV_WRITE_SUPPORT=true # <-------------------------- This must be set to true
+
+# Channel Access Settings
+export EPICS_CA_ADDR_LIST="IPaddress1 IPaddress2" #<------ This line uncommented, use quotes for multiple addresses
+export EPICS_CA_AUTO_ADDR=NO #<--------------------------- Add this line when using a specific address list
+#export EPICS_CA_MAX_ARRAY_BYTES=1000000
+
+# PV Access Settings
+#export EPICS_PVA_ADDR_LIST=localhost
+#export EPICS_PVA_AUTO_ADDR_LIST=YES
+#export EPICS_PVA_BROADCAST_PORT=5076
+#export EPICS_PVA_NAME_SERVERS=
+```
 
 More information on simulated PV's that can be subscribed to by PVWS can be found [`here`](https://control-system-studio.readthedocs.io/en/latest/core/pv/doc/index.html)
 
@@ -68,13 +89,13 @@ Two different scripts are provided that will start the application in docker con
 
 If you already have EPICS running and want to access your own IOCs, use the first script. Otherwise the second script can be used to start a "default" EPICS environment that still works with the application.
 
-<mark>Run Application (Linux Only)</mark> \
+<mark>Run Web Application Only (does not include an EPICS service)</mark> 
 ```
 #ophyd-api/
 docker-compose up -d --build
 ```
 \
-<mark>Run Application + EPICS (Mac or Linux)</mark>
+<mark>Run Web Application + EPICS (starts EPICS service in container)</mark>
 ```
 #ophyd-api/
 docker-compose -f docker-compose.start-epics.yml -d --build
@@ -167,7 +188,7 @@ cd server
 docker build -t python-server .
 docker run -dp 8080:8080 python-server
 ```
-To run the python server and expose a port to use Jupyter Notebook (for direct Bluesky testing):
+For testing Bluesky in Python directly, use the following commands to run Jupyter Notebook from within a container:
 ```
 cd server
 docker build -t python-jupyter .
@@ -182,11 +203,14 @@ Now in a browser you can navigate to localhost:8888/lab
 ## React Frontend
 Install project dependencies from package.json file (only need to run the install command once).
 ```
+#/ophyd-api
+cd frontend
 npm install
 ```
 
 Run the app in development mode.
 ```
+#/ophyd-api/frontend
 npm start
 ```
 Open [http://localhost:3000](http://localhost:3000) to view the app in a browser.
@@ -196,6 +220,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the app in a browser
 ### React Development Scripts
 
 ```
+#/ophyd-api/frontend
 npm test
 ```
 
@@ -203,6 +228,7 @@ Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ```
+#/ophyd-api/frontend
 npm run build
 ```
 
@@ -304,11 +330,12 @@ docker-compose -f docker-compose.start-epics.no-react.yml up --build
 ```
 
 ## Queue Server
-The queue server provides a method for managing and executing Bluesky plans. Within the 
+The queue server provides a method for managing and executing Bluesky plans, it is used in the React app via the HTTP Server.
+
 [`Queue Server Documentation`](https://blueskyproject.io/bluesky-queueserver/installation.html)
 
 [`HTTP Server Documentation`](https://blueskyproject.io/bluesky-httpserver/installation.html)
-### Installing Queue Server 
+### Installing Queue Server outside a container
 These instructions are for directly installing Queue Server outside of a container for development purposes. To run the queue server, redis will also need to be installed.
 
 <mark>Install Redis (Mac)</mark>
@@ -387,9 +414,6 @@ flowchart LR
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-<mark>sample mark</mark>
-
 
 
 <style>
