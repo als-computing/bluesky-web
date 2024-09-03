@@ -3,11 +3,13 @@
 ## to do: volume mount the frontend files to a container, put in docker.dev. in frontend that just calls npm start
 services:
   epics:
-    image: prjemian/synapps:latest
+    image: seijdeleon/epics-motor-sim:latest
     platform: linux/amd64
     networks:
       - epicsnet
-    command: /bin/bash
+    command: >
+      /bin/bash -c "cd /opt/synApps/support/motor-R7-2-2/modules/motorMotorSim/iocs/motorSimIOC/iocBoot/iocMotorSim &&
+      ../../bin/linux-x86_64/motorSim st.cmd"
     tty: true
     stdin_open: true
   pvws:
