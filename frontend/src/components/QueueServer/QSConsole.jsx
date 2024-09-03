@@ -174,12 +174,12 @@ export default function QSConsole({type="default", title=true, description = tru
     if (type === "default") {
         return (
             <main className="h-full bg-white rounded-b-lg">
-                <div name="toggle switch, status" className="flex items-center space-x-12 pl-12 h-1/6">
+                <div name="toggle switch, status" className="flex items-start justify-start space-x-12 pl-12 h-1/6 flex-shrink-0">
                     <div name="toggle" className="flex w-fit items-center space-x-2">
                         <p className={`${isToggleOn ? 'text-gray-400' : 'text-gray-800'}`}>OFF</p>
                         <button
                             onClick={toggleSwitch}
-                            className={`w-16 h-5 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer ${
+                            className={`w-16 h-5 flex items-center bg-gray-300 rounded-full px-1 cursor-pointer ${
                                 isToggleOn ? 'bg-green-600' : 'bg-gray-300'
                             }`}
                             >
@@ -194,8 +194,8 @@ export default function QSConsole({type="default", title=true, description = tru
                     <p name="status" className="">{statusMessage}</p>
                 </div>
                 <section ref={messageContainerRef} name="message container" className="overflow-auto h-5/6  w-full rounded-b-lg " style={{'scrollbarColor': 'grey black'}}>
-                    {isOpened ? <p className="text-slate-400 pl-4 pt-4">Connection Opened. Listening for Queue Server console output.</p> : <p className="animate-pulse text-white pl-4 pt-4">Waiting for initialization...</p>}
-                    <ul className="flex flex-col  py-4">
+                    {isOpened ? <p className="text-slate-400 pl-4">Connection Opened. Listening for Queue Server console output.</p> : <p className="animate-pulse text-white pl-4">Waiting for initialization...</p>}
+                    <ul className="flex flex-col">
                         {wsMessages.map((msg) => {
                             return (
                                 <li key={msg.id} className="w-full flex text-slate-600">
