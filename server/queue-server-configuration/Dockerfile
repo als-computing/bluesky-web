@@ -12,5 +12,5 @@ RUN pip install bluesky-queueserver
 
 # Run Redis server in the background and then start the queue server
 # CMD redis-server --daemonize yes && start-re-manager --zmq-publish-console ON
-CMD start-re-manager --zmq-publish-console ON --redis-addr redis:6379
+# CMD start-re-manager --zmq-publish-console ON --redis-addr redis:6379
 

@@ -10,7 +10,7 @@ added to the list of available plans/devices by the queue server.
 # Required flags for using these files:
 
 # keep_re
-# startup_dire=path/queue-server-configuration/startup
+# startup_dir=path/queue-server-configuration/startup
 
 """ 
 keep-re
