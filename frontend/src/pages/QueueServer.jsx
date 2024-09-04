@@ -1,7 +1,7 @@
 import QItemPopup from "../components/QueueServer/QItemPopup";
 import SidePanel from "../components/QueueServer/SidePanel";
 import MainPanel from "../components/QueueServer/MainPanel";
-import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus, getQueueItem, getQueueHistory } from "../components/QueueServer/utils/apiClient";
+import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus, getQueueItem, getQueueHistory, openWorkerEnvironment } from "../components/QueueServer/utils/apiClient";
 import { useState, Fragment, useEffect, useRef } from 'react';
 import { useQueueServer } from "../components/QueueServer/hooks/useQueueServer";
 
@@ -162,6 +162,18 @@ export default function QueueServer() {
         };
         setCopiedPlan(plan);
     };
+
+
+    useEffect(() => {
+        //check if the re worker has opened or not with GET
+        const checkWorkerEnvironment = (res) => {
+            if (res.worker_environment_exists === false || res.worker_environement_state === 'closed') {
+                console.log('RE worker environment closed, attempting to open a new worker environment')
+                openWorkerEnvironment();
+            }
+        }
+        getStatus(checkWorkerEnvironment);
+    }, [])
 
     return (
         <main className="max-w-screen-3xl w-full min-w-[52rem] h-[calc(100vh-6rem)] min-h-[50rem]  m-auto flex rounded-md relative bg-slate-400">

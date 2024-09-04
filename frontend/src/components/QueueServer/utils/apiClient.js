@@ -216,8 +216,8 @@ const deleteQueueItem = async (body={}, cb=()=>{}) => {
         {headers : {
             'Authorization' : 'ApiKey ' + qServerKey
         }});
-    console.log(response.data);
-    cb(response.data);
+        console.log(response.data);
+        cb(response.data);
     return 'success';
     } catch (error) {
         console.error('Error deleting item from queue', error);
@@ -225,7 +225,24 @@ const deleteQueueItem = async (body={}, cb=()=>{}) => {
     }
 };
 
+const openWorkerEnvironment = async (cb=()=>{}) => {
+    try {
+        const response = await axios.post(httpServerUrl + 'api/environment/open',
+        {}, 
+        {headers : {
+            'Authorization' : 'ApiKey ' + qServerKey
+        }});
+        console.log(response.data);
+        cb(response.data);
+        return 'success';
+    } catch (error) {
+        console.error('Error opening RE Worker Environment:', error);
+        return 'failed';
+    }
+};
 
 
 
-export { getQueue, getStatus, getPlansAllowed, getDevicesAllowed, startRE, postQueueItem, getQueueItem, deleteQueueItem, getQueueHistory, executeItem };
+
+
+export { getQueue, getStatus, getPlansAllowed, getDevicesAllowed, startRE, postQueueItem, getQueueItem, deleteQueueItem, getQueueHistory, executeItem, openWorkerEnvironment };
