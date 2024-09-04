@@ -28,61 +28,31 @@ A Bluesky web interface built with React, Python FastAPI, Bluesky, OPHYD, PV Web
 # User Setup
 A docker-compose file is used to run the required services together. For full functionality, the host computer should be running an EPICS IOC or connected to one through the local network. If an existing EPICS IOC is not running, then use the script that starts EPICS.
 
-## Install PV Web Socket
+## Clone PV Web Socket
 From the top level repo directory, clone the following repository which is used to provide live PV updates.
 
 ```
 git clone https://github.com/ornl-epics/pvws.git
 ```
 
-Now edit the environment variables in `pvws/docker/setenv.sh`
-
-At a minimum, uncomment PV_WRITE_SUPPORT and set to true as shown below.
-```
-## ----- pvws/docker/setenv.sh  ----- ##
-
-# Web Socket Settings
-#export PV_DEFAULT_TYPE=ca
-#export PV_THROTTLE_MS=1000
-#export PV_ARRAY_THROTTLE_MS=10000
-export PV_WRITE_SUPPORT=true # <------ This must be set to true
-
-# Channel Access Settings
-#export EPICS_CA_ADDR_LIST=localhost
-#export EPICS_CA_MAX_ARRAY_BYTES=1000000
-
-# PV Access Settings
-#export EPICS_PVA_ADDR_LIST=localhost
-#export EPICS_PVA_AUTO_ADDR_LIST=YES
-#export EPICS_PVA_BROADCAST_PORT=5076
-#export EPICS_PVA_NAME_SERVERS=
-```
-
-
-If you already have a running instance of EPICS on a computer and use custom EPICS environment variables, then edit the other environment variables for PVWS as required. Here is an example of a typical beamline configuration where EPICS is run within a subnet.
-
-```
-## ----- pvws/docker/setenv.sh  ----- ##
-
-# Web Socket Settings
-#export PV_DEFAULT_TYPE=ca
-#export PV_THROTTLE_MS=1000
-#export PV_ARRAY_THROTTLE_MS=10000
-export PV_WRITE_SUPPORT=true # <-------------------------- This must be set to true
-
-# Channel Access Settings
-export EPICS_CA_ADDR_LIST="IPaddress1 IPaddress2" #<------ This line uncommented, use quotes for multiple addresses
-export EPICS_CA_AUTO_ADDR=NO #<--------------------------- Add this line when using a specific address list
-#export EPICS_CA_MAX_ARRAY_BYTES=1000000
-
-# PV Access Settings
-#export EPICS_PVA_ADDR_LIST=localhost
-#export EPICS_PVA_AUTO_ADDR_LIST=YES
-#export EPICS_PVA_BROADCAST_PORT=5076
-#export EPICS_PVA_NAME_SERVERS=
-```
+The instructions for PVWS explain that the environment variables in `pvws/docker/setenv.sh` must be set, however this will be handled in the top level .env file described in the next section.
 
 More information on simulated PV's that can be subscribed to by PVWS can be found [`here`](https://control-system-studio.readthedocs.io/en/latest/core/pv/doc/index.html)
+
+## Set environment variables
+At the top level of this repository there is a .env-example file. Copy this file and rename to .env, then edit the EPICS_CA_ADDR_LIST variable to match the address list of the desired computers running EPICS.
+
+```
+#.env
+EPICS_CA_ADDR_LIST=YOUR.IP.ADDRESS.RUNNING.EPICS <---- edit this
+EPICS_CA_AUTO_ADDR_LIST=NO
+```
+
+Experienced EPICS users will be familiar with the EPICS_CA_ADDR_LIST environment variable, which is used to specify the
+list of network addressess to search for Chanel Access servers on. If you are running an EPICS IOC on the same computer as this web application, then you can provide the IP address of your computer. If you don't have any EPICS IOC previously running and intend to start EPICS from the Docker container this step can be skipped.
+
+Note that if you already have these environment variables set in the terminal running Docker commands, the terminal's environment variables will overwrite those from the .env file.
+
 
 ## Run Application
 Two different scripts are provided that will start the application in docker containers. The first script starts the main services (frontend, python server, PV Web Socket). The second script will start the same services and also run a container with EPICS. 
@@ -109,6 +79,31 @@ http://localhost:8081/
 ```
 #ophyd-api/
 docker-compose stop
+```
+
+\
+<mark>Common Issues Preventing Startup</mark> 
+
+If docker compose doesn't start the 'server' process due to a 'bind: address 0.0.0.0:5065 already in use' error, then you may need to kill any process that is running on port 5065. The channel access repeater may be running on port 5065 even if you haven't started EPICS.
+
+Example of searching for a service on port 5065:
+```
+sudo lsof -i :5065
+
+#--------Output----------
+#COMMAND     PID   USER   FD   TYPE DEVICE SIZE/OFF  NODE NAME
+#caRepeater  6259  SEIJ   3u   IPv4 39500    0t0     UDP  *:5065   
+```
+
+Get the PID number of the service and kill it with:
+```
+sudo kill 6259 #<---(PID)
+```
+Then retry the docker containers with:
+
+```
+docker-compose down
+docker-compose up -d --build
 ```
 
 ## Run EPICS-Docker
@@ -158,6 +153,50 @@ First clone PV Web Socket at the root directory.
 git clone https://github.com/ornl-epics/pvws.git
 ```
 Optionally set EPICS variables as required for your setup in pvws/docker/setenv.sh
+At a minimum, uncomment PV_WRITE_SUPPORT and set to true as shown below.
+```
+## ----- pvws/docker/setenv.sh  ----- ##
+
+# Web Socket Settings
+#export PV_DEFAULT_TYPE=ca
+#export PV_THROTTLE_MS=1000
+#export PV_ARRAY_THROTTLE_MS=10000
+export PV_WRITE_SUPPORT=true # <------ This must be set to true
+
+# Channel Access Settings
+#export EPICS_CA_ADDR_LIST=localhost
+#export EPICS_CA_MAX_ARRAY_BYTES=1000000
+
+# PV Access Settings
+#export EPICS_PVA_ADDR_LIST=localhost
+#export EPICS_PVA_AUTO_ADDR_LIST=YES
+#export EPICS_PVA_BROADCAST_PORT=5076
+#export EPICS_PVA_NAME_SERVERS=
+```
+
+
+If you already have a running instance of EPICS on a computer and use custom EPICS environment variables, then edit the other environment variables for PVWS as required. Here is an example of a typical beamline configuration where EPICS is run within a subnet.
+
+```
+## ----- pvws/docker/setenv.sh  ----- ##
+
+# Web Socket Settings
+#export PV_DEFAULT_TYPE=ca
+#export PV_THROTTLE_MS=1000
+#export PV_ARRAY_THROTTLE_MS=10000
+export PV_WRITE_SUPPORT=true # <-------------------------- This must be set to true
+
+# Channel Access Settings
+export EPICS_CA_ADDR_LIST="IPaddress1 IPaddress2" #<------ This line uncommented, use quotes for multiple addresses
+export EPICS_CA_AUTO_ADDR=NO #<--------------------------- Add this line when using a specific address list
+#export EPICS_CA_MAX_ARRAY_BYTES=1000000
+
+# PV Access Settings
+#export EPICS_PVA_ADDR_LIST=localhost
+#export EPICS_PVA_AUTO_ADDR_LIST=YES
+#export EPICS_PVA_BROADCAST_PORT=5076
+#export EPICS_PVA_NAME_SERVERS=
+```
 
 Now run PV Web Socket using its provided docker file.
 ```
@@ -251,7 +290,7 @@ The following instructions are provided as a general example for how the epics d
 
 `Run EPICS-Docker (Mac or Linux)`
 ```
-docker run --name epics-synapps -p 5064:5064/tcp -p 5064:5064/udp -p 5065:5065/tcp -p 5065:5065/udp -d prjemian/synapps:latest
+docker run --name epics-synapps -p 5064:5064/tcp -p 5064:5064/udp -p 5065:5065/tcp -p 5065:5065/udp -d -it prjemian/synapps:latest /bin/bash
 docker exec -it epics-synapps /bin/bash
 ```
 \

@@ -46,6 +46,8 @@ services:
       - QSERVER_HTTP_SERVER_ALLOW_ORIGINS=*
     networks: 
       - qnet
+    ports:
+      - "60610:60610"
     command: ["uvicorn", "--host", "0.0.0.0", "--port", "60610", "bluesky_httpserver.server:app"]
   
 networks:
