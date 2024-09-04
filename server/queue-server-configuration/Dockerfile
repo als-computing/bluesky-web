@@ -1,16 +1,40 @@
-FROM python:3.12
+FROM --platform=linux/amd64 python:3.12
 
 WORKDIR /code
 
 COPY . /code
 
+
+# Install EPICS
+RUN apt-get update --allow-unauthenticated && apt-get install -y --allow-unauthenticated debian-archive-keyring
+RUN apt-get update
+RUN apt-get install -y build-essential libreadline-dev wget git
+WORKDIR /opt
+RUN git clone https://github.com/epics-base/epics-base.git 
+WORKDIR /opt/epics-base
+RUN git checkout R7.0.7
+RUN make
+
+ENV EPICS_BASE="/opt/epics-base"
+ENV EPICS_HOST_ARCH=$(${EPICS_BASE}/startup/EpicsHostArch)
+ENV PATH=${EPICS_BASE}/bin/${EPICS_HOST_ARCH}:${PATH}
+
 # Install required Python packages
 RUN pip install bluesky-queueserver
 
-# Install Redis
-# RUN apt-get update && apt-get install -y redis-server
+# Install curl to download Miniconda
+RUN apt-get update && apt-get install -y curl
 
-# Run Redis server in the background and then start the queue server
-# CMD redis-server --daemonize yes && start-re-manager --zmq-publish-console ON
-# CMD start-re-manager --zmq-publish-console ON --redis-addr redis:6379
+# Download and install Miniconda
+RUN curl -LO https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+    bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/miniconda && \
+    rm Miniconda3-latest-Linux-x86_64.sh
 
+# Add Miniconda to the PATH
+ENV PATH="/opt/miniconda/bin:$PATH"
+
+# Verify Conda is installed
+RUN conda --version
+
+# With Conda installed, install pyepics
+RUN conda install -c conda-forge epics-base pyepics ophyd
