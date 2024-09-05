@@ -35,11 +35,6 @@ db = temp()
 RE.subscribe(db.v1.insert)
 
 
-from ophyd.sim import det, motor
-
-from bluesky.plans import count, scan
-
-
 from bluesky.callbacks.best_effort import BestEffortCallback
 bec = BestEffortCallback()
 
