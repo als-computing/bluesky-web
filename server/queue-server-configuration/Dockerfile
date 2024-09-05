@@ -16,8 +16,18 @@ RUN git checkout R7.0.7
 RUN make
 
 ENV EPICS_BASE="/opt/epics-base"
-ENV EPICS_HOST_ARCH=$(${EPICS_BASE}/startup/EpicsHostArch)
-ENV PATH=${EPICS_BASE}/bin/${EPICS_HOST_ARCH}:${PATH}
+#ENV EPICS_HOST_ARCH=$(${EPICS_BASE}/startup/EpicsHostArch)
+#ENV PATH=${EPICS_BASE}/bin/${EPICS_HOST_ARCH}:${PATH}
+# Use a RUN command to evaluate and set EPICS_HOST_ARCH
+RUN EPICS_HOST_ARCH=$(${EPICS_BASE}/startup/EpicsHostArch) && \
+    echo "export EPICS_HOST_ARCH=${EPICS_HOST_ARCH}" >> /etc/bash.bashrc
+
+# Determine EPICS_HOST_ARCH and add it to the PATH, then append it to bash.bashrc
+RUN EPICS_HOST_ARCH=$(${EPICS_BASE}/startup/EpicsHostArch) && \
+    echo "export EPICS_HOST_ARCH=${EPICS_HOST_ARCH}" >> /etc/bash.bashrc && \
+    echo "export PATH=${EPICS_BASE}/bin/${EPICS_HOST_ARCH}:\$PATH" >> /etc/bash.bashrc
+
+
 
 # Install required Python packages
 RUN pip install bluesky-queueserver
