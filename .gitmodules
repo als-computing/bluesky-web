@@ -1,0 +1,3 @@
+[submodule "pvwss"]
+	path = pvwss
+	url = https://github.com/ornl-epics/pvws
