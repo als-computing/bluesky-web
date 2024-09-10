@@ -18,6 +18,8 @@ services:
       - "8080:8080"
     networks:
       - epicsnet
+    environment:
+      - PV_WRITE_SUPPORT=true
   server:
     build: ./server
     ports:

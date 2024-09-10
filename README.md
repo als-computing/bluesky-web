@@ -28,24 +28,22 @@ A Bluesky web interface built with React, Python FastAPI, Bluesky, OPHYD, PV Web
 # User Setup
 A docker-compose file is used to run the required services together. For full functionality, the host computer should be running an EPICS IOC or connected to one through the local network. If an existing EPICS IOC is not running, then use the script that starts EPICS.
 
-## Clone PV Web Socket
-From the top level repo directory, clone the following repository which is used to provide live PV updates.
+## 1. Clone the Repository
+Clone this repository with the --recurse-submodules flag.
 
 ```
-git clone https://github.com/ornl-epics/pvws.git
+git clone --recurse-submodules https://github.com/als-computing/ophyd-API.git
+cd ophyd-API
 ```
 
-The instructions for PVWS explain that the environment variables in `pvws/docker/setenv.sh` must be set, however this will be handled in the top level .env file described in the next section.
-
-More information on simulated PV's that can be subscribed to by PVWS can be found [`here`](https://control-system-studio.readthedocs.io/en/latest/core/pv/doc/index.html)
-
-## Set environment variables
+## 2. Set environment variables
 At the top level of this repository there is a .env-example file. Copy this file and rename to .env, then edit the EPICS_CA_ADDR_LIST variable to match the address list of the desired computers running EPICS.
 
 ```
 #.env
 EPICS_CA_ADDR_LIST=YOUR.IP.ADDRESS.RUNNING.EPICS <---- edit this
 EPICS_CA_AUTO_ADDR_LIST=NO
+PV_WRITE_SUPPORT=true
 ```
 
 Experienced EPICS users will be familiar with the EPICS_CA_ADDR_LIST environment variable, which is used to specify the
@@ -54,7 +52,7 @@ list of network addressess to search for Chanel Access servers on. If you are ru
 Note that if you already have these environment variables set in the terminal running Docker commands, the terminal's environment variables will overwrite those from the .env file.
 
 
-## Run Application
+## 3. Run Application
 Two different scripts are provided that will start the application in docker containers. The first script starts the main services (frontend, python server, PV Web Socket). The second script will start the same services and also run a container with EPICS. 
 
 If you already have EPICS running and want to access your own IOCs, use the first script. Otherwise the second script can be used to start a "default" EPICS environment that still works with the application.
@@ -148,7 +146,7 @@ This command automatically starts the GP IOC in the container with prefix "ocean
 The React frontend and Python server can be run outside of containers for development ease. To allow for full functionality of the frontend, PV Web Socket should be running in its container. Additionally either the host computer or another computer on the LAN should be running EPICS. Instructions for running EPICS in a container are also provided.
 
 ## PV Web Socket
-First clone PV Web Socket at the root directory.
+PVWS is installed with this repository when using the --recurse-submodules flag. It can also be cloned manually with:
 ```
 git clone https://github.com/ornl-epics/pvws.git
 ```
@@ -205,6 +203,8 @@ docker-compose up
 ```
 
 To verify it is running navigate to http://localhost:8080/pvws
+
+More information on simulated PV's that can be subscribed to by PVWS can be found [`here`](https://control-system-studio.readthedocs.io/en/latest/core/pv/doc/index.html)
 ## Python Server
 Optionally create a python environment prior to installing libraries.
 ```
