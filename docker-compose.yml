@@ -17,8 +17,8 @@ services:
       - "8080:8080"
     networks: 
       - qnet
-  server:
-    build: ./server
+  python-server:
+    build: ./python-server
     environment:
       - EPICS_CA_ADDR_LIST=${EPICS_CA_ADDR_LIST}
       - EPICS_CA_AUTO_ADDR_LIST=NO
@@ -31,15 +31,15 @@ services:
     networks: 
       - qnet
   qserver:
-    build: ./server/queue-server-configuration
+    build: ./queue-server
     environment:
       - EPICS_CA_ADDR_LIST=${EPICS_CA_ADDR_LIST}
       - EPICS_CA_AUTO_ADDR_LIST=NO
     networks: 
       - qnet
     command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "redis:6379"]
-  httpserver:
-    build: ./server/queue-server-configuration/httpserver
+  qserver-api:
+    build: ./queue-server-api
     environment:
       - QSERVER_ZMQ_CONTROL_ADDRESS=tcp://qserver:60615
       - QSERVER_ZMQ_INFO_ADDRESS=tcp://qserver:60625

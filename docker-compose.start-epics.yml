@@ -22,8 +22,8 @@ services:
       - epicsnet
     environment:
       - PV_WRITE_SUPPORT=true
-  server:
-    build: ./server
+  python-server:
+    build: ./python-server
     ports:
       - "8000:8000"
       - "8888:8888"
@@ -33,12 +33,12 @@ services:
       - ZMQ_HOST=qserver
       - ZMQ_PORT=60625
   qserver:
-    build: ./server/queue-server-configuration
+    build: ./queue-server
     networks: 
       - epicsnet
     command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "redis:6379"]
-  httpserver:
-    build: ./server/queue-server-configuration/httpserver
+  qserver-api:
+    build: ./queue-server-api
     environment:
       - QSERVER_ZMQ_CONTROL_ADDRESS=tcp://qserver:60615
       - QSERVER_ZMQ_INFO_ADDRESS=tcp://qserver:60625
