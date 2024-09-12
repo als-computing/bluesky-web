@@ -3113,6 +3113,77 @@ existing_plans:
     - annotation:
         type: typing.List[str]
       convert_device_names: true
+      description: Required. List of detectors
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - annotation:
+        type: typing.Any
+      convert_device_names: true
+      description: Required. Inidividual motor that is moved between the start and
+        stop positions.
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: motor
+    - annotation:
+        type: float
+      default: '0.0'
+      default_defined_in_decorator: true
+      description: Required. The start position for the motor, uses the default units
+        of the motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '4000'
+      min: '-4000'
+      name: start
+      step: '0.1'
+    - annotation:
+        type: float
+      default: '0.0'
+      default_defined_in_decorator: true
+      description: Required. The stop position for the motor, uses the default units
+        of the motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '4000'
+      min: '-4000'
+      name: stop
+      step: '0.1'
+    - annotation:
+        type: int
+      default: '10'
+      default_defined_in_decorator: true
+      description: Required. The number of points that motor will stop at between
+        the start and stop.
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '200'
+      min: '0'
+      name: num
+      step: '1'
+    - annotation:
+        type: dict
+      default: None
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  scan_enums:
+    description: Scan over one multi-motor trajectory.
+    module: __main__
+    name: scan_enums
+    parameters:
+    - annotation:
+        type: typing.List[str]
+      convert_device_names: true
+      description: Required. List of detectors
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -3126,6 +3197,8 @@ existing_plans:
           - channeltron_hv
         type: motor1
       convert_device_names: true
+      description: Required. Inidividual motor that is moved between the start and
+        stop positions.
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -3134,6 +3207,8 @@ existing_plans:
         type: float
       default: '0.0'
       default_defined_in_decorator: true
+      description: Required. The start position for the motor, uses the default units
+        of the motor
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -3145,6 +3220,8 @@ existing_plans:
         type: float
       default: '0.0'
       default_defined_in_decorator: true
+      description: Required. The stop position for the motor, uses the default units
+        of the motor
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -3156,6 +3233,8 @@ existing_plans:
         type: int
       default: '10'
       default_defined_in_decorator: true
+      description: Required. The number of points that motor will stop at between
+        the start and stop.
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1

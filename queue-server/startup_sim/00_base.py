@@ -29,6 +29,9 @@ RE.subscribe(db.v1.insert)
 from bluesky.callbacks.best_effort import BestEffortCallback
 bec = BestEffortCallback()
 
+#disable automatic plotting which throws an error in Mac OS
+bec.disable_plots()
+
 # Send all metadata/data captured to the BestEffortCallback.
 RE.subscribe(bec)
 
