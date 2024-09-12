@@ -26,9 +26,10 @@ export default function QueueServer() {
     if (process.env.REACT_APP_QSERVER_POLLING_INTERVAL) {
         pollingInterval = process.env.REACT_APP_QSERVER_POLLING_INTERVAL;
     } else {
+        const oneSecond = 1000; //1 second in milliseconds
         const tenSeconds = 10000; //10 seconds in milliseconds
         const thirtySeconds = 30000; //30 seconds in milliseconds
-        pollingInterval = thirtySeconds;
+        pollingInterval = oneSecond;
     }
 
     const {
