@@ -83,6 +83,12 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
             });
     };
 
+    const handleCopyClick = (name, kwargs) => {
+        //close the popup after the item is copied so user can immediately see the plan below the popup
+        handleCopyItemClick(name, kwargs);
+        handleQItemPopupClose();
+    }
+
     const displayKwarg = (value) => {
         //value may be an Array, String, or Object
         if (Array.isArray(value)) {
@@ -130,7 +136,7 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
             content: 
                 <Fragment>
                     {Object.keys(popupItem.kwargs).map((kwarg) => printParameter(kwarg))}
-                    <div className="flex justify-center py-4"><Button text='Copy Plan' cb={()=> handleCopyItemClick(popupItem.name, popupItem.kwargs)} styles={`m-auto ${isDeleteModeVisible ? 'opacity-0' : ''}`}/></div>
+                    <div className="flex justify-center py-4"><Button text='Copy Plan' cb={()=> handleCopyClick(popupItem.name, popupItem.kwargs)} styles={`m-auto ${isDeleteModeVisible ? 'opacity-0' : ''}`}/></div>
                 </Fragment>
         },
         {
