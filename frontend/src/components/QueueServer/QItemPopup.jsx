@@ -128,13 +128,10 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
             name:'Parameters',
             icon: tailwindIcons.adjustmentsVertical,
             content: 
-                ('kwarg' in popupItem) ?
                 <Fragment>
                     {Object.keys(popupItem.kwargs).map((kwarg) => printParameter(kwarg))}
                     <div className="flex justify-center py-4"><Button text='Copy Plan' cb={()=> handleCopyItemClick(popupItem.name, popupItem.kwargs)} styles={`m-auto ${isDeleteModeVisible ? 'opacity-0' : ''}`}/></div>
                 </Fragment>
-                :
-                <p>args: {popupItem.args}</p>
         },
         {
             name:'UID',
@@ -243,7 +240,7 @@ export default function QItemPopup( {popupItem={}, handleQItemPopupClose=()=>{},
 
 
         return (
-            <div name="background" className={`absolute top-0 left-0 w-full h-full z-10 ${getPlanColorOpacity(popupItem.name)} flex justify-center items-center ${isDeleteModeVisible ? 'bg-red-600/40' : ''}`}>
+            <div name="background" className={`absolute top-0 left-0 w-full h-full z-20 ${getPlanColorOpacity(popupItem.name)} flex justify-center items-center ${isDeleteModeVisible ? 'bg-red-600/40' : ''}`}>
                 <div name="main popup" className={`relative ${isHistory ? 'w-[90%] h-[70%] max-w-6xl max-h-[80rem]' : 'w-[75%]  h-[50%] min-h-[40rem] max-w-[40rem] max-h-[60rem]'} rounded-lg ${isDeleteModeVisible ? deleteBg : 'bg-slate-50'}`}>
                     {areResultsVisible ? <DeleteResultPopup response={response} cb={handleCloseResults}/> : ''}
                     {isDeleteModeVisible ? <ConfirmDeleteItemPopup handleCancel={handleCancelDeleteClick} handleDelete={handleConfirmDeleteClick} /> : ''}
