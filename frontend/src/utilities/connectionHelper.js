@@ -152,6 +152,8 @@ const getPVWSUrl = () => {
     return wsUrl;
 }
 
+
+
 const getQServerKey = () => {
     var key;
     const defaultKey = 'test';
@@ -179,6 +181,20 @@ const getFastAPIUrl = () => {
     return httpUrl;
 }
 
+const getHttpServerUrl = () => {
+    //if no env variable is set, then assume that the React App is on the same workstation as PVWS
+        //having an env variable would be for developers running React on a separate workstation from PVWS
+    const currentWebsiteIP = window.location.hostname;
+    const pathname = "/";
+    const port = ":60610";
+    var httpUrl;
+    if (process.env.REACT_APP_HTTP_SERVER_URL) {
+        httpUrl = process.env.REACT_APP_HTTP_SERVER_URL;
+    } else {
+        httpUrl = "http://" + currentWebsiteIP + port + pathname;
+    }
+    return httpUrl;
+}
 const getQSConsoleUrl = () => {
     //if no env variable is set, then assume that the React App is on the same workstation as the fastAPI server
         //having an env variable would be for developers running React on a separate workstation from fastAPI
@@ -263,4 +279,4 @@ const startAutomaticSetup = ({devices=[], setDevices=()=>{}, connection={}, setS
 
 
 
-export {closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice, getPVWSUrl, getQSConsoleUrl, initializeDeviceList, startAutomaticSetup, getQServerKey};
+export {getHttpServerUrl, closeWebSocket, initializeConnection, checkConnectionStatus, handleWebSocketMessage, subscribeDevices, updateDevice, getPVWSUrl, getQSConsoleUrl, initializeDeviceList, startAutomaticSetup, getQServerKey};

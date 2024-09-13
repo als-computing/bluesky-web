@@ -10,7 +10,7 @@ added to the list of available plans/devices by the queue server.
 # Required flags for using these files:
 
 # keep_re
-# startup_dire=path/queue-server-configuration/startup
+# startup_dir=path/queue-server-configuration/startup
 
 """ 
 keep-re
@@ -35,23 +35,8 @@ db = temp()
 RE.subscribe(db.v1.insert)
 
 
-from ophyd.sim import det, motor
-
-from bluesky.plans import count, scan
-
-
 from bluesky.callbacks.best_effort import BestEffortCallback
 bec = BestEffortCallback()
 
 # Send all metadata/data captured to the BestEffortCallback.
 RE.subscribe(bec)
-
-
-# flake8: noqa
-print(f"Loading file {__file__!r}")
-
-from ophyd.sim import hw
-
-# Import ALL simulated Ophyd objects in global namespace (borrowed from ophyd.sim)
-globals().update(hw().__dict__)
-del hw

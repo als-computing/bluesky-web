@@ -1,15 +1,17 @@
 #Mac or Linux
 services:
   frontend:
-    build: ./frontend
-    ports:
-      - "8081:80"
+      build: ./frontend
+      ports:
+        - "8081:80"
   epics:
-    image: prjemian/synapps:latest
+    image: seijdeleon/epics-motor-sim:latest
     platform: linux/amd64
     networks:
       - epicsnet
-    command: /bin/bash
+    command: >
+      /bin/bash -c "cd /opt/synApps/support/motor-R7-2-2/modules/motorMotorSim/iocs/motorSimIOC/iocBoot/iocMotorSim &&
+      ../../bin/linux-x86_64/motorSim st.cmd"
     tty: true
     stdin_open: true
   pvws:
@@ -18,11 +20,37 @@ services:
       - "8080:8080"
     networks:
       - epicsnet
-  server:
-    build: ./server
+    environment:
+      - PV_WRITE_SUPPORT=true
+  python-server:
+    build: ./python-server
     ports:
       - "8000:8000"
+      - "8888:8888"
     networks:
+      - epicsnet
+    environment:
+      - ZMQ_HOST=qserver
+      - ZMQ_PORT=60625
+  qserver:
+    build: ./queue-server
+    networks: 
+      - epicsnet
+    command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "redis:6379"]
+  qserver-api:
+    build: ./queue-server-api
+    environment:
+      - QSERVER_ZMQ_CONTROL_ADDRESS=tcp://qserver:60615
+      - QSERVER_ZMQ_INFO_ADDRESS=tcp://qserver:60625
+      - QSERVER_HTTP_SERVER_ALLOW_ORIGINS=*
+    networks: 
+      - epicsnet
+    command: ["uvicorn", "--host", "0.0.0.0", "--port", "60610", "bluesky_httpserver.server:app"]
+    ports:
+      - "60610:60610"
+  redis:
+    image: redis:7.4-rc2-alpine
+    networks: 
       - epicsnet
 
 networks:

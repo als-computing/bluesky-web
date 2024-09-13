@@ -1,5 +1,5 @@
-# Ophyd API
-A Bluesky web interface built with React, Python FastAPI, Bluesky, OPHYD, PV Web Socket.
+# Bluesky Web
+A web based beamline control system built with React, Bluesky, and PV Web Socket.
 
 
 <div style="width: fit-content; border-style:solid; padding-right:40px; padding-top: 20px; padding-bottom: 20px; border-radius: 5px; margin-bottom:20px;">
@@ -7,7 +7,7 @@ A Bluesky web interface built with React, Python FastAPI, Bluesky, OPHYD, PV Web
 <h2 style="margin: auto; text-align:center; border-bottom: none">Contents</h2>
 
 - [User Setup](#user-setup)
-  - [Required: Install PV Web Scoket](#isntall-pv-web-socket)
+  - [Required: Install PV Web Scoket](#install-pv-web-socket)
   - [Required: Run Application](#run-application)
   - [Optional: Run EPICS-Docker](#run-epics-docker)
     - [Use Image Directly](#use-image-directly)
@@ -28,56 +28,45 @@ A Bluesky web interface built with React, Python FastAPI, Bluesky, OPHYD, PV Web
 # User Setup
 A docker-compose file is used to run the required services together. For full functionality, the host computer should be running an EPICS IOC or connected to one through the local network. If an existing EPICS IOC is not running, then use the script that starts EPICS.
 
-## Install PV Web Socket
-From the top level repo directory, clone the following repository which is used to provide live PV updates.
+## 1. Clone the Repository
+Clone this repository with the --recurse-submodules flag.
 
 ```
-git clone https://github.com/ornl-epics/pvws.git
+git clone --recurse-submodules https://github.com/als-computing/Bluesky-Web.git
+cd Bluesky-Web
 ```
 
-Now edit the environment variables in `pvws/docker/setenv.sh`
+## 2. Set environment variables
+At the top level of this repository there is a .env-example file. Copy this file and rename to .env, then edit the EPICS_CA_ADDR_LIST variable to match the address list of the desired computers running EPICS.
 
-At a minimum, uncomment PV_WRITE_SUPPORT and set to true as shown below.
 ```
-## ----- pvws/docker/setenv.sh  ----- ##
-
-# Web Socket Settings
-#export PV_DEFAULT_TYPE=ca
-#export PV_THROTTLE_MS=1000
-#export PV_ARRAY_THROTTLE_MS=10000
-export PV_WRITE_SUPPORT=true # <------ This must be set to true
-
-# Channel Access Settings
-#export EPICS_CA_ADDR_LIST=localhost
-#export EPICS_CA_MAX_ARRAY_BYTES=1000000
-
-# PV Access Settings
-#export EPICS_PVA_ADDR_LIST=localhost
-#export EPICS_PVA_AUTO_ADDR_LIST=YES
-#export EPICS_PVA_BROADCAST_PORT=5076
-#export EPICS_PVA_NAME_SERVERS=
+#.env
+EPICS_CA_ADDR_LIST=YOUR.IP.ADDRESS.RUNNING.EPICS <---- edit this
+EPICS_CA_AUTO_ADDR_LIST=NO
+PV_WRITE_SUPPORT=true
 ```
 
+Experienced EPICS users will be familiar with the EPICS_CA_ADDR_LIST environment variable, which is used to specify the
+list of network addressess to search for Chanel Access servers on. If you are running an EPICS IOC on the same computer as this web application, then you can provide the IP address of your computer. If you don't have any EPICS IOC previously running and intend to start EPICS from the Docker container this step can be skipped.
 
-If you already have a running instance of EPICS on a computer and use custom EPICS environment variables, then edit the other environment variables for PVWS as required. 
+Note that if you already have these environment variables set in the terminal running Docker commands, the terminal's environment variables will overwrite those from the .env file.
 
-More information on simulated PV's that can be subscribed to by PVWS can be found [`here`](https://control-system-studio.readthedocs.io/en/latest/core/pv/doc/index.html)
 
-## Run Application
+## 3. Run Application
 Two different scripts are provided that will start the application in docker containers. The first script starts the main services (frontend, python server, PV Web Socket). The second script will start the same services and also run a container with EPICS. 
 
 If you already have EPICS running and want to access your own IOCs, use the first script. Otherwise the second script can be used to start a "default" EPICS environment that still works with the application.
 
-<mark>Run Application (Linux Only)</mark> \
+<mark>Run Web Application Only (does not include an EPICS service)</mark> 
 ```
-#ophyd-api/
+#Bluesky-Web/
 docker-compose up -d --build
 ```
 \
-<mark>Run Application + EPICS (Mac or Linux)</mark>
+<mark>Run Web Application + EPICS (starts EPICS service in container)</mark>
 ```
-#ophyd-api/
-docker-compose -f docker-compose.start-epics.yml -d --build
+#Bluesky-Web/
+docker-compose -f docker-compose.start-epics.yml up -d --build
 ```
 Navigate to port 8081 in a web browser to view the application
 
@@ -86,8 +75,33 @@ http://localhost:8081/
 \
 <mark>Stop Application</mark>
 ```
-#ophyd-api/
+#Bluesky-Web/
 docker-compose stop
+```
+
+\
+<mark>Common Issues Preventing Startup</mark> 
+
+If docker compose doesn't start the 'server' process due to a 'bind: address 0.0.0.0:5065 already in use' error, then you may need to kill any process that is running on port 5065. The channel access repeater may be running on port 5065 even if you haven't started EPICS.
+
+Example of searching for a service on port 5065:
+```
+sudo lsof -i :5065
+
+#--------Output----------
+#COMMAND     PID   USER   FD   TYPE DEVICE SIZE/OFF  NODE NAME
+#caRepeater  6259  SEIJ   3u   IPv4 39500    0t0     UDP  *:5065   
+```
+
+Get the PID number of the service and kill it with:
+```
+sudo kill 6259 #<---(PID)
+```
+Then retry the docker containers with:
+
+```
+docker-compose down
+docker-compose up -d --build
 ```
 
 ## Run EPICS-Docker
@@ -132,11 +146,55 @@ This command automatically starts the GP IOC in the container with prefix "ocean
 The React frontend and Python server can be run outside of containers for development ease. To allow for full functionality of the frontend, PV Web Socket should be running in its container. Additionally either the host computer or another computer on the LAN should be running EPICS. Instructions for running EPICS in a container are also provided.
 
 ## PV Web Socket
-First clone PV Web Socket at the root directory.
+PVWS is installed with this repository when using the --recurse-submodules flag. It can also be cloned manually with:
 ```
 git clone https://github.com/ornl-epics/pvws.git
 ```
 Optionally set EPICS variables as required for your setup in pvws/docker/setenv.sh
+At a minimum, uncomment PV_WRITE_SUPPORT and set to true as shown below.
+```
+## ----- pvws/docker/setenv.sh  ----- ##
+
+# Web Socket Settings
+#export PV_DEFAULT_TYPE=ca
+#export PV_THROTTLE_MS=1000
+#export PV_ARRAY_THROTTLE_MS=10000
+export PV_WRITE_SUPPORT=true # <------ This must be set to true
+
+# Channel Access Settings
+#export EPICS_CA_ADDR_LIST=localhost
+#export EPICS_CA_MAX_ARRAY_BYTES=1000000
+
+# PV Access Settings
+#export EPICS_PVA_ADDR_LIST=localhost
+#export EPICS_PVA_AUTO_ADDR_LIST=YES
+#export EPICS_PVA_BROADCAST_PORT=5076
+#export EPICS_PVA_NAME_SERVERS=
+```
+
+
+If you already have a running instance of EPICS on a computer and use custom EPICS environment variables, then edit the other environment variables for PVWS as required. Here is an example of a typical beamline configuration where EPICS is run within a subnet.
+
+```
+## ----- pvws/docker/setenv.sh  ----- ##
+
+# Web Socket Settings
+#export PV_DEFAULT_TYPE=ca
+#export PV_THROTTLE_MS=1000
+#export PV_ARRAY_THROTTLE_MS=10000
+export PV_WRITE_SUPPORT=true # <-------------------------- This must be set to true
+
+# Channel Access Settings
+export EPICS_CA_ADDR_LIST="IPaddress1 IPaddress2" #<------ This line uncommented, use quotes for multiple addresses
+export EPICS_CA_AUTO_ADDR=NO #<--------------------------- Add this line when using a specific address list
+#export EPICS_CA_MAX_ARRAY_BYTES=1000000
+
+# PV Access Settings
+#export EPICS_PVA_ADDR_LIST=localhost
+#export EPICS_PVA_AUTO_ADDR_LIST=YES
+#export EPICS_PVA_BROADCAST_PORT=5076
+#export EPICS_PVA_NAME_SERVERS=
+```
 
 Now run PV Web Socket using its provided docker file.
 ```
@@ -145,11 +203,13 @@ docker-compose up
 ```
 
 To verify it is running navigate to http://localhost:8080/pvws
+
+More information on simulated PV's that can be subscribed to by PVWS can be found [`here`](https://control-system-studio.readthedocs.io/en/latest/core/pv/doc/index.html)
 ## Python Server
 Optionally create a python environment prior to installing libraries.
 ```
-conda create --name ophyd-api
-conda activate ophyd-api
+conda create --name Bluesky-Web
+conda activate Bluesky-Web
 ```
 Install necessary dependencies.
 ```
@@ -167,7 +227,7 @@ cd server
 docker build -t python-server .
 docker run -dp 8080:8080 python-server
 ```
-To run the python server and expose a port to use Jupyter Notebook (for direct Bluesky testing):
+For testing Bluesky in Python directly, use the following commands to run Jupyter Notebook from within a container:
 ```
 cd server
 docker build -t python-jupyter .
@@ -182,11 +242,14 @@ Now in a browser you can navigate to localhost:8888/lab
 ## React Frontend
 Install project dependencies from package.json file (only need to run the install command once).
 ```
+#/Bluesky-Web
+cd frontend
 npm install
 ```
 
 Run the app in development mode.
 ```
+#/Bluesky-Web/frontend
 npm start
 ```
 Open [http://localhost:3000](http://localhost:3000) to view the app in a browser.
@@ -196,6 +259,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the app in a browser
 ### React Development Scripts
 
 ```
+#/Bluesky-Web/frontend
 npm test
 ```
 
@@ -203,6 +267,7 @@ Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ```
+#/Bluesky-Web/frontend
 npm run build
 ```
 
@@ -225,7 +290,7 @@ The following instructions are provided as a general example for how the epics d
 
 `Run EPICS-Docker (Mac or Linux)`
 ```
-docker run --name epics-synapps -p 5064:5064/tcp -p 5064:5064/udp -p 5065:5065/tcp -p 5065:5065/udp -d prjemian/synapps:latest
+docker run --name epics-synapps -p 5064:5064/tcp -p 5064:5064/udp -p 5065:5065/tcp -p 5065:5065/udp -d -it prjemian/synapps:latest /bin/bash
 docker exec -it epics-synapps /bin/bash
 ```
 \
@@ -304,11 +369,12 @@ docker-compose -f docker-compose.start-epics.no-react.yml up --build
 ```
 
 ## Queue Server
-The queue server provides a method for managing and executing Bluesky plans. Within the 
+The queue server provides a method for managing and executing Bluesky plans, it is used in the React app via the HTTP Server.
+
 [`Queue Server Documentation`](https://blueskyproject.io/bluesky-queueserver/installation.html)
 
 [`HTTP Server Documentation`](https://blueskyproject.io/bluesky-httpserver/installation.html)
-### Installing Queue Server 
+### Installing Queue Server outside a container
 These instructions are for directly installing Queue Server outside of a container for development purposes. To run the queue server, redis will also need to be installed.
 
 <mark>Install Redis (Mac)</mark>
@@ -348,7 +414,7 @@ start-re-manager --zmq-publish-console ON
 
 <mark> Start Queue Server with BL5.3.1 Devices</mark>
 ```
-#from the /ophyd-api directory
+#from the /Bluesky-Web directory
 
 start-re-manager --zmq-publish-console ON --startup-dir /server/queue-server-configuration/startup_bl531 --keep-re
 ```
@@ -387,9 +453,6 @@ flowchart LR
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-<mark>sample mark</mark>
-
 
 
 <style>

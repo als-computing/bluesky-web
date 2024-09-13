@@ -1,152 +1,48 @@
-import QSConsole from "../components/QueueServer/QSConsole";
-import QSList from "../components/QueueServer/QSList";
-import QSRunEngineWorker from "../components/QueueServer/QSRunEngineWorker";
-import { getQServerKey } from "../utilities/connectionHelper";
-import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus } from "../components/QueueServer/apiClient";
-import axios from "axios";
+import QItemPopup from "../components/QueueServer/QItemPopup";
+import SidePanel from "../components/QueueServer/SidePanel";
+import MainPanel from "../components/QueueServer/MainPanel";
+import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus, getQueueItem, getQueueHistory, openWorkerEnvironment } from "../components/QueueServer/utils/apiClient";
 import { useState, Fragment, useEffect, useRef } from 'react';
+import { useQueueServer } from "../components/QueueServer/hooks/useQueueServer";
 
-const sampleQueueData = [
-    {
-        "name": "count",
-        "args": [
-            [
-                "det1",
-                "det2"
-            ]
-        ],
-        "kwargs": {
-            "num": 10,
-            "delay": 1
-        },
-        "item_type": "plan",
-        "user": "qserver-cli",
-        "user_group": "primary",
-        "item_uid": "eb0c43a7-3227-450a-bbb1-260f1ee7a4dc"
-    },
-    {
-        "name": "count",
-        "args": [
-            [
-                "det1",
-                "det2"
-            ]
-        ],
-        "kwargs": {
-            "num": 10,
-            "delay": 1
-        },
-        "item_type": "plan",
-        "user": "qserver-cli",
-        "user_group": "primary",
-        "item_uid": "0462793a-b2ff-4d0f-94fe-9f496c179ec1"
-    },
-    {
-        "name": "spiral_count",
-        "args": [
-            [
-                "det1",
-                "det2"
-            ]
-        ],
-        "kwargs": {
-            "num": 10,
-            "delay": 1
-        },
-        "item_type": "plan",
-        "user": "qserver-cli",
-        "user_group": "primary",
-        "item_uid": "1462793a-b2ff-4d0f-94fe-9f496c179ec1"
-    }
-];
 
 export default function QueueServer() {
-    var pollingInterval;
-    if (process.env.REACT_APP_QSERVER_POLLING_INTERVAL) {
-        pollingInterval = processConsoleMessage.env.REACT_APP_QSERVER_POLLING_INTERVAL;
-    } else {
-        const tenSeconds = 10000; //10 seconds in milliseconds
-        const thirtySeconds = 30000; //30 seconds in milliseconds
-        pollingInterval = thirtySeconds;
-    }
 
     const [ workerStatus, setWorkerStatus ] = useState('');
-    const [ queueData, setQueueData ] = useState([]);
-    const queueDataRef = useRef(queueData);
-    const [ isREToggleOn, setIsREToggleOn ] = useState(false);
-    const runEngineToggleRef = useRef(isREToggleOn);
-    const [ runningItem, setRunningItem ] = useState({});
-    const runningItemRef = useRef(runningItem);
+    const [ isQItemPopupVisible, setIsQItemPopupVisible ] = useState(false);
+    const [ isHistoryVisible, setIsHistoryVisible ] = useState(true);
+    const [ popupItem, setPopupItem ] = useState({});
+    const [ isItemDeleteButtonVisible, setIsItemDeleteButtonVisible ] = useState(true);
+    const [ copiedPlan, setCopiedPlan ] = useState(false);
+    const [ copyDictionaryTrigger, setCopyDictionaryTrigger ] = useState(0);
+    const [ isSidepanelExpanded, setIsSidepanelExpanded ] = useState(false);
+    const [ minimizeAllWidgets, setMinimizeAllWidgets ] = useState(false);
+    const [ expandQueueList, setExpandQueueList ] = useState(false); //controls the QS list between single column
+    const [ isGlobalMetadataChecked, setIsGlobalMetadataChecked ] = useState(true);
+    const [ globalMetadata, setGlobalMetadata ] = useState({});
 
-    //update ref when queueData changes
-    useEffect(() => {
-        queueDataRef.current = queueData;
-    }, [queueData]);
-
-    useEffect(() => {
-        runningItemRef.current = runningItem;
-    }, [runningItem]);
-
-    useEffect(() => {
-        runEngineToggleRef.current = isREToggleOn;
-    }, [isREToggleOn]);
-    
-
-
-    //not currently used
-    const getStatusCallback = (data) => {
-        // if RE worker is not running, set toggle off
-        console.log({data});
-        if (data.re_state !== "running") {
-            console.log("re is not running, check if toggle is on");
-            console.log(runEngineToggleRef.current);
-            if (runEngineToggleRef.current) {
-                console.log("toggle was on, now turn off toggle");
-                setIsREToggleOn(false);
-            }
-        } else {
-            console.log("re state is running. check if toggle is on");
-            if (!runEngineToggleRef.current) {
-                console.log("toggle was off, now turning on");
-                setIsREToggleOn(true);
-            }
-        }
-    };
-
-    const handleQueueDataResponse =(res) => {
-        //checks if UI update should occur and sends data to callback
-        try {
-            if (res.success === true) {
-                if (JSON.stringify(res.items) !== JSON.stringify(queueDataRef.current)) { //we could also compare the plan_queue_uid which will change when the plan changes
-                    //console.log('different queue data, updating');
-                    setQueueData(res.items);
-                } else {
-                    //console.log('same queue data, do nothing');
-                }
-                if (JSON.stringify(res.running_item) !== JSON.stringify(runningItemRef.current)) {
-                    //console.log('different running item, updating');
-                    setRunningItem(res.running_item);
-                    if (Object.keys(res.running_item).length > 0) {
-                        setIsREToggleOn(true);
-                    } else {
-                        setIsREToggleOn(false);
-                    }
-                } else {
-                    //console.log('same running item, do nothing');
-                }
-            }
-        } catch(error) {
-            console.log({error});
-        }
+    //setup polling interval for getting regular updates from the http server
+    var pollingInterval;
+    if (process.env.REACT_APP_QSERVER_POLLING_INTERVAL) {
+        pollingInterval = process.env.REACT_APP_QSERVER_POLLING_INTERVAL;
+    } else {
+        const oneSecond = 1000; //1 second in milliseconds
+        const tenSeconds = 10000; //10 seconds in milliseconds
+        const thirtySeconds = 30000; //30 seconds in milliseconds
+        pollingInterval = oneSecond;
     }
-    
-    useEffect(() => {
-        //get current queue
-        //getQueue(setQueueData, queueDataRef, setRunningItem, runningItemRef); //we need to send in a handler for a running item
-        getQueue(handleQueueDataResponse);
-        //start polling
-        setInterval(()=> getQueue(handleQueueDataResponse), pollingInterval);
-    }, []);
+
+    const {
+        queueData,
+        queueHistoryData,
+        isREToggleOn,
+        runningItem,
+        runEngineToggleRef,
+        setIsREToggleOn,
+        handleQueueDataResponse,
+        handleQueueHistoryResponse
+    } = useQueueServer(pollingInterval);
+
 
     const processConsoleMessage = (msg) => {
         //using the console log to trigger get requests has some issues with stale state, even with useRef
@@ -154,41 +50,171 @@ export default function QueueServer() {
         //The get/status api endpoint seems to not provide the most recent running status when called immediately after the console triggers it
         //console.log({msg});
         //function processess each Queue Server console message to trigger immediate state and UI updates
-        if (msg.startsWith("Queue is empty") || msg.startsWith("Starting the plan")) {
+        if (msg.startsWith("Processing the next queue item")) {
+            getQueue(handleQueueDataResponse);
+            getQueueHistory(handleQueueHistoryResponse);
+        }
+
+        if (msg.startsWith("Starting the plan")) {
             //update RE worker
             getQueue(handleQueueDataResponse);
+            getQueueHistory(handleQueueHistoryResponse);
         }
 
         if (msg.startsWith("Starting queue processing")) {
-            //get request on RE process
             getQueue(handleQueueDataResponse);
         }
 
         if (msg.startsWith("Item added: success=True")) {
-            //get request on queue items
             getQueue(handleQueueDataResponse);
         }
-    }
-    const handleREMessage = (msg) => {
-        //when the WS receives message about RE Worker, trigger UI updates on RE Worker Component
+
+        if (msg.startsWith("Clearing the queue")) {
+            getQueue(handleQueueDataResponse);
+        }
+
+        if (msg.startsWith("Queue is empty")) {
+            //message will occur if RE worker turned on with no available queue items
+            //TO DO - fix this because it's not turning the toggle switch to 'off'
+            setTimeout(()=> getQueue(handleQueueDataResponse), 500 ); //call the server some time after failure occurs
+        }
+
+        if (msg.startsWith("The plan failed")) {
+            //get request on queue items
+            //qserver takes some time to place the item back into the queue
+            setTimeout(()=> getQueue(handleQueueDataResponse), 500 ); //call the server some time after failure occurs
+            setTimeout(()=> getQueueHistory(handleQueueHistoryResponse), 500 );
+        }
+
+        if (msg.startsWith("Removing item from the queue")) {
+            //get request on queue items
+            //qserver takes some time to place the item back into the queue
+            setTimeout(()=> getQueue(handleQueueDataResponse), 500 ); //call the server some time after failure occurs
+        }
+    };
+
+    const handleOpenQItemPopup = (data, showDeleteButton=true) => {
+        if (data.success !== false) {
+            //set popup to visible
+            if (data.item) {
+                //occurs on GET request
+                setPopupItem(data.item);
+            } else {
+                //occurs when item is sent in directly
+                setPopupItem(data);
+                showDeleteButton ? setIsItemDeleteButtonVisible(true) : setIsItemDeleteButtonVisible(false);
+            }
+            setIsQItemPopupVisible(true);
+        } else {
+            console.log('No item found in "get queue item" response');
+        }
     }
 
+    const handleQItemClick = (arg, showDeleteButton=true) => {
+        //until httpserver queue/item/get endpoint is fixed,
+        //populate the item popup with the existing data.
+        //It is better to do a 'GET' on item UID in case the item parameters
+        //have been changed by a user on another workstation and the data is stale
+        if (typeof arg === 'string') {
+            getQueueItem(arg, handleOpenQItemPopup);
+        } else {
+            //entire item has been sent in
+            handleOpenQItemPopup(arg, showDeleteButton);
+        }
+    };
 
-    //to do - refactor this so we can more easily set the size on different routes
+    const handleQItemPopupClose = () => {
+        setIsQItemPopupVisible(false);
+        setPopupItem({});
+    };
+
+    const handleSidepanelExpandClick = (isSidepanelExpanded) => {
+        if (isSidepanelExpanded) {
+            setIsSidepanelExpanded(false);
+            //expand all widgets on the main panel
+            setMinimizeAllWidgets(false);
+        } else {
+            setIsSidepanelExpanded(true);
+            //minimize all widgets on the main panel
+            setMinimizeAllWidgets(true);
+        }
+    };
+
+    const handleGlobalMetadataCheckboxChange = (isChecked) => {
+        setIsGlobalMetadataChecked(isChecked);
+    };
+
+    const updateGlobalMetadata = (dict) => {
+        setGlobalMetadata(dict);
+    }
+
+/**
+ * Sets the copiedPlan state variable which triggers the plan and parameters to be updated in QSAddItem
+ * 
+ * @param {string} name - String value representing the name of the plan
+ * @param {object} parameters - Object of format {key1: value1, key2: value2, ...}
+ * // The values may be string, array, or objects
+ */
+    const handleCopyItemClick = (name='', parameters={}) => {
+        //updates the state variables in QSAddItem
+        var plan = {
+            name: name,
+            parameters: parameters
+        };
+        setCopiedPlan(plan);
+    };
+
+
+    useEffect(() => {
+        //check if the re worker has opened or not with GET
+        const checkWorkerEnvironment = (res) => {
+            if (res.worker_environment_exists === false || res.worker_environement_state === 'closed') {
+                console.log('RE worker environment closed, attempting to open a new worker environment')
+                openWorkerEnvironment();
+            }
+        }
+        getStatus(checkWorkerEnvironment);
+    }, [])
+
     return (
-        <Fragment>
-            <main className="bg-black max-w-screen-2xl m-auto rounded-md h-1/2 3xl:max-w-screen-xl">
-                <div className="flex h-fit mx-4 pt-4 border-b-white border-b pb-4">
-                    <div className="w-9/12 h-full px-2 ">
-                        <QSList queueData={queueData}/>
-                    </div>
-                    <div className="w-3/12 h-full">
-                        <QSRunEngineWorker workerStatus={workerStatus} runningItem={runningItem} isREToggleOn={isREToggleOn} setIsREToggleOn={setIsREToggleOn}/>
-                    </div>
-                </div>
-                <QSConsole title={false} description={false} processConsoleMessage={processConsoleMessage}/>
-            </main>
-            <button >Add item</button>
-        </Fragment>
+        <main className="max-w-screen-3xl w-full min-w-[52rem] h-[calc(100vh-6rem)] min-h-[50rem]  m-auto flex rounded-md relative bg-slate-400">
+            {/* ITEM POPUP  */}
+            {isQItemPopupVisible ? (
+                <QItemPopup 
+                    handleQItemPopupClose={handleQItemPopupClose} 
+                    popupItem={popupItem} 
+                    isItemDeleteButtonVisible={isItemDeleteButtonVisible} 
+                    handleCopyItemClick={handleCopyItemClick} 
+                    copyDictionaryTrigger={copyDictionaryTrigger}
+                />
+            ) : (
+                ''
+            )} 
+            <div className={`${isSidepanelExpanded ? 'w-4/5' : 'w-1/5 '}  flex-shrink-0 transition-all duration-300 ease-in-out bg-slate-200 rounded-md shadow-md drop-shadow h-full`}>
+                <SidePanel 
+                    queueData={queueData}
+                    queueHistoryData={queueHistoryData} 
+                    handleQItemClick={handleQItemClick}
+                    workerStatus={workerStatus} 
+                    runningItem={runningItem} 
+                    isREToggleOn={isREToggleOn} 
+                    setIsREToggleOn={setIsREToggleOn}
+                    handleSidepanelExpandClick={handleSidepanelExpandClick}
+                    isSidepanelExpanded={isSidepanelExpanded}
+                />
+            </div>
+
+            <div className="flex-grow bg-slate-400 rounded-md">
+                <MainPanel 
+                    processConsoleMessage={processConsoleMessage}
+                    copiedPlan={copiedPlan}
+                    minimizeAllWidgets={minimizeAllWidgets}
+                    isGlobalMetadataChecked={isGlobalMetadataChecked}
+                    handleGlobalMetadataCheckboxChange={handleGlobalMetadataCheckboxChange}
+                    globalMetadata={globalMetadata}
+                    updateGlobalMetadata={updateGlobalMetadata}
+                />
+            </div>
+        </main>
     )
 }

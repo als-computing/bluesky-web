@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { startRE } from './apiClient';
+import { startRE } from './utils/apiClient';
 
 import QItem from "./QItem";
 
-export default function QSRunEngineWorker({ isREToggleOn, setIsREToggleOn, runningItem }) {
+export default function QSRunEngineWorker({ isREToggleOn=false, setIsREToggleOn=()=>{}, runningItem={} }) {
     //const [ isREToggleOn, setIsREToggleOn ] = useState(false);
 
     //TO DO : the toggle switch needs to listen to the GET requests for the queue status
@@ -29,11 +29,11 @@ export default function QSRunEngineWorker({ isREToggleOn, setIsREToggleOn, runni
 
     const ToggleSlider = () => {
         return (
-            <div name="toggle" className="flex w-fit flex-col items-center space-y-2">
-                <p className={`${isREToggleOn ? 'text-white' : 'text-gray-400'} transition-colors duration-500`}>ON</p>
+            <div name="toggle" className="flex flex-grow text-right flex-col items-center space-y-2 absolute right-2">
+                <p className={`${isREToggleOn ? 'text-green-600' : 'text-gray-500'} transition-colors duration-500`}>ON</p>
                 <button
                     onClick={toggleSwitch}
-                    className={`w-6 h-16 flex items-center justify-center bg-gray-300 rounded-full cursor-pointer ${
+                    className={`w-6 h-16 flex items-center justify-center bg-gray-400 rounded-full cursor-pointer ${
                         isREToggleOn ? 'bg-green-600' : 'bg-gray-300'
                     }`}
                     >
@@ -43,25 +43,15 @@ export default function QSRunEngineWorker({ isREToggleOn, setIsREToggleOn, runni
                         }`}
                     ></div>
                 </button>
-                <p className={`${isREToggleOn ? 'text-gray-400' : 'text-white'} transition-colors duration-500`}>OFF</p>
+                <p className={`${isREToggleOn ? 'text-gray-500' : 'text-grey-600'} transition-colors duration-500`}>OFF</p>
             </div>
         )
     }
 
-    useEffect(() => {
-        //
-    }, [])
     return (
-        <section>
-            <div className="flex items-center justify-center space-x-2">
-                <h2 className="text-white text-xl text-center">RE Worker Process</h2>
-                <div name="status icon" className="w-4 h-4 bg-yellow-300 rounded-lg"></div>
-            </div>
-            <div className="flex justify-center">
-                <QItem item={runningItem} />
-                {ToggleSlider() }
-            </div>
-            <p className="text-white text-center">idle</p>
-        </section>
+        <div className="flex justify-center items-center mt-2 w-full relative">
+            <QItem item={runningItem} />
+            <ToggleSlider />
+        </div>
     )
 }

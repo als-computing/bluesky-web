@@ -2,6 +2,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 import zmq
 import asyncio
 import logging
+import os
 
 logging.basicConfig(level=logging.INFO)
 
@@ -14,9 +15,15 @@ async def websocket_endpoint(websocket: WebSocket):
     
     context = zmq.Context()
     socket = context.socket(zmq.SUB)
-    socket.connect("tcp://localhost:60625")
+
+    # Determine the connection address
+    zmq_host = os.getenv("ZMQ_HOST", "localhost")
+    zmq_port = os.getenv("ZMQ_PORT", "60625")
+    zmq_address = f"tcp://{zmq_host}:{zmq_port}"
+
+    socket.connect(zmq_address)
     socket.setsockopt_string(zmq.SUBSCRIBE, "")
-    logging.info("Connected to ZMQ service at tcp://localhost:60625...")
+    logging.info(f"Connected to ZMQ service at {zmq_address}...")
 
     async def zmq_listener():
         while True:

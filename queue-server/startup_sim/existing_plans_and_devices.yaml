@@ -1529,26 +1529,7 @@ existing_devices:
     is_readable: false
     module: ophyd.sim
 existing_plans:
-  _sim_plan_inner:
-    module: __main__
-    name: _sim_plan_inner
-    parameters:
-    - annotation:
-        type: int
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: npts
-    - annotation:
-        type: float
-      default: '1.0'
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: delay
-    properties:
-      is_generator: true
-  adaptive_scan:
+  _adaptive_scan:
     description: Scan over one variable with adaptively tuned step size.
     module: bluesky.plans
     name: adaptive_scan
@@ -1606,6 +1587,1274 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: threshold
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _fly:
+    description: Perform a fly scan with one or more 'flyers'.
+    module: bluesky.plans
+    name: fly
+    parameters:
+    - description: objects that support the flyer interface
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: flyers
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _grid_scan:
+    description: Scan over a mesh; each motor is on an independent trajectory.
+    module: bluesky.plans
+    name: grid_scan
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - kind:
+        name: VAR_POSITIONAL
+        value: 2
+      name: args
+    - default: None
+      description: 'which axes should be snaked, either ``False`` (do not snake any
+        axes),
+
+        ``True`` (snake all axes) or a list of axes to snake. "Snaking" an axis
+
+        is defined as following snake-like, winding trajectory instead of a
+
+        simple left-to-right trajectory. The elements of the list are motors
+
+        that are listed in `args`. The list must not contain the slowest
+
+        (first) motor, since it can''t be snaked.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: snake_axes
+    - default: None
+      description: 'hook for customizing action of inner loop (messages per step).
+
+        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+
+        for details.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _inner_product_scan:
+    module: bluesky.plans
+    name: inner_product_scan
+    parameters:
+    - kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: num
+    - kind:
+        name: VAR_POSITIONAL
+        value: 2
+      name: args
+    - default: None
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _list_grid_scan:
+    description: Scan over a mesh; each motor is on an independent trajectory.
+    module: bluesky.plans
+    name: list_grid_scan
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: "patterned like (``motor1, position_list1,``\n                ``motor2,\
+        \ position_list2,``\n                ``motor3, position_list3,``\n       \
+        \         ``...,``\n                ``motorN, position_listN``)\n\nThe first\
+        \ motor is the \"slowest\", the outer loop. ``position_list``'s\nare lists\
+        \ of positions, all lists must have the same length. Motors\ncan be any 'settable'\
+        \ object (motor, temp controller, etc.)."
+      kind:
+        name: VAR_POSITIONAL
+        value: 2
+      name: args
+    - default: 'False'
+      description: 'which axes should be snaked, either ``False`` (do not snake any
+        axes),
+
+        ``True`` (snake all axes) or a list of axes to snake. "Snaking" an axis
+
+        is defined as following snake-like, winding trajectory instead of a
+
+        simple left-to-right trajectory.The elements of the list are motors
+
+        that are listed in `args`. The list must not contain the slowest
+
+        (first) motor, since it can''t be snaked.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: snake_axes
+    - default: None
+      description: 'hook for customizing action of inner loop (messages per step).
+
+        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+
+        for details.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _list_scan:
+    description: Scan over one or more variables in steps simultaneously (inner product).
+    module: bluesky.plans
+    name: list_scan
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: "For one dimension, ``motor, [point1, point2, ....]``.\nIn general:\n\
+        \n.. code-block:: python\n\n    motor1, [point1, point2, ...],\n    motor2,\
+        \ [point1, point2, ...],\n    ...,\n    motorN, [point1, point2, ...]\n\n\
+        Motors can be any 'settable' object (motor, temp controller, etc.)"
+      kind:
+        name: VAR_POSITIONAL
+        value: 2
+      name: args
+    - default: None
+      description: 'hook for customizing action of inner loop (messages per step)
+
+        Expected signature:
+
+        ``f(detectors, motor, step) -> plan (a generator)``'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _log_scan:
+    description: Scan over one variable in log-spaced steps.
+    module: bluesky.plans
+    name: log_scan
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: motor
+    - description: starting position of motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: start
+    - description: ending position of motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: stop
+    - description: number of steps
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: num
+    - default: None
+      description: 'hook for customizing action of inner loop (messages per step)
+
+        Expected signature: ``f(detectors, motor, step)``'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _ramp_plan:
+    description: Take data while ramping one or more positioners.
+    module: bluesky.plans
+    name: ramp_plan
+    parameters:
+    - description: 'plan to start the ramp.  This will be run inside of a open/close
+
+        run.
+
+
+        This plan must return a `ophyd.StatusBase` object.'
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: go_plan
+    - kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: monitor_sig
+    - description: 'generator which takes no input
+
+
+        This will be called for every data point.  This should create
+
+        one or more events.'
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: inner_plan_func
+    - default: 'True'
+      description: If True, add a pre data at beginning
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: take_pre_data
+    - default: None
+      description: 'If not None, the maximum time the ramp can run.
+
+
+        In seconds'
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: timeout
+    - default: None
+      description: 'If not None, take data no faster than this.  If None, take
+
+        data as fast as possible
+
+
+        If running the inner plan takes longer than `period` than take
+
+        data with no dead time.
+
+
+        In seconds.'
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: period
+    - default: None
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: md
+    properties:
+      is_generator: true
+  _rel_adaptive_scan:
+    description: Relative scan over one variable with adaptively tuned step size.
+    module: bluesky.plans
+    name: rel_adaptive_scan
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: data field whose output is the focus of the adaptive tuning
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: target_field
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: motor
+    - description: starting position of motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: start
+    - description: ending position of motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: stop
+    - description: smallest step for fast-changing regions
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: min_step
+    - description: largest step for slow-chaning regions
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: max_step
+    - description: desired fractional change in detector signal between steps
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: target_delta
+    - description: whether backward steps are allowed -- this is concern with some
+        motors
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: backstep
+    - default: '0.8'
+      description: threshold for going backward and rescanning a region, default is
+        0.8
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: threshold
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _rel_grid_scan:
+    description: Scan over a mesh relative to current position.
+    module: bluesky.plans
+    name: rel_grid_scan
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - kind:
+        name: VAR_POSITIONAL
+        value: 2
+      name: args
+    - default: None
+      description: 'which axes should be snaked, either ``False`` (do not snake any
+        axes),
+
+        ``True`` (snake all axes) or a list of axes to snake. "Snaking" an axis
+
+        is defined as following snake-like, winding trajectory instead of a
+
+        simple left-to-right trajectory. The elements of the list are motors
+
+        that are listed in `args`. The list must not contain the slowest
+
+        (first) motor, since it can''t be snaked.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: snake_axes
+    - default: None
+      description: 'hook for customizing action of inner loop (messages per step).
+
+        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+
+        for details.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _rel_list_grid_scan:
+    description: 'Scan over a mesh; each motor is on an independent trajectory. Each
+      point is
+
+      relative to the current position.'
+    module: bluesky.plans
+    name: rel_list_grid_scan
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: "patterned like (``motor1, position_list1,``\n                ``motor2,\
+        \ position_list2,``\n                ``motor3, position_list3,``\n       \
+        \         ``...,``\n                ``motorN, position_listN``)\n\nThe first\
+        \ motor is the \"slowest\", the outer loop. ``position_list``'s\nare lists\
+        \ of positions, all lists must have the same length. Motors\ncan be any 'settable'\
+        \ object (motor, temp controller, etc.)."
+      kind:
+        name: VAR_POSITIONAL
+        value: 2
+      name: args
+    - default: 'False'
+      description: 'which axes should be snaked, either ``False`` (do not snake any
+        axes),
+
+        ``True`` (snake all axes) or a list of axes to snake. "Snaking" an axis
+
+        is defined as following snake-like, winding trajectory instead of a
+
+        simple left-to-right trajectory.The elements of the list are motors
+
+        that are listed in `args`. The list must not contain the slowest
+
+        (first) motor, since it can''t be snaked.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: snake_axes
+    - default: None
+      description: 'hook for customizing action of inner loop (messages per step).
+
+        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+
+        for details.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _rel_list_scan:
+    description: Scan over one variable in steps relative to current position.
+    module: bluesky.plans
+    name: rel_list_scan
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: "For one dimension, ``motor, [point1, point2, ....]``.\nIn general:\n\
+        \n.. code-block:: python\n\n    motor1, [point1, point2, ...],\n    motor2,\
+        \ [point1, point2, ...],\n    ...,\n    motorN, [point1, point2, ...]\n\n\
+        Motors can be any 'settable' object (motor, temp controller, etc.)\npoint1,\
+        \ point2 etc are relative to the current location."
+      kind:
+        name: VAR_POSITIONAL
+        value: 2
+      name: args
+    - default: None
+      description: 'hook for customizing action of inner loop (messages per step)
+
+        Expected signature: ``f(detectors, motor, step)``'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _rel_log_scan:
+    description: Scan over one variable in log-spaced steps relative to current position.
+    module: bluesky.plans
+    name: rel_log_scan
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: motor
+    - description: starting position of motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: start
+    - description: ending position of motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: stop
+    - description: number of steps
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: num
+    - default: None
+      description: 'hook for customizing action of inner loop (messages per step)
+
+        Expected signature: ``f(detectors, motor, step)``'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _rel_scan:
+    description: Scan over one multi-motor trajectory relative to current position.
+    module: bluesky.plans
+    name: rel_scan
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: "For one dimension, ``motor, start, stop``.\nIn general:\n\n..\
+        \ code-block:: python\n\n    motor1, start1, stop1,\n    motor2, start2, start2,\n\
+        \    ...,\n    motorN, startN, stopN,\n\nMotors can be any 'settable' object\
+        \ (motor, temp controller, etc.)"
+      kind:
+        name: VAR_POSITIONAL
+        value: 2
+      name: args
+    - default: None
+      description: number of points
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: num
+    - default: None
+      description: 'hook for customizing action of inner loop (messages per step).
+
+        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+
+        for details.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _rel_spiral:
+    description: Relative spiral scan
+    module: bluesky.plans
+    name: rel_spiral
+    parameters:
+    - kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_motor
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_motor
+    - description: x width of spiral
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_range
+    - description: y width of spiral
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_range
+    - description: Delta radius along the minor axis of the ellipse.
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: dr
+    - description: Number of theta steps
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: nth
+    - default: None
+      description: 'Delta radius along the major axis of the ellipse. If None, it
+
+        defaults to dr.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: dr_y
+    - default: '0.0'
+      description: Tilt angle in radians, default 0.0
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: tilt
+    - default: None
+      description: 'hook for customizing action of inner loop (messages per step).
+
+        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+
+        for details.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _rel_spiral_fermat:
+    description: Relative fermat spiral scan
+    module: bluesky.plans
+    name: rel_spiral_fermat
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_motor
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_motor
+    - description: x width of spiral
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_range
+    - description: y width of spiral
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_range
+    - description: delta radius
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: dr
+    - description: radius gets divided by this
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: factor
+    - default: None
+      description: 'Delta radius along the major axis of the ellipse, if not specifed
+
+        defaults to dr'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: dr_y
+    - default: '0.0'
+      description: Tilt angle in radians, default 0.0
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: tilt
+    - default: None
+      description: 'hook for customizing action of inner loop (messages per step).
+
+        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+
+        for details.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _rel_spiral_square:
+    description: Relative square spiral scan, centered around current (x, y) position.
+    module: bluesky.plans
+    name: rel_spiral_square
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_motor
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_motor
+    - description: x width of spiral
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_range
+    - description: y width of spiral
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_range
+    - description: number of x axis points
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_num
+    - description: Number of y axis points.
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_num
+    - default: None
+      description: 'hook for cutomizing action of inner loop (messages per step).
+
+        See docstring of :func:`bluesky.plans.one_nd_step` (the default) for
+
+        details.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _relative_inner_product_scan:
+    module: bluesky.plans
+    name: relative_inner_product_scan
+    parameters:
+    - kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: num
+    - kind:
+        name: VAR_POSITIONAL
+        value: 2
+      name: args
+    - default: None
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _scan:
+    description: Scan over one multi-motor trajectory.
+    module: bluesky.plans
+    name: scan
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: "For one dimension, ``motor, start, stop``.\nIn general:\n\n..\
+        \ code-block:: python\n\n    motor1, start1, stop1,\n    motor2, start2, stop2,\n\
+        \    ...,\n    motorN, startN, stopN\n\nMotors can be any 'settable' object\
+        \ (motor, temp controller, etc.)"
+      kind:
+        name: VAR_POSITIONAL
+        value: 2
+      name: args
+    - default: None
+      description: number of points
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: num
+    - default: None
+      description: 'hook for customizing action of inner loop (messages per step).
+
+        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+
+        for details.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _sim_plan_inner:
+    module: __main__
+    name: _sim_plan_inner
+    parameters:
+    - annotation:
+        type: int
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: npts
+    - annotation:
+        type: float
+      default: '1.0'
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: delay
+    properties:
+      is_generator: true
+  _spiral:
+    description: Spiral scan, centered around (x_start, y_start)
+    module: bluesky.plans
+    name: spiral
+    parameters:
+    - kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_motor
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_motor
+    - description: x center
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_start
+    - description: y center
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_start
+    - description: x width of spiral
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_range
+    - description: y width of spiral
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_range
+    - description: Delta radius along the minor axis of the ellipse.
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: dr
+    - description: Number of theta steps
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: nth
+    - default: None
+      description: 'Delta radius along the major axis of the ellipse. If None, defaults
+        to
+
+        dr.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: dr_y
+    - default: '0.0'
+      description: Tilt angle in radians, default 0.0
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: tilt
+    - default: None
+      description: 'hook for customizing action of inner loop (messages per step).
+
+        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+
+        for details.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _spiral_fermat:
+    description: Absolute fermat spiral scan, centered around (x_start, y_start)
+    module: bluesky.plans
+    name: spiral_fermat
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_motor
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_motor
+    - description: x center
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_start
+    - description: y center
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_start
+    - description: x width of spiral
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_range
+    - description: y width of spiral
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_range
+    - description: delta radius
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: dr
+    - description: radius gets divided by this
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: factor
+    - default: None
+      description: 'Delta radius along the major axis of the ellipse, if not specifed
+
+        defaults to dr.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: dr_y
+    - default: '0.0'
+      description: Tilt angle in radians, default 0.0
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: tilt
+    - default: None
+      description: 'hook for customizing action of inner loop (messages per step).
+
+        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+
+        for details.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _spiral_square:
+    description: Absolute square spiral scan, centered around (x_center, y_center)
+    module: bluesky.plans
+    name: spiral_square
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_motor
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_motor
+    - description: x center
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_center
+    - description: y center
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_center
+    - description: x width of spiral
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_range
+    - description: y width of spiral
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_range
+    - description: number of x axis points
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: x_num
+    - description: Number of y axis points.
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: y_num
+    - default: None
+      description: 'hook for cutomizing action of inner loop (messages per step).
+
+        See docstring of :func:`bluesky.plans.one_nd_step` (the default) for
+
+        details.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _tune_centroid:
+    description: 'plan: tune a motor to the centroid of signal(motor)'
+    module: bluesky.plans
+    name: tune_centroid
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: detector field whose output is to maximize
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: signal
+    - description: any 'settable' object (motor, temp controller, etc.)
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: motor
+    - description: start of range
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: start
+    - description: 'end of range, note: start < stop'
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: stop
+    - description: smallest step size to use.
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: min_step
+    - default: '10'
+      description: number of points with each traversal, default = 10
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: num
+    - default: '3.0'
+      description: 'used in calculating new range after each pass
+
+
+        note: step_factor > 1.0, default = 3'
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: step_factor
+    - default: 'False'
+      description: if False (default), always scan from start to stop
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: snake
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _tweak:
+    description: Move and motor and read a detector with an interactive prompt.
+    module: bluesky.plans
+    name: tweak
+    parameters:
+    - kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detector
+    - description: data field whose output is the focus of the adaptive tuning
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: target_field
+    - kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: motor
+    - description: initial suggestion for step size
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: step
+    - default: None
+      description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  _x2x_scan:
+    description: Relatively scan over two motors in a 2:1 ratio
+    module: bluesky.plans
+    name: x2x_scan
+    parameters:
+    - description: list of 'readable' objects
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - description: The second motor will move half as much as the first
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: motor1
+    - description: The second motor will move half as much as the first
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: motor2
+    - description: 'The relative limits of the first motor.  The second motor
+
+        will move between ``start / 2`` and ``stop / 2``'
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: start
+    - description: 'The relative limits of the first motor.  The second motor
+
+        will move between ``start / 2`` and ``stop / 2``'
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: stop
+    - kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: num
+    - default: None
+      description: 'hook for cutomizing action of inner loop (messages per step).
+
+        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+
+        for details.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
     - default: None
       description: metadata
       kind:
@@ -1763,238 +3012,6 @@ existing_plans:
       name: md
     properties:
       is_generator: true
-  fly:
-    description: Perform a fly scan with one or more 'flyers'.
-    module: bluesky.plans
-    name: fly
-    parameters:
-    - description: objects that support the flyer interface
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: flyers
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  grid_scan:
-    description: Scan over a mesh; each motor is on an independent trajectory.
-    module: bluesky.plans
-    name: grid_scan
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - kind:
-        name: VAR_POSITIONAL
-        value: 2
-      name: args
-    - default: None
-      description: 'which axes should be snaked, either ``False`` (do not snake any
-        axes),
-
-        ``True`` (snake all axes) or a list of axes to snake. "Snaking" an axis
-
-        is defined as following snake-like, winding trajectory instead of a
-
-        simple left-to-right trajectory. The elements of the list are motors
-
-        that are listed in `args`. The list must not contain the slowest
-
-        (first) motor, since it can''t be snaked.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: snake_axes
-    - default: None
-      description: 'hook for customizing action of inner loop (messages per step).
-
-        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
-
-        for details.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  inner_product_scan:
-    module: bluesky.plans
-    name: inner_product_scan
-    parameters:
-    - kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: num
-    - kind:
-        name: VAR_POSITIONAL
-        value: 2
-      name: args
-    - default: None
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  list_grid_scan:
-    description: Scan over a mesh; each motor is on an independent trajectory.
-    module: bluesky.plans
-    name: list_grid_scan
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: "patterned like (``motor1, position_list1,``\n                ``motor2,\
-        \ position_list2,``\n                ``motor3, position_list3,``\n       \
-        \         ``...,``\n                ``motorN, position_listN``)\n\nThe first\
-        \ motor is the \"slowest\", the outer loop. ``position_list``'s\nare lists\
-        \ of positions, all lists must have the same length. Motors\ncan be any 'settable'\
-        \ object (motor, temp controller, etc.)."
-      kind:
-        name: VAR_POSITIONAL
-        value: 2
-      name: args
-    - default: 'False'
-      description: 'which axes should be snaked, either ``False`` (do not snake any
-        axes),
-
-        ``True`` (snake all axes) or a list of axes to snake. "Snaking" an axis
-
-        is defined as following snake-like, winding trajectory instead of a
-
-        simple left-to-right trajectory.The elements of the list are motors
-
-        that are listed in `args`. The list must not contain the slowest
-
-        (first) motor, since it can''t be snaked.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: snake_axes
-    - default: None
-      description: 'hook for customizing action of inner loop (messages per step).
-
-        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
-
-        for details.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  list_scan:
-    description: Scan over one or more variables in steps simultaneously (inner product).
-    module: bluesky.plans
-    name: list_scan
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: "For one dimension, ``motor, [point1, point2, ....]``.\nIn general:\n\
-        \n.. code-block:: python\n\n    motor1, [point1, point2, ...],\n    motor2,\
-        \ [point1, point2, ...],\n    ...,\n    motorN, [point1, point2, ...]\n\n\
-        Motors can be any 'settable' object (motor, temp controller, etc.)"
-      kind:
-        name: VAR_POSITIONAL
-        value: 2
-      name: args
-    - default: None
-      description: 'hook for customizing action of inner loop (messages per step)
-
-        Expected signature:
-
-        ``f(detectors, motor, step) -> plan (a generator)``'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  log_scan:
-    description: Scan over one variable in log-spaced steps.
-    module: bluesky.plans
-    name: log_scan
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: motor
-    - description: starting position of motor
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: start
-    - description: ending position of motor
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: stop
-    - description: number of steps
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: num
-    - default: None
-      description: 'hook for customizing action of inner loop (messages per step)
-
-        Expected signature: ``f(detectors, motor, step)``'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
   marked_up_count:
     module: __main__
     name: marked_up_count
@@ -2088,634 +3105,146 @@ existing_plans:
       name: n_progress_bars
     properties:
       is_generator: true
-  ramp_plan:
-    description: Take data while ramping one or more positioners.
-    module: bluesky.plans
-    name: ramp_plan
-    parameters:
-    - description: 'plan to start the ramp.  This will be run inside of a open/close
-
-        run.
-
-
-        This plan must return a `ophyd.StatusBase` object.'
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: go_plan
-    - kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: monitor_sig
-    - description: 'generator which takes no input
-
-
-        This will be called for every data point.  This should create
-
-        one or more events.'
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: inner_plan_func
-    - default: 'True'
-      description: If True, add a pre data at beginning
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: take_pre_data
-    - default: None
-      description: 'If not None, the maximum time the ramp can run.
-
-
-        In seconds'
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: timeout
-    - default: None
-      description: 'If not None, take data no faster than this.  If None, take
-
-        data as fast as possible
-
-
-        If running the inner plan takes longer than `period` than take
-
-        data with no dead time.
-
-
-        In seconds.'
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: period
-    - default: None
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: md
-    properties:
-      is_generator: true
-  rel_adaptive_scan:
-    description: Relative scan over one variable with adaptively tuned step size.
-    module: bluesky.plans
-    name: rel_adaptive_scan
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: data field whose output is the focus of the adaptive tuning
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: target_field
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: motor
-    - description: starting position of motor
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: start
-    - description: ending position of motor
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: stop
-    - description: smallest step for fast-changing regions
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: min_step
-    - description: largest step for slow-chaning regions
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: max_step
-    - description: desired fractional change in detector signal between steps
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: target_delta
-    - description: whether backward steps are allowed -- this is concern with some
-        motors
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: backstep
-    - default: '0.8'
-      description: threshold for going backward and rescanning a region, default is
-        0.8
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: threshold
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  rel_grid_scan:
-    description: Scan over a mesh relative to current position.
-    module: bluesky.plans
-    name: rel_grid_scan
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - kind:
-        name: VAR_POSITIONAL
-        value: 2
-      name: args
-    - default: None
-      description: 'which axes should be snaked, either ``False`` (do not snake any
-        axes),
-
-        ``True`` (snake all axes) or a list of axes to snake. "Snaking" an axis
-
-        is defined as following snake-like, winding trajectory instead of a
-
-        simple left-to-right trajectory. The elements of the list are motors
-
-        that are listed in `args`. The list must not contain the slowest
-
-        (first) motor, since it can''t be snaked.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: snake_axes
-    - default: None
-      description: 'hook for customizing action of inner loop (messages per step).
-
-        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
-
-        for details.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  rel_list_grid_scan:
-    description: 'Scan over a mesh; each motor is on an independent trajectory. Each
-      point is
-
-      relative to the current position.'
-    module: bluesky.plans
-    name: rel_list_grid_scan
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: "patterned like (``motor1, position_list1,``\n                ``motor2,\
-        \ position_list2,``\n                ``motor3, position_list3,``\n       \
-        \         ``...,``\n                ``motorN, position_listN``)\n\nThe first\
-        \ motor is the \"slowest\", the outer loop. ``position_list``'s\nare lists\
-        \ of positions, all lists must have the same length. Motors\ncan be any 'settable'\
-        \ object (motor, temp controller, etc.)."
-      kind:
-        name: VAR_POSITIONAL
-        value: 2
-      name: args
-    - default: 'False'
-      description: 'which axes should be snaked, either ``False`` (do not snake any
-        axes),
-
-        ``True`` (snake all axes) or a list of axes to snake. "Snaking" an axis
-
-        is defined as following snake-like, winding trajectory instead of a
-
-        simple left-to-right trajectory.The elements of the list are motors
-
-        that are listed in `args`. The list must not contain the slowest
-
-        (first) motor, since it can''t be snaked.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: snake_axes
-    - default: None
-      description: 'hook for customizing action of inner loop (messages per step).
-
-        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
-
-        for details.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  rel_list_scan:
-    description: Scan over one variable in steps relative to current position.
-    module: bluesky.plans
-    name: rel_list_scan
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: "For one dimension, ``motor, [point1, point2, ....]``.\nIn general:\n\
-        \n.. code-block:: python\n\n    motor1, [point1, point2, ...],\n    motor2,\
-        \ [point1, point2, ...],\n    ...,\n    motorN, [point1, point2, ...]\n\n\
-        Motors can be any 'settable' object (motor, temp controller, etc.)\npoint1,\
-        \ point2 etc are relative to the current location."
-      kind:
-        name: VAR_POSITIONAL
-        value: 2
-      name: args
-    - default: None
-      description: 'hook for customizing action of inner loop (messages per step)
-
-        Expected signature: ``f(detectors, motor, step)``'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  rel_log_scan:
-    description: Scan over one variable in log-spaced steps relative to current position.
-    module: bluesky.plans
-    name: rel_log_scan
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: motor
-    - description: starting position of motor
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: start
-    - description: ending position of motor
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: stop
-    - description: number of steps
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: num
-    - default: None
-      description: 'hook for customizing action of inner loop (messages per step)
-
-        Expected signature: ``f(detectors, motor, step)``'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  rel_scan:
-    description: Scan over one multi-motor trajectory relative to current position.
-    module: bluesky.plans
-    name: rel_scan
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: "For one dimension, ``motor, start, stop``.\nIn general:\n\n..\
-        \ code-block:: python\n\n    motor1, start1, stop1,\n    motor2, start2, start2,\n\
-        \    ...,\n    motorN, startN, stopN,\n\nMotors can be any 'settable' object\
-        \ (motor, temp controller, etc.)"
-      kind:
-        name: VAR_POSITIONAL
-        value: 2
-      name: args
-    - default: None
-      description: number of points
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: num
-    - default: None
-      description: 'hook for customizing action of inner loop (messages per step).
-
-        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
-
-        for details.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  rel_spiral:
-    description: Relative spiral scan
-    module: bluesky.plans
-    name: rel_spiral
-    parameters:
-    - kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_motor
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_motor
-    - description: x width of spiral
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_range
-    - description: y width of spiral
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_range
-    - description: Delta radius along the minor axis of the ellipse.
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: dr
-    - description: Number of theta steps
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: nth
-    - default: None
-      description: 'Delta radius along the major axis of the ellipse. If None, it
-
-        defaults to dr.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: dr_y
-    - default: '0.0'
-      description: Tilt angle in radians, default 0.0
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: tilt
-    - default: None
-      description: 'hook for customizing action of inner loop (messages per step).
-
-        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
-
-        for details.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  rel_spiral_fermat:
-    description: Relative fermat spiral scan
-    module: bluesky.plans
-    name: rel_spiral_fermat
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_motor
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_motor
-    - description: x width of spiral
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_range
-    - description: y width of spiral
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_range
-    - description: delta radius
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: dr
-    - description: radius gets divided by this
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: factor
-    - default: None
-      description: 'Delta radius along the major axis of the ellipse, if not specifed
-
-        defaults to dr'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: dr_y
-    - default: '0.0'
-      description: Tilt angle in radians, default 0.0
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: tilt
-    - default: None
-      description: 'hook for customizing action of inner loop (messages per step).
-
-        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
-
-        for details.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  rel_spiral_square:
-    description: Relative square spiral scan, centered around current (x, y) position.
-    module: bluesky.plans
-    name: rel_spiral_square
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_motor
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_motor
-    - description: x width of spiral
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_range
-    - description: y width of spiral
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_range
-    - description: number of x axis points
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_num
-    - description: Number of y axis points.
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_num
-    - default: None
-      description: 'hook for cutomizing action of inner loop (messages per step).
-
-        See docstring of :func:`bluesky.plans.one_nd_step` (the default) for
-
-        details.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  relative_inner_product_scan:
-    module: bluesky.plans
-    name: relative_inner_product_scan
-    parameters:
-    - kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: num
-    - kind:
-        name: VAR_POSITIONAL
-        value: 2
-      name: args
-    - default: None
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
   scan:
     description: Scan over one multi-motor trajectory.
-    module: bluesky.plans
+    module: __main__
     name: scan
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: typing.List[str]
+      convert_device_names: true
+      description: Required. List of detectors
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - description: "For one dimension, ``motor, start, stop``.\nIn general:\n\n..\
-        \ code-block:: python\n\n    motor1, start1, stop1,\n    motor2, start2, stop2,\n\
-        \    ...,\n    motorN, startN, stopN\n\nMotors can be any 'settable' object\
-        \ (motor, temp controller, etc.)"
+    - annotation:
+        type: typing.Any
+      convert_device_names: true
+      description: Required. Inidividual motor that is moved between the start and
+        stop positions.
       kind:
-        name: VAR_POSITIONAL
-        value: 2
-      name: args
-    - default: None
-      description: number of points
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: motor
+    - annotation:
+        type: float
+      default: '0.0'
+      default_defined_in_decorator: true
+      description: Required. The start position for the motor, uses the default units
+        of the motor
       kind:
-        name: KEYWORD_ONLY
-        value: 3
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '4000'
+      min: '-4000'
+      name: start
+      step: '0.1'
+    - annotation:
+        type: float
+      default: '0.0'
+      default_defined_in_decorator: true
+      description: Required. The stop position for the motor, uses the default units
+        of the motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '4000'
+      min: '-4000'
+      name: stop
+      step: '0.1'
+    - annotation:
+        type: int
+      default: '10'
+      default_defined_in_decorator: true
+      description: Required. The number of points that motor will stop at between
+        the start and stop.
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '200'
+      min: '0'
       name: num
-    - default: None
-      description: 'hook for customizing action of inner loop (messages per step).
-
-        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
-
-        for details.'
+      step: '1'
+    - annotation:
+        type: dict
+      default: None
       kind:
         name: KEYWORD_ONLY
         value: 3
-      name: per_step
-    - default: None
-      description: metadata
+      name: md
+    properties:
+      is_generator: true
+  scan_enums:
+    description: Scan over one multi-motor trajectory.
+    module: __main__
+    name: scan_enums
+    parameters:
+    - annotation:
+        type: typing.List[str]
+      convert_device_names: true
+      description: Required. List of detectors
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: detectors
+    - annotation:
+        enums:
+          motor1:
+          - end_station_motors.x
+          - end_station_motors.z
+          - end_station_motors.filters
+          - channeltron_hv
+        type: motor1
+      convert_device_names: true
+      description: Required. Inidividual motor that is moved between the start and
+        stop positions.
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: motor
+    - annotation:
+        type: float
+      default: '0.0'
+      default_defined_in_decorator: true
+      description: Required. The start position for the motor, uses the default units
+        of the motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '4000'
+      min: '-4000'
+      name: start
+      step: '0.1'
+    - annotation:
+        type: float
+      default: '0.0'
+      default_defined_in_decorator: true
+      description: Required. The stop position for the motor, uses the default units
+        of the motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '4000'
+      min: '-4000'
+      name: stop
+      step: '0.1'
+    - annotation:
+        type: int
+      default: '10'
+      default_defined_in_decorator: true
+      description: Required. The number of points that motor will stop at between
+        the start and stop.
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '200'
+      min: '0'
+      name: num
+      step: '1'
+    - annotation:
+        type: dict
+      default: None
       kind:
         name: KEYWORD_ONLY
         value: 3
@@ -2776,388 +3305,5 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: delay
-    properties:
-      is_generator: true
-  spiral:
-    description: Spiral scan, centered around (x_start, y_start)
-    module: bluesky.plans
-    name: spiral
-    parameters:
-    - kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_motor
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_motor
-    - description: x center
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_start
-    - description: y center
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_start
-    - description: x width of spiral
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_range
-    - description: y width of spiral
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_range
-    - description: Delta radius along the minor axis of the ellipse.
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: dr
-    - description: Number of theta steps
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: nth
-    - default: None
-      description: 'Delta radius along the major axis of the ellipse. If None, defaults
-        to
-
-        dr.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: dr_y
-    - default: '0.0'
-      description: Tilt angle in radians, default 0.0
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: tilt
-    - default: None
-      description: 'hook for customizing action of inner loop (messages per step).
-
-        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
-
-        for details.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  spiral_fermat:
-    description: Absolute fermat spiral scan, centered around (x_start, y_start)
-    module: bluesky.plans
-    name: spiral_fermat
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_motor
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_motor
-    - description: x center
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_start
-    - description: y center
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_start
-    - description: x width of spiral
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_range
-    - description: y width of spiral
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_range
-    - description: delta radius
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: dr
-    - description: radius gets divided by this
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: factor
-    - default: None
-      description: 'Delta radius along the major axis of the ellipse, if not specifed
-
-        defaults to dr.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: dr_y
-    - default: '0.0'
-      description: Tilt angle in radians, default 0.0
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: tilt
-    - default: None
-      description: 'hook for customizing action of inner loop (messages per step).
-
-        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
-
-        for details.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  spiral_square:
-    description: Absolute square spiral scan, centered around (x_center, y_center)
-    module: bluesky.plans
-    name: spiral_square
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_motor
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_motor
-    - description: x center
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_center
-    - description: y center
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_center
-    - description: x width of spiral
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_range
-    - description: y width of spiral
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_range
-    - description: number of x axis points
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: x_num
-    - description: Number of y axis points.
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: y_num
-    - default: None
-      description: 'hook for cutomizing action of inner loop (messages per step).
-
-        See docstring of :func:`bluesky.plans.one_nd_step` (the default) for
-
-        details.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  tune_centroid:
-    description: 'plan: tune a motor to the centroid of signal(motor)'
-    module: bluesky.plans
-    name: tune_centroid
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: detector field whose output is to maximize
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: signal
-    - description: any 'settable' object (motor, temp controller, etc.)
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: motor
-    - description: start of range
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: start
-    - description: 'end of range, note: start < stop'
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: stop
-    - description: smallest step size to use.
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: min_step
-    - default: '10'
-      description: number of points with each traversal, default = 10
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: num
-    - default: '3.0'
-      description: 'used in calculating new range after each pass
-
-
-        note: step_factor > 1.0, default = 3'
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: step_factor
-    - default: 'False'
-      description: if False (default), always scan from start to stop
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: snake
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  tweak:
-    description: Move and motor and read a detector with an interactive prompt.
-    module: bluesky.plans
-    name: tweak
-    parameters:
-    - kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detector
-    - description: data field whose output is the focus of the adaptive tuning
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: target_field
-    - kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: motor
-    - description: initial suggestion for step size
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
-    properties:
-      is_generator: true
-  x2x_scan:
-    description: Relatively scan over two motors in a 2:1 ratio
-    module: bluesky.plans
-    name: x2x_scan
-    parameters:
-    - description: list of 'readable' objects
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: detectors
-    - description: The second motor will move half as much as the first
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: motor1
-    - description: The second motor will move half as much as the first
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: motor2
-    - description: 'The relative limits of the first motor.  The second motor
-
-        will move between ``start / 2`` and ``stop / 2``'
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: start
-    - description: 'The relative limits of the first motor.  The second motor
-
-        will move between ``start / 2`` and ``stop / 2``'
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: stop
-    - kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: num
-    - default: None
-      description: 'hook for cutomizing action of inner loop (messages per step).
-
-        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
-
-        for details.'
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: per_step
-    - default: None
-      description: metadata
-      kind:
-        name: KEYWORD_ONLY
-        value: 3
-      name: md
     properties:
       is_generator: true

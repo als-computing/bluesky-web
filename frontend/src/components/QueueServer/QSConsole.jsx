@@ -6,15 +6,27 @@ import dayjs from 'dayjs';
 import Button from '../library/Button';
 //import ToggleSlider from '../library/ToggleSlider'; //to do  - see if this can be refactored to include the functionality for turning off if connection fails
 
-export default function QSConsole({ title=true, description = true, processConsoleMessage=() =>{} }) {
+export default function QSConsole({type="default", title=true, description = true, processConsoleMessage=() =>{} }) {
 
     
     const [ wsMessages, setWsMessages ] = useState([]); //text for the websocket output
     const [ isOpened, setIsOpened ] = useState(false); //boolean representing status of WS connection
     const [ statusMessage, setStatusMessage ] = useState('');
+    const [isToggleOn, setIsToggleOn] = useState(false); //toggle UI switch for turning output on and off
     const connection = useRef(null); //queue server WS via FastAPI
     const wsUrl = getQSConsoleUrl();
     const messageContainerRef = useRef(null);
+    const hasErrorOccuredRef = useRef(false);
+    const didUserTurnOffWS = useRef(false);
+
+    const toggleSwitch = () => {
+        if (isToggleOn) {
+            handleCloseWS();
+        } else {
+            handleOpenWS();
+        }
+        setIsToggleOn(!isToggleOn);
+    };
 
     const handleWebSocketMessage = (event) => {
         //console.log('received message from ws');
@@ -98,16 +110,42 @@ export default function QSConsole({ title=true, description = true, processConso
             setStatusMessage("Last connection attempt to websocket failed at " + dayjs().format('HH:MM A'))
             setIsToggleOn(false);
             console.log({error});
-        })
+            hasErrorOccuredRef.current = true;
+        });
 
     
         //if websocket opens, add event listener for messages
         socket.addEventListener("open", event => {
             setIsOpened(true);
             console.log("Opened connection in socket to: " + wsUrl);
-            setStatusMessage("Opened connection " + dayjs().format('hh:MM A'));
+            setStatusMessage("Opened connection " + dayjs().format('hh:mm A'));
             socket.addEventListener("message", handleWebSocketMessage);
             connection.current = socket;
+        });
+
+        //if websocket closes, attempt to reconnect & display a message
+        socket.addEventListener("close", event => {
+            console.log('ws connection to fastapi server closed');
+            setIsToggleOn(false);
+            if (hasErrorOccuredRef.current === true) {
+                //Either the fastAPI server stopped running, or the initial connection attempt failed
+                //reset the ref
+                hasErrorOccuredRef.current = false;
+                setStatusMessage("Error occured during connection attempt at  " + dayjs().format('hh:MM A'));
+            } else {
+                //no error has occured, so the connection closed from user input or due to computer sleeping
+                if (didUserTurnOffWS.current === false) {
+                    //computer fell asleep
+                    //attempt to reconnect WS
+                    handleOpenWS();
+                    setIsToggleOn(true);
+                } else {
+                    setStatusMessage("Manually disconnected from websocket at " + dayjs().format('hh:MM A'));
+                    //user turned off ws
+                    //reset the ref
+                    didUserTurnOffWS.current = false;
+                }
+            }
         })
     }
 
@@ -117,6 +155,7 @@ export default function QSConsole({ title=true, description = true, processConso
     }
 
     const handleCloseWS = () => {
+        didUserTurnOffWS.current = true;
         closeWebSocket(connection);
         setIsOpened(false);
     }
@@ -127,22 +166,54 @@ export default function QSConsole({ title=true, description = true, processConso
         }
     }, [wsMessages]);
 
-    const [isToggleOn, setIsToggleOn] = useState(false);
+    useEffect(() => {
+        toggleSwitch();
+    }, []);
 
-    const toggleSwitch = () => {
-        if (isToggleOn) {
-            handleCloseWS();
-        } else {
-            handleOpenWS();
-        }
-        setIsToggleOn(!isToggleOn);
-    };
-
-    return (
-        <main className="h-full ">
-            {title ? <h1 className="text-center text-xl font-medium pt-8 pb-4" >Queue Server Listener</h1> : ''}
-            <section ref={messageContainerRef} name="message container" className="overflow-auto h-4/6  w-full rounded-lg bg-black">
-                <div name="title, toggle switch, status" className="flex items-center space-x-12 py-4 pl-4">
+    
+    if (type === "default") {
+        return (
+            <main className="h-full bg-white rounded-b-lg">
+                <div name="toggle switch, status" className="flex items-start justify-start space-x-12 pl-12 h-1/6 flex-shrink-0">
+                    <div name="toggle" className="flex w-fit items-center space-x-2">
+                        <p className={`${isToggleOn ? 'text-gray-400' : 'text-gray-800'}`}>OFF</p>
+                        <button
+                            onClick={toggleSwitch}
+                            className={`w-16 h-5 flex items-center bg-gray-300 rounded-full px-1 cursor-pointer ${
+                                isToggleOn ? 'bg-green-600' : 'bg-gray-300'
+                            }`}
+                            >
+                            <div
+                                className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${
+                                    isToggleOn ? 'translate-x-10' : 'translate-x-0'
+                                }`}
+                            ></div>
+                        </button>
+                        <p className={`${isToggleOn ? 'text-green-600' : 'text-gray-400'}`}>ON</p>
+                    </div>
+                    <p name="status" className="">{statusMessage}</p>
+                </div>
+                <section ref={messageContainerRef} name="message container" className="overflow-auto h-5/6  w-full rounded-b-lg " style={{'scrollbarColor': 'grey black'}}>
+                    {isOpened ? <p className="text-slate-400 pl-4">Connection Opened. Listening for Queue Server console output.</p> : <p className="animate-pulse text-white pl-4">Waiting for initialization...</p>}
+                    <ul className="flex flex-col">
+                        {wsMessages.map((msg) => {
+                            return (
+                                <li key={msg.id} className="w-full flex text-slate-600">
+                                    <p className="w-1/12 text-center text-slate-500"> {msg.id} </p>
+                                    <p className="w-9/12">{msg.mainText}</p>
+                                    <p className="w-1/6 text-sky-600 text-center">{msg.time}</p>
+                                </li>
+                            )
+                        })}
+                    </ul>
+                </section>
+            </main>
+        )
+    } else {
+        //old one prior to revised layout
+        return (
+            <main className="h-full">
+                <div name="title, toggle switch, status" className="flex items-center space-x-12 pl-12 h-1/6">
                     <h2 name="title" className="text-white text-xl">Queue Server Console Output</h2>
                     <div name="toggle" className="flex w-fit items-center space-x-2">
                         <p className={`${isToggleOn ? 'text-gray-400' : 'text-white'}`}>OFF</p>
@@ -162,25 +233,24 @@ export default function QSConsole({ title=true, description = true, processConso
                     </div>
                     <p name="status" className="text-white">{statusMessage}</p>
                 </div>
-                {isOpened ? <p className="text-slate-400 pl-4 pt-4">Connection Opened. Listening for Queue Server console output.</p> : <p className="animate-pulse text-white pl-4 pt-4">Waiting for initialization...</p>}
-                <ul className="flex flex-col bg-black py-4">
-                    {wsMessages.map((msg) => {
-                        return (
-                            <li key={msg.id} className="w-full flex text-white">
-                                <p className="w-1/12 text-center text-slate-500"> {msg.id} </p>
-                                <p className="w-9/12">{msg.mainText}</p>
-                                <p className="w-1/6 text-sky-600 text-center">{msg.time}</p>
-                            </li>
-                        )
-                    })}
-                </ul>
-            </section>
-            {description ? 
-                <div className="h-1/6 flex flex-col items-center justify-center space-y-4 ">
-                    <p className="max-w-2xl">This screen reads output from the Queue Server's console. A FastAPI web socket endpoint provides the output from the Queue Server's ZMQ channel. This screen is read only.</p>
-                </div> 
-                : ''}
-            
-        </main>
-    )
+                <section ref={messageContainerRef} name="message container" className="overflow-auto h-5/6  w-full rounded-lg bg-black" style={{'scrollbarColor': 'grey black'}}>
+                    {isOpened ? <p className="text-slate-400 pl-4 pt-4">Connection Opened. Listening for Queue Server console output.</p> : <p className="animate-pulse text-white pl-4 pt-4">Waiting for initialization...</p>}
+                    <ul className="flex flex-col bg-black py-4">
+                        {wsMessages.map((msg) => {
+                            return (
+                                <li key={msg.id} className="w-full flex text-white">
+                                    <p className="w-1/12 text-center text-slate-500"> {msg.id} </p>
+                                    <p className="w-9/12">{msg.mainText}</p>
+                                    <p className="w-1/6 text-sky-600 text-center">{msg.time}</p>
+                                </li>
+                            )
+                        })}
+                    </ul>
+                </section>
+            </main>
+        )
+    }
+
+
+    
 }
