@@ -71,7 +71,7 @@ export default function DeviceTable( { connection, devices, setDevices, activeDi
                     <li className="flex h-[10%] justify-center items-center space-x-4  text-lg font-medium text-center bg-gray-100 rounded-t-md">
                         <p className="w-3/12">Device</p> 
                         <p className="w-2/12">Position</p> 
-                        <p className="w-2/12">Jog</p> 
+                        <p className="w-2/12">Step</p> 
                         <p className="w-2/12">Set Position</p> 
                         <p className="w-2/12">Last Update</p>
                     </li>
