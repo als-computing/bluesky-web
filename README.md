@@ -1,5 +1,5 @@
-# Ophyd API
-A Bluesky web interface built with React, Python FastAPI, Bluesky, OPHYD, PV Web Socket.
+# Bluesky Web
+A web based beamline control system built with React, Bluesky, and PV Web Socket.
 
 
 <div style="width: fit-content; border-style:solid; padding-right:40px; padding-top: 20px; padding-bottom: 20px; border-radius: 5px; margin-bottom:20px;">
@@ -32,8 +32,8 @@ A docker-compose file is used to run the required services together. For full fu
 Clone this repository with the --recurse-submodules flag.
 
 ```
-git clone --recurse-submodules https://github.com/als-computing/ophyd-API.git
-cd ophyd-API
+git clone --recurse-submodules https://github.com/als-computing/Bluesky-Web.git
+cd Bluesky-Web
 ```
 
 ## 2. Set environment variables
@@ -59,13 +59,13 @@ If you already have EPICS running and want to access your own IOCs, use the firs
 
 <mark>Run Web Application Only (does not include an EPICS service)</mark> 
 ```
-#ophyd-api/
+#Bluesky-Web/
 docker-compose up -d --build
 ```
 \
 <mark>Run Web Application + EPICS (starts EPICS service in container)</mark>
 ```
-#ophyd-api/
+#Bluesky-Web/
 docker-compose -f docker-compose.start-epics.yml up -d --build
 ```
 Navigate to port 8081 in a web browser to view the application
@@ -75,7 +75,7 @@ http://localhost:8081/
 \
 <mark>Stop Application</mark>
 ```
-#ophyd-api/
+#Bluesky-Web/
 docker-compose stop
 ```
 
@@ -208,8 +208,8 @@ More information on simulated PV's that can be subscribed to by PVWS can be foun
 ## Python Server
 Optionally create a python environment prior to installing libraries.
 ```
-conda create --name ophyd-api
-conda activate ophyd-api
+conda create --name Bluesky-Web
+conda activate Bluesky-Web
 ```
 Install necessary dependencies.
 ```
@@ -242,14 +242,14 @@ Now in a browser you can navigate to localhost:8888/lab
 ## React Frontend
 Install project dependencies from package.json file (only need to run the install command once).
 ```
-#/ophyd-api
+#/Bluesky-Web
 cd frontend
 npm install
 ```
 
 Run the app in development mode.
 ```
-#/ophyd-api/frontend
+#/Bluesky-Web/frontend
 npm start
 ```
 Open [http://localhost:3000](http://localhost:3000) to view the app in a browser.
@@ -259,7 +259,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the app in a browser
 ### React Development Scripts
 
 ```
-#/ophyd-api/frontend
+#/Bluesky-Web/frontend
 npm test
 ```
 
@@ -267,7 +267,7 @@ Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ```
-#/ophyd-api/frontend
+#/Bluesky-Web/frontend
 npm run build
 ```
 
@@ -414,7 +414,7 @@ start-re-manager --zmq-publish-console ON
 
 <mark> Start Queue Server with BL5.3.1 Devices</mark>
 ```
-#from the /ophyd-api directory
+#from the /Bluesky-Web directory
 
 start-re-manager --zmq-publish-console ON --startup-dir /server/queue-server-configuration/startup_bl531 --keep-re
 ```
