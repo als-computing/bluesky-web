@@ -47,7 +47,7 @@ const icons = {
     
 }
 
-export default function ControllerInterface( {defaultControllerList=[]} ) {
+export default function ControllerInterface( {defaultControllerList=[], deviceList=autoDeviceList.motorMotorSim} ) {
     const [ devices, setDevices ] = useState({});
     const [ lockoutList, setLockoutList ] = useState([]); //for preventing double clicks
     const [ lockedControllerList, setLockedControllerList ] = useState([]); //for manually preventing user interaction, set by the user on individual controller modules
@@ -61,7 +61,7 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
 
     useEffect(() => {
         startAutomaticSetup({
-            devices: autoDeviceList.motorMotorSim,
+            devices: deviceList,
             setDevices,
             connection,
             setUpdatedDeviceKey,
@@ -164,7 +164,7 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
                                             </div>
                                             <div name="Close Box" className="w-1/6 flex justify-end h-auto"><div className="border cursor-pointer w-5" onClick={() => handlePopOutClick(key)}>{icons.minus}</div></div>
                                         </div>
-                                        <div name="Current Value" className="h-1/6  flex justify-center items-center space-x-1 text-lg"><p>{devices[key].value}</p><p>{devices[key].units}</p></div>
+                                        <div name="Current Value" className="h-1/6  flex justify-center items-center space-x-1 text-lg"><p>{devices[key].isConnected ? parseFloat(devices[key].value.toPrecision(4)) : 'N/A'}</p></div>
                                         <div name="Jog Heading" className="h-1/6  flex justify-center items-end"> <p>Jog</p></div>
                                         <div name="Jog Buttons" className={`h-1/6  flex justify-center items-start space-x-2`}>
                                             <button
@@ -204,9 +204,9 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
                     <h2 className="h-8 text-sky-900 text-lg">Device List</h2>
 
                     <div className="h-[calc(100%-5rem)] relative pb-4" id="pvlistContainer">
-                        <div id="upArrow" className={`absolute top-0 w-full h-auto flex justify-center bg-[#ffffff99] transition-all duration-700  ${isUpArrowVisible ? 'opacity-100 z-50' : 'z-0 opacity-0'}`}>{icons.upArrow}</div>
+                        <div id="upArrow" className={`absolute top-4 w-full h-auto flex justify-center bg-[#ffffff99] transition-all duration-700  ${isUpArrowVisible ? 'opacity-100 z-50' : 'z-0 opacity-0'}`}>{icons.upArrow}</div>
                         <div id="downArrow" className={`absolute bottom-0 w-full flex justify-center bg-[#ffffff99] transition-all duration-700  ${isDownArrowVisible ? 'opacity-100 z-50' : 'z-0 opacity-0'}`}>{icons.downArrow}</div>
-                        <ul name="PV List" id="pvList" className="absolute top-2 overflow-y-auto h-full w-full z-20" onScroll={handleScroll}>
+                        <ul name="PV List" id="pvList" className="absolute top-4 overflow-y-auto h-[calc(100%-1rem)] w-full z-20" onScroll={handleScroll}>
                             {Object.keys(devices).map((key) => {
                                 return (
                                     <li className={`flex  list-none px-2 ${devices[key].isConnected ? 'text-inherit' : 'text-red-500'}`} key={key}>
@@ -221,7 +221,7 @@ export default function ControllerInterface( {defaultControllerList=[]} ) {
                                                 <p className="w-full text-left overflow-x-auto">{devices[key].prefix}</p>
                                             </div>
                                             <div className="w-3/12">
-                                                <p className="text-right w-full overflow-x-auto">{devices[key].value}</p>
+                                                <p className="text-right w-full overflow-x-auto">{devices[key].isConnected ? parseFloat(devices[key].value.toPrecision(4)) : 'N/A'}</p>
                                             </div>
                                             <div className="w-2/12">
                                                 <p className="text-center">{devices[key].isConnected ? devices[key].units.substring(0,3) : ''}</p>

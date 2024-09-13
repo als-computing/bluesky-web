@@ -8,7 +8,7 @@ export default function BL601() {
     const connection = useRef(null);
 
     useEffect(()=> {
-        startAutomaticSetup(autoDeviceList.bl601, setDevices, connection);
+        startAutomaticSetup({devices: autoDeviceList.bl601, setDevices: setDevices, connection: connection});
     },[])
 
     return (

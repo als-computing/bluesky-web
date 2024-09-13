@@ -1,0 +1,55 @@
+services:
+  redis:
+    image: redis:7.4-rc2-alpine
+    networks: 
+      - qnet
+  frontend:
+    build: ./frontend
+    ports:
+      - "8081:80"
+  pvws:
+    build: ./pvws/docker
+    environment:
+      - EPICS_CA_ADDR_LIST=${EPICS_CA_ADDR_LIST}
+      - EPICS_CA_AUTO_ADDR_LIST=NO
+      - PV_WRITE_SUPPORT=true
+    ports:
+      - "8080:8080"
+    networks: 
+      - qnet
+  python-server:
+    build: ./python-server
+    environment:
+      - EPICS_CA_ADDR_LIST=${EPICS_CA_ADDR_LIST}
+      - EPICS_CA_AUTO_ADDR_LIST=NO
+      - ZMQ_HOST=qserver
+      - ZMQ_PORT=60625
+    ports:
+      - "8000:8000"
+      - "5064:5064"
+      - "5065:5065/udp"
+    networks: 
+      - qnet
+  qserver:
+    build: ./queue-server
+    environment:
+      - EPICS_CA_ADDR_LIST=${EPICS_CA_ADDR_LIST}
+      - EPICS_CA_AUTO_ADDR_LIST=NO
+    networks: 
+      - qnet
+    command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "redis:6379", "--startup-dir", "/code/startup_bl531", "--keep-re"]
+  qserver-api:
+    build: ./queue-server-api
+    environment:
+      - QSERVER_ZMQ_CONTROL_ADDRESS=tcp://qserver:60615
+      - QSERVER_ZMQ_INFO_ADDRESS=tcp://qserver:60625
+      - QSERVER_HTTP_SERVER_ALLOW_ORIGINS=*
+    networks: 
+      - qnet
+    command: ["uvicorn", "--host", "0.0.0.0", "--port", "60610", "bluesky_httpserver.server:app"]
+    ports:
+      - "60610:60610"
+  
+networks:
+  qnet:
+    driver: bridge
