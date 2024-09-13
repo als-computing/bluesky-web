@@ -30,7 +30,7 @@ export default function Widget({children, title='', icon='', expandedHeight="h-f
         <div className={`${hideContent || minimizeAllWidgets ? 'h-fit hover:cursor-pointer' : (isExpanded ? expandedHeight : defaultHeight)} ${maxHeight} rounded-md border border-slate-600 flex-shrink-0`}>
             <div className={`w-full h-10 flex items-center bg-[#213149] rounded-t-md flex-shrink-0 ${hideContent || minimizeAllWidgets ? 'rounded-b-md' : ''}`} onClick={()=>handleHeaderClick(hideContent)}>
                 <p className="h-5/6 aspect-square flex-shrink-0 text-white ml-2">{icon}</p>
-                <p className="flex-grow text-white ml-4 text-xl">{title}</p>
+                <p className="flex-grow text-white ml-4 text-xl truncate">{title}</p>
                 {minimizeAllWidgets ? '' :
                 <Fragment>
                     <p className="h-5/6 aspect-square flex-shrink-0 text-white mr-3 hover:cursor-pointer hover:text-yellow-400" onClick={()=> handleMinusClick(isExpanded, hideContent)}>{tailwindIcons.minus}</p>

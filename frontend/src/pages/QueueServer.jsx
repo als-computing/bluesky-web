@@ -177,7 +177,7 @@ export default function QueueServer() {
     }, [])
 
     return (
-        <main className="max-w-screen-3xl w-full min-w-[52rem] h-[calc(100vh-6rem)] min-h-[50rem]  m-auto flex rounded-md relative bg-slate-400">
+        <main className="max-w-screen-3xl w-full min-w-[52rem] h-[calc(100vh-6rem)] min-h-[50rem]  m-auto flex rounded-md relative bg-slate-400 border ">
             {/* ITEM POPUP  */}
             {isQItemPopupVisible ? (
                 <QItemPopup 
