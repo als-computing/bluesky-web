@@ -28,9 +28,9 @@ export default function SubmissionResultPopup( {isVisible=false, cb=()=>{}, resp
         <Fragment>
             <p className="text-lg font-semibold text-sky-900">Success</p>
             <p>{response.item.item_type} type: {response.item.name}</p>
-            <div className="flex">
+            <div className="flex items-center">
                 <p>Item UID: {response.item.item_uid}</p>
-                <div className="hover:cursor-pointer w-10 aspect-square" onClick={handleCopyClick}>
+                <div className={`${isTextCopied ? "text-green-500 hover:text-green-400" : "hover:text-black"} hover:cursor-pointer w-10 aspect-square pl-1`} onClick={handleCopyClick}>
                     {isTextCopied ? tailwindIcons.clipBoardDocumentCheck : tailwindIcons.clipBoardDocument}
                 </div>
             </div>  
@@ -48,8 +48,8 @@ export default function SubmissionResultPopup( {isVisible=false, cb=()=>{}, resp
     };
 
     return (
-        <div className={` absolute z-20 top-0 h-full w-full bg-slate-100/90 flex items-center justify-center rounded-b-md`}>
-            <div className="bg-white z-30 rounded-lg shadow-lg w-7/12 h-64 flex flex-col items-center justify-center space-y-2 text-slate-500">
+        <div onClick={()=>closePopup()} className={` absolute z-20 top-0 h-full w-full bg-slate-100/90 flex items-center justify-center rounded-b-md`}>
+            <div onClick={(e) => e.stopPropagation()} className="bg-white z-30 rounded-lg shadow-lg w-7/12 h-64 flex flex-col items-center justify-center space-y-2 text-slate-500">
                 <div className={`${response.success ? 'text-green-600' : 'text-red-600'} h-16 w-16`}>{response.success === true ? tailwindIcons.checkmarkInCircle : tailwindIcons.exclamationTriangle}</div>
                 {response.success ? <SuccessMessage /> : <FailureMessage />}
                 <Button text={response.success ? 'Continue' : 'Close'} cb={()=>closePopup(response.success)} />
