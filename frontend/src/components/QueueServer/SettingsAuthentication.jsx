@@ -1,5 +1,5 @@
 export default function SettingsAuthentication() {
     return (
-        <div>Authentication</div>
+        <div>Authentication Coming Soon</div>
     )
 }

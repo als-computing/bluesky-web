@@ -213,6 +213,8 @@ export default function QueueServer() {
                     handleGlobalMetadataCheckboxChange={handleGlobalMetadataCheckboxChange}
                     globalMetadata={globalMetadata}
                     updateGlobalMetadata={updateGlobalMetadata}
+                    expandPanel={handleSidepanelExpandClick}
+                    isSidepanelExpanded={isSidepanelExpanded}
                 />
             </div>
         </main>

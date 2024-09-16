@@ -1,7 +1,18 @@
 import { useState, Fragment } from "react";
 import { tailwindIcons } from "../../assets/icons";
 
-export default function Widget({children, title='', icon='', expandedHeight="h-fit", defaultHeight='h-1/4', maxHeight='max-h-3/4', minimizeAllWidgets=false}) {
+export default function Widget({
+    children, 
+    title='', 
+    icon='', 
+    expandedHeight="h-fit", 
+    defaultHeight='h-1/4', 
+    maxHeight='max-h-3/4', 
+    minimizeAllWidgets=false,
+    expandPanel=()=>{},
+    isSidePanelExpanded=false
+}) {
+
     const [isExpanded, setIsExpanded] = useState(false);
     const [hideContent, setHideContent] = useState(false);
 
@@ -27,8 +38,8 @@ export default function Widget({children, title='', icon='', expandedHeight="h-f
     };
 
     return (
-        <div className={`${hideContent || minimizeAllWidgets ? 'h-fit hover:cursor-pointer' : (isExpanded ? expandedHeight : defaultHeight)} ${maxHeight} rounded-md border border-slate-600 flex-shrink-0`}>
-            <div className={`w-full h-10 flex items-center bg-[#213149] rounded-t-md flex-shrink-0 ${hideContent || minimizeAllWidgets ? 'rounded-b-md' : ''}`} onClick={()=>handleHeaderClick(hideContent)}>
+        <div onClick={minimizeAllWidgets ? expandPanel : ()=>{}} className={`${hideContent || minimizeAllWidgets ? 'h-fit hover:cursor-pointer' : (isExpanded ? expandedHeight : defaultHeight)} ${maxHeight} rounded-md border border-slate-600 flex-shrink-0`}>
+            <div className={`w-full h-10 flex items-center bg-[#213149] rounded-t-md flex-shrink-0 ${hideContent || minimizeAllWidgets ? 'rounded-b-md hover:bg-[#2131498f]' : ''}`} onClick={()=>handleHeaderClick(hideContent)}>
                 <p className="h-5/6 aspect-square flex-shrink-0 text-white ml-2">{icon}</p>
                 <p className="flex-grow text-white ml-4 text-xl truncate">{title}</p>
                 {minimizeAllWidgets ? '' :
