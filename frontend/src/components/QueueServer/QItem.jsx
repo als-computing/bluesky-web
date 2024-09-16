@@ -32,15 +32,28 @@ export default function QItem ({ item=false, label='', text='', styles='', click
                         
                         <div className="text-xs ml-2 flex-grow overflow-hidden">
                             {('kwargs' in item && 'md' in item.kwargs) ? 
-                                Object.keys(item.kwargs.md).map((key) => {
-                                    return (
-                                        <div className="flex flex-wrap" key={key}>
-                                            <p>{key}</p>
-                                            <p>:</p>
-                                            <p>{item.kwargs.md[key]}</p>
-                                        </div>
-                                    )
-                                })
+                                <Fragment>
+                                    {Object.keys(item.kwargs.md).map((key) => {
+                                        return (
+                                            <div className="flex flex-wrap" key={key}>
+                                                <p>{key}</p>
+                                                <p>:</p>
+                                                <p>{item.kwargs.md[key]}</p>
+                                            </div>
+                                        )
+                                    })}
+                                    {
+                                    Object.keys(item.kwargs).map((kwarg) => {
+                                        return (
+                                            <div className="flex flex-wrap" key={kwarg}>
+                                                <p className="text-black">{kwarg} </p>
+                                                <p>:</p>
+                                                <p className="ml-2 text-wrap text-clip">{displayKwarg(item.kwargs[kwarg])}</p>
+                                            </div>
+                                        )
+                                    })
+                                    }
+                                </Fragment> 
                             :
                                 ('kwargs' in item) ? 
                                     Object.keys(item.kwargs).map((kwarg) => {

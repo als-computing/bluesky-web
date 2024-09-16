@@ -20,9 +20,9 @@ export default function SidePanel({
     const BlurryBar = () => {
         return (
             <Fragment>
-                <div className="blur-sm z-10 absolute bg-slate-200/75 -bottom-2 w-4/5 h-2"></div>
-                <div className=" blur-sm z-10 absolute bg-slate-200/90 -bottom-1 w-4/5 h-1"></div>
-                <div className=" blur-sm z-10 absolute bg-slate-200 bottom-0 w-4/5 h-1"></div>
+                <div className="blur-sm z-10 absolute bg-slate-200/75 -bottom-2 w-11/12 h-2"></div>
+                <div className=" blur-sm z-10 absolute bg-slate-200/90 -bottom-1 w-11/12 h-1"></div>
+                <div className=" blur-sm z-10 absolute bg-slate-200 bottom-0 w-11/12 h-1"></div>
             </Fragment>
         )
     }
