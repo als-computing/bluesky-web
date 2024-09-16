@@ -165,7 +165,7 @@ export default function ControllerInterface( {defaultControllerList=[], deviceLi
                                             <div name="Close Box" className="w-1/6 flex justify-end h-auto"><div className="border cursor-pointer w-5" onClick={() => handlePopOutClick(key)}>{icons.minus}</div></div>
                                         </div>
                                         <div name="Current Value" className="h-1/6  flex justify-center items-center space-x-1 text-lg"><p>{devices[key].isConnected ? parseFloat(devices[key].value.toPrecision(4)) : 'N/A'}</p></div>
-                                        <div name="Jog Heading" className="h-1/6  flex justify-center items-end"> <p>Jog</p></div>
+                                        <div name="Jog Heading" className="h-1/6  flex justify-center items-end"> <p>Step</p></div>
                                         <div name="Jog Buttons" className={`h-1/6  flex justify-center items-start space-x-2`}>
                                             <button
                                                 disabled={lockedControllerList.includes(key)} 
@@ -210,12 +210,12 @@ export default function ControllerInterface( {defaultControllerList=[], deviceLi
                             {Object.keys(devices).map((key) => {
                                 return (
                                     <li className={`flex  list-none px-2 ${devices[key].isConnected ? 'text-inherit' : 'text-red-500'}`} key={key}>
-                                        <div className={`w-1/12 cursor-pointer flex items-center ${controllerList.includes(key) ? 'pr-2' : 'pl-2'}`} onClick={() => handlePopOutClick(key)}>
-                                            <div className="w-11/12">
+                                        <div className={`w-10 flex-shrink-0 cursor-pointer flex items-center justify-end ${controllerList.includes(key) ? 'pr-2' : 'pl-2'}`} onClick={() => handlePopOutClick(key)}>
+                                            <div className="w-full aspect-square hover:text-slate-500">
                                                 {controllerList.includes(key) ? icons.rightArrowBox : icons.leftArrowBox}  
                                             </div>
                                         </div>
-                                        <div className={`border-slate-500 border w-11/12 flex py-1 ${updatedDeviceKey === key ? `animate-flash` : ''}`}>
+                                        <div className={`border-slate-500 border flex-grow flex py-1 ${updatedDeviceKey === key ? `animate-flash` : ''}`}>
                                             <div className="w-7/12 flex items-center pl-1">
                                                 <div className={`w-4 ${devices[key].isConnected ? 'text-amber-500 animate-pulse' : 'text-slate-700'}`}>{icons.lightning}</div>
                                                 <p className="w-full text-left overflow-x-auto">{devices[key].prefix}</p>

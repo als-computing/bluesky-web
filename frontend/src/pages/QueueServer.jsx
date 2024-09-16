@@ -146,6 +146,21 @@ export default function QueueServer() {
 
     const updateGlobalMetadata = (dict) => {
         setGlobalMetadata(dict);
+    };
+
+    const removeDuplicateMetadata = (plan) => {
+        //removes any duplicate between copied plan and global md
+        //prevents user from seeing duplicated key/value in md parameter input
+
+        if ('md' in plan.parameters) {
+            for (var key in globalMetadata) {
+                console.log({key});
+                if (key in plan.parameters.md) {
+                    delete plan.parameters.md[key];
+                }
+            }
+        }
+        return plan;
     }
 
 /**
@@ -161,7 +176,8 @@ export default function QueueServer() {
             name: name,
             parameters: parameters
         };
-        setCopiedPlan(plan);
+        var sanitizedPlan = removeDuplicateMetadata(plan);
+        setCopiedPlan(sanitizedPlan);
     };
 
 
@@ -177,7 +193,7 @@ export default function QueueServer() {
     }, [])
 
     return (
-        <main className="max-w-screen-3xl w-full min-w-[52rem] h-[calc(100vh-6rem)] min-h-[50rem]  m-auto flex rounded-md relative bg-slate-400">
+        <main className="max-w-screen-3xl w-full min-w-[52rem] h-[calc(100vh-6rem)] min-h-[50rem]  m-auto flex rounded-md relative bg-slate-400 border ">
             {/* ITEM POPUP  */}
             {isQItemPopupVisible ? (
                 <QItemPopup 
@@ -213,6 +229,8 @@ export default function QueueServer() {
                     handleGlobalMetadataCheckboxChange={handleGlobalMetadataCheckboxChange}
                     globalMetadata={globalMetadata}
                     updateGlobalMetadata={updateGlobalMetadata}
+                    expandPanel={handleSidepanelExpandClick}
+                    isSidepanelExpanded={isSidepanelExpanded}
                 />
             </div>
         </main>

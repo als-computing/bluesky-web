@@ -3,6 +3,7 @@ import QSRunEngineWorker from "./QSRunEngineWorker";
 import { tailwindIcons, customIcons } from "../../assets/icons";
 import '../../App.css';
 import './RunningIcon.css';
+import { Fragment } from "react";
 
 export default function SidePanel({
     queueData=[],
@@ -15,6 +16,17 @@ export default function SidePanel({
     handleSidepanelExpandClick=()=>{},
     isSidepanelExpanded=false
 }) {
+
+    const BlurryBar = () => {
+        return (
+            <Fragment>
+                <div className="blur-sm z-10 absolute bg-slate-200/75 -bottom-2 w-11/12 h-2"></div>
+                <div className=" blur-sm z-10 absolute bg-slate-200/90 -bottom-1 w-11/12 h-1"></div>
+                <div className=" blur-sm z-10 absolute bg-slate-200 bottom-0 w-11/12 h-1"></div>
+            </Fragment>
+        )
+    }
+
     return (
         <aside className="w-full h-full flex flex-col relative">
             {/* Upper Half - Variable Height*/}
@@ -26,6 +38,7 @@ export default function SidePanel({
                     </span>
                     <p className="text-xl font-semibold text-center text-sky-950">Queue</p>
                     <div className="aspect-square h-8 hover:cursor-pointer hover:text-sky-800 absolute right-2 -top-1" onClick={()=>handleSidepanelExpandClick(isSidepanelExpanded)}>{isSidepanelExpanded ? tailwindIcons.arrowsPointingIn : tailwindIcons.arrowsPointingOut}</div>
+                    <BlurryBar />
                 </span>
                 <div className=" flex-grow overflow-y-scroll scrollbar-always-visible pt-2 mx-1">
                     <QSList type="short" queueData={queueData} handleQItemClick={handleQItemClick}/>
@@ -64,6 +77,7 @@ export default function SidePanel({
                         <p className="text-slate-600">{queueHistoryData.length}</p>
                     </span>
                     <p className="text-xl font-semibold text-center text-sky-950">History</p>
+                    <BlurryBar />
                 </span>
                 <div className=" flex-grow overflow-y-scroll scrollbar-always-visible mx-1 mb-1">
                     <QSList type="history" queueData={queueHistoryData} handleQItemClick={handleQItemClick}/>

@@ -61,7 +61,7 @@ export default function SettingsMetadata({isGlobalMetadataChecked=false, handleG
                     <Checkbox isChecked={isGlobalMetadataChecked} cb={handleGlobalMetadataCheckboxChange}/>
                 </div>
                 <div className="w-40 h-10 flex items-center flex-shrink-0  ">
-                    <p>Global Metadata</p>
+                    <p>Constant Metadata</p>
                 </div>
                 <div className="flex-grow ">
                     <ul className="w-ful max-w-lg">

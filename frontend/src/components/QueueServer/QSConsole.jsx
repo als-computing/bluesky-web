@@ -171,29 +171,29 @@ export default function QSConsole({type="default", title=true, description = tru
     }, []);
 
     
-    if (type === "default") {
-        return (
-            <main className="h-full bg-white rounded-b-lg">
-                <div name="toggle switch, status" className="flex items-start justify-start space-x-12 pl-12 h-1/6 flex-shrink-0">
-                    <div name="toggle" className="flex w-fit items-center space-x-2">
-                        <p className={`${isToggleOn ? 'text-gray-400' : 'text-gray-800'}`}>OFF</p>
-                        <button
-                            onClick={toggleSwitch}
-                            className={`w-16 h-5 flex items-center bg-gray-300 rounded-full px-1 cursor-pointer ${
-                                isToggleOn ? 'bg-green-600' : 'bg-gray-300'
+    return (
+        <main className="h-full bg-white rounded-b-lg relative">
+            <div name="toggle switch, status" className="flex items-start justify-start space-x-12 pl-12 pt-1 absolute top-0 z-10">
+                <div name="toggle" className="flex w-fit items-center space-x-2">
+                    <p className={`${isToggleOn ? 'text-gray-400' : 'text-gray-800'}`}>OFF</p>
+                    <button
+                        onClick={toggleSwitch}
+                        className={`w-16 h-5 flex items-center bg-gray-300 rounded-full px-1 cursor-pointer ${
+                            isToggleOn ? 'bg-green-600' : 'bg-gray-300'
+                        }`}
+                        >
+                        <div
+                            className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${
+                                isToggleOn ? 'translate-x-10' : 'translate-x-0'
                             }`}
-                            >
-                            <div
-                                className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${
-                                    isToggleOn ? 'translate-x-10' : 'translate-x-0'
-                                }`}
-                            ></div>
-                        </button>
-                        <p className={`${isToggleOn ? 'text-green-600' : 'text-gray-400'}`}>ON</p>
-                    </div>
-                    <p name="status" className="">{statusMessage}</p>
+                        ></div>
+                    </button>
+                    <p className={`${isToggleOn ? 'text-green-600' : 'text-gray-400'}`}>ON</p>
                 </div>
-                <section ref={messageContainerRef} name="message container" className="overflow-auto h-5/6  w-full rounded-b-lg " style={{'scrollbarColor': 'grey black'}}>
+                <p name="status" className="text-slate-500">{statusMessage}</p>
+            </div>
+            <div className="h-full w-full rounded-b-lg absolute top-0 pt-8">
+                <section ref={messageContainerRef} name="message container" className="overflow-auto h-full w-full rounded-b-lg" style={{'scrollbarColor': 'grey black'}}>
                     {isOpened ? <p className="text-slate-400 pl-4">Connection Opened. Listening for Queue Server console output.</p> : <p className="animate-pulse text-white pl-4">Waiting for initialization...</p>}
                     <ul className="flex flex-col">
                         {wsMessages.map((msg) => {
@@ -207,50 +207,7 @@ export default function QSConsole({type="default", title=true, description = tru
                         })}
                     </ul>
                 </section>
-            </main>
-        )
-    } else {
-        //old one prior to revised layout
-        return (
-            <main className="h-full">
-                <div name="title, toggle switch, status" className="flex items-center space-x-12 pl-12 h-1/6">
-                    <h2 name="title" className="text-white text-xl">Queue Server Console Output</h2>
-                    <div name="toggle" className="flex w-fit items-center space-x-2">
-                        <p className={`${isToggleOn ? 'text-gray-400' : 'text-white'}`}>OFF</p>
-                        <button
-                            onClick={toggleSwitch}
-                            className={`w-16 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer ${
-                                isToggleOn ? 'bg-green-600' : 'bg-gray-300'
-                            }`}
-                            >
-                            <div
-                                className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${
-                                    isToggleOn ? 'translate-x-9' : 'translate-x-0'
-                                }`}
-                            ></div>
-                        </button>
-                        <p className={`${isToggleOn ? 'text-white' : 'text-gray-400'}`}>ON</p>
-                    </div>
-                    <p name="status" className="text-white">{statusMessage}</p>
-                </div>
-                <section ref={messageContainerRef} name="message container" className="overflow-auto h-5/6  w-full rounded-lg bg-black" style={{'scrollbarColor': 'grey black'}}>
-                    {isOpened ? <p className="text-slate-400 pl-4 pt-4">Connection Opened. Listening for Queue Server console output.</p> : <p className="animate-pulse text-white pl-4 pt-4">Waiting for initialization...</p>}
-                    <ul className="flex flex-col bg-black py-4">
-                        {wsMessages.map((msg) => {
-                            return (
-                                <li key={msg.id} className="w-full flex text-white">
-                                    <p className="w-1/12 text-center text-slate-500"> {msg.id} </p>
-                                    <p className="w-9/12">{msg.mainText}</p>
-                                    <p className="w-1/6 text-sky-600 text-center">{msg.time}</p>
-                                </li>
-                            )
-                        })}
-                    </ul>
-                </section>
-            </main>
-        )
-    }
-
-
-    
+            </div>
+        </main>
+    )
 }
