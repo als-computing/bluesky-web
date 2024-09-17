@@ -9,7 +9,7 @@ export default function Motor() {
     const connection = useRef(null); //PVWS
 
     return(
-        <section className="block w-full items-center max-w-screen-lg m-auto p-4 rounded-md border border-slate-500 my-8">
+        <section className="block w-full items-center max-w-screen-lg m-auto p-4 rounded-md my-8">
             <Connect connection={connection} devices={devices} setDevices={setDevices} activeDisplay={activeDisplay} setActiveDisplay={setActiveDisplay} setUpdatedDeviceKey={setUpdatedDeviceKey}/>
             <DeviceTable connection={connection} devices={devices} setDevices={setDevices} activeDisplay={activeDisplay} updatedDeviceKey={updatedDeviceKey}/>
         </section>

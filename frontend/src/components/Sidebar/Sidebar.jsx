@@ -17,9 +17,9 @@ export default function Sidebar() {
 
     const directoryList = [
         {text: 'Home', href: '/', icon: icons.home},
+        {text: 'Q Server', href: '/queueserver', icon: icons.queueList},
         {text: 'Devices', href: '/devices', icon: icons.rectangleGroup},
         {text: 'Camera', href: '/camera', icon: icons.videoCamera},
-        {text: 'Q Server', href: '/queueserver', icon: icons.queueList},
         {text: 'BL 5.3.1', href: '/beamlines/bl531', icon: icons.userCircle},
         {text: 'BL 6.0.1', href: '/beamlines/bl601', icon: icons.userCircle}
     ]
