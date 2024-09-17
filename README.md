@@ -32,7 +32,7 @@ A docker-compose file is used to run the required services together. For full fu
 Clone this repository with the --recurse-submodules flag.
 
 ```
-git clone --recurse-submodules https://github.com/als-computing/Bluesky-Web.git
+git clone --recurse-submodules https://github.com/als-computing/bluesky-web.git
 cd Bluesky-Web
 ```
 
