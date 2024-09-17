@@ -1,4 +1,5 @@
 import WebSocketImage from "../components/WebGL/WebSocketImage";
+import JPEGCanvas from "../components/JPEGCanvas/JPEGCanvas.jsx";
 import { generateImgData } from '../components/WebGL/imgDataGenerator.js';
 
 const width = 256;
@@ -10,7 +11,10 @@ const urlJPEG = 'ws://localhost:8000/pvsim/jpeg'; //text
 const imgData = generateImgData(width, height);
 
 export default function Camera() {
-    return (
+/*     return (
         <WebSocketImage url={urlSim} width={width} height={height}/>
+    ) */
+    return (
+        <JPEGCanvas />
     )
 }

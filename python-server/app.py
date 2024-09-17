@@ -42,7 +42,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#app.include_router(pvws.router) #turn this off if not connected to EPICS
+app.include_router(pvws.router) #turn this off if not connected to EPICS
 app.include_router(pvsim.router)
 app.include_router(queue_server.router)
 

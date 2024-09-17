@@ -15,7 +15,8 @@ export default function JPEGCanvas() {
         const context = canvas.getContext('2d');
 
         try {
-            ws.current = new WebSocket('ws://localhost:8000/pvsim/jpeg');
+            //ws.current = new WebSocket('ws://localhost:8000/pvsim/jpeg');
+            ws.current = new WebSocket('ws://localhost:8000/pvws/pv');
         } catch (error) {
             console.log({error});
             return;
@@ -62,7 +63,7 @@ export default function JPEGCanvas() {
         <div className="flex flex-col justify-center items-center border border-slate-500 rounded-md space-y-4 py-8">
             <h2 className="text-xl font-medium">Canvas JPEG</h2>
             <canvas className="m-auto" ref={canvasRef} width={512} height={512} />
-            <img src={src} alt='test' className='w-64 h-64'/>
+            {/* <img src={src} alt='test' className='w-64 h-64'/> */}
             <p>Average fps: {fps}</p>
             {socketStatus === 'closed' ? <Button text="start" cb={startWebSocket}/> : <Button text="stop" cb={closeWebSocket}/>}
         </div>
