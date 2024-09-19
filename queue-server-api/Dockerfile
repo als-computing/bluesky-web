@@ -1,3 +1,4 @@
+#This dockerfile runs the Bluesky HTTP Server. 
 FROM --platform=linux/amd64 python:3.9-slim
 
 #environment variables for authentication and CORS
