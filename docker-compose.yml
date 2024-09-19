@@ -26,9 +26,6 @@ services:
       - ZMQ_PORT=60625
     ports:
       - "8000:8000"
-      - "5064:5064/tcp"
-      - "5064:5064/udp"
-      - "5065:5065/udp"
     networks: 
       - qnet
   qserver:
