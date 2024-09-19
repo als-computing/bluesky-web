@@ -18,13 +18,13 @@ export default function Step0( { step, setStep, connection, devices, setDevices,
     const options =[
         {
             title: 'motorMotorSim',
-            description: 'Connect to (4) PVs from the EPICS motorMotorSim IOC.',
+            description: 'Connect to all (32) PVs from the default EPICS motorMotorSim IOC.',
             icon: icons.fastForward,
             callback: () => {startAutomaticSetup({devices: autoDeviceList.motorMotorSim, setDevices, connection, setStep, setActiveDisplay, setUpdatedDeviceKey})}
         },
         {
             title: 'ADSimDetector',
-            description: 'Connect to (12) PVs from the EPICS ADSimDetector IOC.',
+            description: 'Connect to (5) PVs from the default EPICS ADSimDetector IOC.',
             icon: icons.fastForward,
             callback: () => {startAutomaticSetup({devices: autoDeviceList.adSimDetector, setDevices, connection, setStep, setActiveDisplay, setUpdatedDeviceKey})}
         },

@@ -1379,6 +1379,53 @@ var autoDeviceList = {
             max: '',
             increment: 0,
         },
+    ],
+    adSimDetector: [
+        {
+            prefix: '13SIM1:cam1:AcquireTime',
+            nickname: 'AcquireTime',
+            group: '',
+            units: '',
+            min: '',
+            max: '',
+            increment: 0,
+        },
+        {
+            prefix: '13SIM1:cam1:AcquirePeriod',
+            nickname: 'AcquirePeriod',
+            group: '',
+            units: '',
+            min: '',
+            max: '',
+            increment: 0,
+        },
+        {
+            prefix: '13SIM1:cam1:GainRed',
+            nickname: 'GainRed',
+            group: '',
+            units: '',
+            min: '',
+            max: '',
+            increment: 0,
+        },
+        {
+            prefix: '13SIM1:cam1:GainGreen',
+            nickname: 'GainGreen',
+            group: '',
+            units: '',
+            min: '',
+            max: '',
+            increment: 0,
+        },
+        {
+            prefix: '13SIM1:cam1:GainBlue',
+            nickname: 'GainBlue',
+            group: '',
+            units: '',
+            min: '',
+            max: '',
+            increment: 0,
+        },
     ]
 }
 export var autoDeviceList;

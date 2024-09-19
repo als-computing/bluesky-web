@@ -31,7 +31,7 @@ async def websocket_endpoint(websocket: WebSocket):
             await websocket.send_bytes(flat_data)
             
             # Wait for a second before sending the next frame
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.1)
     except Exception as e:
         print("Error:", e)
     finally:

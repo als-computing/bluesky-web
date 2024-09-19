@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Button from '../library/Button';
+const medm_full = "/images/adSimDetectorMEDM.png";
+const medm_plugin = "/images/adSimDetectorPlugin.png";
 
 export default function JPEGCanvas() {
     const canvasRef = useRef(null);
@@ -15,7 +17,8 @@ export default function JPEGCanvas() {
         const context = canvas.getContext('2d');
 
         try {
-            ws.current = new WebSocket('ws://localhost:8000/pvsim/jpeg');
+            //ws.current = new WebSocket('ws://localhost:8000/pvsim/jpeg');
+            ws.current = new WebSocket('ws://localhost:8000/pvws/pv');
         } catch (error) {
             console.log({error});
             return;
@@ -59,12 +62,20 @@ export default function JPEGCanvas() {
     }, []);
 
     return (
-        <div className="flex flex-col justify-center items-center border border-slate-500 rounded-md space-y-4 py-8">
-            <h2 className="text-xl font-medium">Canvas JPEG</h2>
-            <canvas className="m-auto" ref={canvasRef} width={512} height={512} />
-            <img src={src} alt='test' className='w-64 h-64'/>
+        <div className="flex flex-col justify-center items-center  rounded-md space-y-4 py-8">
+            <h2 className="text-xl font-medium">Camera Streaming</h2>
+            <canvas className="m-auto border " ref={canvasRef} width={512} height={512} />
+            {/* <img src={src} alt='test' className='w-64 h-64'/> */}
             <p>Average fps: {fps}</p>
             {socketStatus === 'closed' ? <Button text="start" cb={startWebSocket}/> : <Button text="stop" cb={closeWebSocket}/>}
+            <article className="max-w-3xl flex flex-col space-y-3">
+                <p>Not seeing any images after clicking start? This camera streamer currently only works with adSimDetector because the PV is hardcoded in to the python server.</p>
+                <p>If the adSimDetector IOC is running, a command still needs to be issued to make it start acquiring images. This is typically done with an EPICS display manager, the below settings are what works.</p>
+                <img src={medm_full} alt="MEDM display manager"/>
+                <p>Note that the color mode is RGB, the size is 512 x 512, the # images is set to 1, and acquire period is 0.010. </p>
+                <p>For plugins, the NDPluginStdArrays must be turned on.</p>
+                <img src={medm_plugin} alt="MEDM plugin excerpt"/>
+            </article>
         </div>
     )
 }

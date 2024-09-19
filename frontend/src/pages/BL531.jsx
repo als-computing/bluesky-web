@@ -15,9 +15,7 @@ export default function BL531() {
     return (
         <main>
             <section>
-                <h1>Beamline 5.3.1</h1>
-                <p>Beamline description here</p>
-                <p>beamline picture here</p>
+                <p>In progress layout for BL5.3.1 under development</p>
             </section>
             <div className="flex sm:flex-col 3xl:flex-row 3xl:justify-around 3xl:space-x-10 3xl:pl-10 3xl:flex-wrap">
                 <section className="3xl:w-5/12">

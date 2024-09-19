@@ -1,5 +1,5 @@
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
-#This method of grouping devices should be used for the final production, but I haven't figured out how to call specific devices using the class structure
+#This method of grouping devices should be used for the final production
 """ class M101(Device):
     m101_pitch_mm = Component(EpicsSignalRO, 'm101_pitch_mm')
     m101_bend_um = Component(EpicsSignalRO, 'm101_bend_um')

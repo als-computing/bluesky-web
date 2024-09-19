@@ -14,9 +14,7 @@ export default function BL601() {
     return (
         <main>
             <section>
-                <h1>Beamline 6.0.1 Amber</h1>
-                <p>Beamline description here</p>
-                <p>beamline picture here</p>
+            <p>In progress layout for BL6.0.1 under development</p>
             </section>
             <section>
                 <DeviceTable connection={connection} devices={devices} setDevices={setDevices}/>

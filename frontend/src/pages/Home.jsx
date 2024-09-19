@@ -1,20 +1,18 @@
-import WebSocketImage from "../components/WebGL/WebSocketImage";
-import Motor from "../components/Motor/Motor";
-import Postman from "../components/Postman/Postman";
-import ControllerInterface from "../components/ControllerInterface/ControllerInterface";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
-    const width = 256;
-    const height = 256;
-    const urlSim = 'ws://localhost:8000/pvsim'; //blob
-    const urlReal = 'ws://localhost:8000/pvws/pv'; //blob
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        // Redirect to /queueserver when the component loads
+        setTimeout(()=> navigate('/queueserver'), 2000);
+        //navigate('/queueserver');
+    }, [navigate]);
 
     return (
-        <section>
-            <ControllerInterface defaultControllerList={['IOC:m1', 'IOC:m2', 'IOC:m3']}/>
-            <WebSocketImage url={urlSim} width={width} height={height}/>
-            <Motor />
-            <Postman />
+        <section className='w-full h-40 flex items-center justify-center'>
+            <p>Nothing to see here yet, redirecting to Queue Server</p>
         </section>
     )
 }

@@ -32,7 +32,7 @@ A docker-compose file is used to run the required services together. For full fu
 Clone this repository with the --recurse-submodules flag.
 
 ```
-git clone --recurse-submodules https://github.com/als-computing/Bluesky-Web.git
+git clone --recurse-submodules https://github.com/als-computing/bluesky-web.git
 cd Bluesky-Web
 ```
 
@@ -68,7 +68,7 @@ docker-compose up -d --build
 #Bluesky-Web/
 docker-compose -f docker-compose.start-epics.yml up -d --build
 ```
-Navigate to port 8081 in a web browser to view the application
+Navigate to port 8081 in a web browser to view the application.
 
 http://localhost:8081/
 
@@ -82,7 +82,7 @@ docker-compose stop
 \
 <mark>Common Issues Preventing Startup</mark> 
 
-If docker compose doesn't start the 'server' process due to a 'bind: address 0.0.0.0:5065 already in use' error, then you may need to kill any process that is running on port 5065. The channel access repeater may be running on port 5065 even if you haven't started EPICS.
+For configurations where Channel Access ports are mapped to the host, docker may not be able to start a service due to a 'bind: address 0.0.0.0:5065 already in use' error. One solution is to simply find the PID of the proces and stop it.
 
 Example of searching for a service on port 5065:
 ```

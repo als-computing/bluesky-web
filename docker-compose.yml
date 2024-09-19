@@ -26,8 +26,6 @@ services:
       - ZMQ_PORT=60625
     ports:
       - "8000:8000"
-      - "5064:5064"
-      - "5065:5065/udp"
     networks: 
       - qnet
   qserver:
@@ -37,7 +35,7 @@ services:
       - EPICS_CA_AUTO_ADDR_LIST=NO
     networks: 
       - qnet
-    command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "redis:6379"]
+    command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "redis:6379", "--startup-dir", "/code/startup_blank", "--keep-re"]
   qserver-api:
     build: ./queue-server-api
     environment:

@@ -25,6 +25,7 @@ frontend/yarn-debug.log*
 frontend/yarn-error.log*
 python-server/__pycache__/main.cpython-311.pyc
 python-server/__pycache__
+python-server/__pycache__/
 
 
 
