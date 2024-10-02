@@ -1,6 +1,8 @@
 import QItemPopup from "../components/QueueServer/QItemPopup";
 import SidePanel from "../components/QueueServer/SidePanel";
 import MainPanel from "../components/QueueServer/MainPanel";
+import QSList from "../components/QueueServer/QSList";
+import QSRunEngineWorker from "../components/QueueServer/QSRunEngineWorker";
 import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus, getQueueItem, getQueueHistory, openWorkerEnvironment } from "../components/QueueServer/utils/apiClient";
 import { useState, Fragment, useEffect, useRef } from 'react';
 import { useQueueServer } from "../components/QueueServer/hooks/useQueueServer";
@@ -185,7 +187,7 @@ export default function QueueServer() {
         //check if the re worker has opened or not with GET
         const checkWorkerEnvironment = (res) => {
             if (res.worker_environment_exists === false || res.worker_environement_state === 'closed') {
-                console.log('RE worker environment closed, attempting to open a new worker environment')
+                console.log('RE worker environment closed, attempting to open a new worker environment');
                 openWorkerEnvironment();
             }
         }
@@ -210,14 +212,14 @@ export default function QueueServer() {
                 <SidePanel 
                     queueData={queueData}
                     queueHistoryData={queueHistoryData} 
-                    handleQItemClick={handleQItemClick}
-                    workerStatus={workerStatus} 
-                    runningItem={runningItem} 
                     isREToggleOn={isREToggleOn} 
-                    setIsREToggleOn={setIsREToggleOn}
                     handleSidepanelExpandClick={handleSidepanelExpandClick}
                     isSidepanelExpanded={isSidepanelExpanded}
-                />
+                >
+                    <QSList type="short" queueData={queueData} handleQItemClick={handleQItemClick}/>
+                    <QSRunEngineWorker runningItem={runningItem} isREToggleOn={isREToggleOn} setIsREToggleOn={setIsREToggleOn}/>
+                    <QSList type="history" queueData={queueHistoryData} handleQItemClick={handleQItemClick}/>
+                </SidePanel>
             </div>
 
             <div className="flex-grow bg-slate-400 rounded-md">
