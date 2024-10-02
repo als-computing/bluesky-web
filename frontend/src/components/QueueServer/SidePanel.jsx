@@ -1,5 +1,3 @@
-import QSList from "./QSList";
-import QSRunEngineWorker from "./QSRunEngineWorker";
 import { tailwindIcons, customIcons } from "../../assets/icons";
 import '../../App.css';
 import './RunningIcon.css';

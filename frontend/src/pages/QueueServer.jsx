@@ -1,6 +1,11 @@
 import QItemPopup from "../components/QueueServer/QItemPopup";
 import SidePanel from "../components/QueueServer/SidePanel";
 import MainPanel from "../components/QueueServer/MainPanel";
+import Widget from "../components/QueueServer/Widget";
+import SettingsContainer from "../components/QueueServer/SettingsContainer";
+import QSConsole from "../components/QueueServer/QSConsole";
+import QSAddItem from "../components/QueueServer/QSAddItem";
+import { tailwindIcons } from "../assets/icons";
 import QSList from "../components/QueueServer/QSList";
 import QSRunEngineWorker from "../components/QueueServer/QSRunEngineWorker";
 import { getQueue, getDevicesAllowed, getPlansAllowed, getStatus, getQueueItem, getQueueHistory, openWorkerEnvironment } from "../components/QueueServer/utils/apiClient";
@@ -223,18 +228,13 @@ export default function QueueServer() {
             </div>
 
             <div className="flex-grow bg-slate-400 rounded-md">
-                <MainPanel 
-                    processConsoleMessage={processConsoleMessage}
-                    copiedPlan={copiedPlan}
-                    minimizeAllWidgets={minimizeAllWidgets}
-                    isGlobalMetadataChecked={isGlobalMetadataChecked}
-                    handleGlobalMetadataCheckboxChange={handleGlobalMetadataCheckboxChange}
-                    globalMetadata={globalMetadata}
-                    updateGlobalMetadata={updateGlobalMetadata}
-                    expandPanel={handleSidepanelExpandClick}
-                    isSidepanelExpanded={isSidepanelExpanded}
-                />
+                <MainPanel minimizeAllWidgets={minimizeAllWidgets} expandPanel={handleSidepanelExpandClick} isSidePanelExpanded={isSidepanelExpanded}>
+                    <SettingsContainer title="Settings" icon={tailwindIcons.cog} expandedHeight="h-1/2" defaultHeight="h-1/4" maxHeight="max-h-[30rem]" isGlobalMetadataChecked={isGlobalMetadataChecked} handleGlobalMetadataCheckboxChange={handleGlobalMetadataCheckboxChange} globalMetadata={globalMetadata} updateGlobalMetadata={updateGlobalMetadata}/>
+                    <QSAddItem title="Add Item" icon={tailwindIcons.plus} expandedHeight="h-5/6" defaultHeight="h-1/2" maxHeight="max-h-[50rem]" copiedPlan={copiedPlan} copyDictionaryTrigger={copyDictionaryTrigger} isGlobalMetadataChecked={isGlobalMetadataChecked} globalMetadata={globalMetadata}/> 
+                    <QSConsole title="Console Output" icon={tailwindIcons.commandLine} expandedHeight="h-3/4" defaultHeight="h-[22%]" processConsoleMessage={processConsoleMessage}/> 
+                </MainPanel>
             </div>
         </main>
     )
 }
+
