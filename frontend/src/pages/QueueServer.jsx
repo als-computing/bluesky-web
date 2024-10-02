@@ -15,30 +15,13 @@ import { useQueueServer } from "../components/QueueServer/hooks/useQueueServer";
 
 export default function QueueServer() {
 
-    const [ workerStatus, setWorkerStatus ] = useState('');
     const [ isQItemPopupVisible, setIsQItemPopupVisible ] = useState(false);
-    const [ isHistoryVisible, setIsHistoryVisible ] = useState(true);
     const [ popupItem, setPopupItem ] = useState({});
     const [ isItemDeleteButtonVisible, setIsItemDeleteButtonVisible ] = useState(true);
     const [ copiedPlan, setCopiedPlan ] = useState(false);
-    const [ copyDictionaryTrigger, setCopyDictionaryTrigger ] = useState(0);
     const [ isSidepanelExpanded, setIsSidepanelExpanded ] = useState(false);
     const [ minimizeAllWidgets, setMinimizeAllWidgets ] = useState(false);
-    const [ expandQueueList, setExpandQueueList ] = useState(false); //controls the QS list between single column
-    const [ isGlobalMetadataChecked, setIsGlobalMetadataChecked ] = useState(true);
-    const [ globalMetadata, setGlobalMetadata ] = useState({});
-
-    //setup polling interval for getting regular updates from the http server
-    var pollingInterval;
-    if (process.env.REACT_APP_QSERVER_POLLING_INTERVAL) {
-        pollingInterval = process.env.REACT_APP_QSERVER_POLLING_INTERVAL;
-    } else {
-        const oneSecond = 1000; //1 second in milliseconds
-        const tenSeconds = 10000; //10 seconds in milliseconds
-        const thirtySeconds = 30000; //30 seconds in milliseconds
-        pollingInterval = oneSecond;
-    }
-
+    
     const {
         queueData,
         queueHistoryData,
@@ -46,59 +29,13 @@ export default function QueueServer() {
         runningItem,
         runEngineToggleRef,
         setIsREToggleOn,
-        handleQueueDataResponse,
-        handleQueueHistoryResponse
-    } = useQueueServer(pollingInterval);
-
-
-    const processConsoleMessage = (msg) => {
-        //using the console log to trigger get requests has some issues with stale state, even with useRef
-        //This can be further evaluated, but we should potentially get rid of the ref for the toggle button which had issues.
-        //The get/status api endpoint seems to not provide the most recent running status when called immediately after the console triggers it
-        //console.log({msg});
-        //function processess each Queue Server console message to trigger immediate state and UI updates
-        if (msg.startsWith("Processing the next queue item")) {
-            getQueue(handleQueueDataResponse);
-            getQueueHistory(handleQueueHistoryResponse);
-        }
-
-        if (msg.startsWith("Starting the plan")) {
-            //update RE worker
-            getQueue(handleQueueDataResponse);
-            getQueueHistory(handleQueueHistoryResponse);
-        }
-
-        if (msg.startsWith("Starting queue processing")) {
-            getQueue(handleQueueDataResponse);
-        }
-
-        if (msg.startsWith("Item added: success=True")) {
-            getQueue(handleQueueDataResponse);
-        }
-
-        if (msg.startsWith("Clearing the queue")) {
-            getQueue(handleQueueDataResponse);
-        }
-
-        if (msg.startsWith("Queue is empty")) {
-            //message will occur if RE worker turned on with no available queue items
-            //TO DO - fix this because it's not turning the toggle switch to 'off'
-            setTimeout(()=> getQueue(handleQueueDataResponse), 500 ); //call the server some time after failure occurs
-        }
-
-        if (msg.startsWith("The plan failed")) {
-            //get request on queue items
-            //qserver takes some time to place the item back into the queue
-            setTimeout(()=> getQueue(handleQueueDataResponse), 500 ); //call the server some time after failure occurs
-            setTimeout(()=> getQueueHistory(handleQueueHistoryResponse), 500 );
-        }
-
-        if (msg.startsWith("Removing item from the queue")) {
-            //get request on queue items
-            //qserver takes some time to place the item back into the queue
-            setTimeout(()=> getQueue(handleQueueDataResponse), 500 ); //call the server some time after failure occurs
-        }
-    };
+        processConsoleMessage,
+        globalMetadata,
+        updateGlobalMetadata,
+        removeDuplicateMetadata,
+        isGlobalMetadataChecked,
+        handleGlobalMetadataCheckboxChange
+    } = useQueueServer();
 
     const handleOpenQItemPopup = (data, showDeleteButton=true) => {
         if (data.success !== false) {
@@ -147,29 +84,6 @@ export default function QueueServer() {
         }
     };
 
-    const handleGlobalMetadataCheckboxChange = (isChecked) => {
-        setIsGlobalMetadataChecked(isChecked);
-    };
-
-    const updateGlobalMetadata = (dict) => {
-        setGlobalMetadata(dict);
-    };
-
-    const removeDuplicateMetadata = (plan) => {
-        //removes any duplicate between copied plan and global md
-        //prevents user from seeing duplicated key/value in md parameter input
-
-        if ('md' in plan.parameters) {
-            for (var key in globalMetadata) {
-                console.log({key});
-                if (key in plan.parameters.md) {
-                    delete plan.parameters.md[key];
-                }
-            }
-        }
-        return plan;
-    }
-
 /**
  * Sets the copiedPlan state variable which triggers the plan and parameters to be updated in QSAddItem
  * 
@@ -186,7 +100,6 @@ export default function QueueServer() {
         var sanitizedPlan = removeDuplicateMetadata(plan);
         setCopiedPlan(sanitizedPlan);
     };
-
 
     useEffect(() => {
         //check if the re worker has opened or not with GET
@@ -208,7 +121,6 @@ export default function QueueServer() {
                     popupItem={popupItem} 
                     isItemDeleteButtonVisible={isItemDeleteButtonVisible} 
                     handleCopyItemClick={handleCopyItemClick} 
-                    copyDictionaryTrigger={copyDictionaryTrigger}
                 />
             ) : (
                 ''
@@ -230,7 +142,7 @@ export default function QueueServer() {
             <div className="flex-grow bg-slate-400 rounded-md">
                 <MainPanel minimizeAllWidgets={minimizeAllWidgets} expandPanel={handleSidepanelExpandClick} isSidePanelExpanded={isSidepanelExpanded}>
                     <SettingsContainer title="Settings" icon={tailwindIcons.cog} expandedHeight="h-1/2" defaultHeight="h-1/4" maxHeight="max-h-[30rem]" isGlobalMetadataChecked={isGlobalMetadataChecked} handleGlobalMetadataCheckboxChange={handleGlobalMetadataCheckboxChange} globalMetadata={globalMetadata} updateGlobalMetadata={updateGlobalMetadata}/>
-                    <QSAddItem title="Add Item" icon={tailwindIcons.plus} expandedHeight="h-5/6" defaultHeight="h-1/2" maxHeight="max-h-[50rem]" copiedPlan={copiedPlan} copyDictionaryTrigger={copyDictionaryTrigger} isGlobalMetadataChecked={isGlobalMetadataChecked} globalMetadata={globalMetadata}/> 
+                    <QSAddItem title="Add Item" icon={tailwindIcons.plus} expandedHeight="h-5/6" defaultHeight="h-1/2" maxHeight="max-h-[50rem]" copiedPlan={copiedPlan} isGlobalMetadataChecked={isGlobalMetadataChecked} globalMetadata={globalMetadata}/> 
                     <QSConsole title="Console Output" icon={tailwindIcons.commandLine} expandedHeight="h-3/4" defaultHeight="h-[22%]" processConsoleMessage={processConsoleMessage}/> 
                 </MainPanel>
             </div>
