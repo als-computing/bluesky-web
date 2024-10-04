@@ -16,7 +16,7 @@ const sampleBody = {
     pos: 'back'
 };
 
-export default function QSAddItem({copiedPlan=false, type='default', copyDictionaryTrigger=false, isGlobalMetadataChecked=false, globalMetadata={}}) {
+export default function QSAddItem({copiedPlan=false, type='default', isGlobalMetadataChecked=false, globalMetadata={}}) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isSubmissionPopupOpen, setIsSubmissionPopupOpen] = useState(false);
     const [submissionResponse, setSubmissionResponse] = useState({});
