@@ -51,6 +51,10 @@ list of network addressess to search for Chanel Access servers on. If you are ru
 
 Note that if you already have these environment variables set in the terminal running Docker commands, the terminal's environment variables will overwrite those from the .env file.
 
+<mark>Common Issues with EPICS_CA_ADDR_LIST</mark>
+\
+When using docker bridge network, broadcast UDP messages will not be sent outside the container network. If you can only access your EPICS IOCs via an IP address ending in .255, then the host network mode is required instead of bridge. This host network mode is only available on Linux machines.
+
 
 ## 3. Run Application
 Two different scripts are provided that will start the application in docker containers. The first script starts the main services (frontend, python server, PV Web Socket). The second script will start the same services and also run a container with EPICS. 
