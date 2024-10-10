@@ -92,7 +92,8 @@ export default function ControllerInterface( {defaultControllerList=[], deviceLi
         var tempArray;
         if (controllerList.includes(key)) {
             var index = controllerList.indexOf(key);
-            tempArray = controllerList.toSpliced(index, 1);
+            tempArray = controllerList.slice();
+            tempArray.splice(index, 1);
         } else {
             tempArray = controllerList.slice();
             tempArray.push(key);
@@ -105,7 +106,8 @@ export default function ControllerInterface( {defaultControllerList=[], deviceLi
         var tempArray;
         if (lockedControllerList.includes(key)) {
             var index = lockedControllerList.indexOf(key);
-            tempArray = lockedControllerList.toSpliced(index, 1);
+            tempArray = lockedControllerList.slice();
+            tempArray.splice(index, 1);
         } else {
             tempArray = lockedControllerList.slice();
             tempArray.push(key);
