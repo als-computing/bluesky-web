@@ -985,8 +985,8 @@ var autoDeviceList = {
             nickname: 'DCM angle',
             group: 'DCM',
             units: '',
-            min: '',
-            max: '',
+            min: 20,
+            max: 70,
             increment: 0,
         },
         {
