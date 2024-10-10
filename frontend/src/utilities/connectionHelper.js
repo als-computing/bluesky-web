@@ -105,8 +105,13 @@ const updateDevice = (e, setDevices, setUpdatedDeviceKey=()=>{}) => {
         var tempDevice = devices[prefix];
         if ("value" in e) { //PV is or was previously connected to WS
             if("units" in e) { //First connection response sends units, must initialize
-                tempDevice.min = e.min;
-                tempDevice.max = e.max;
+                //only initialize min & max if they were not set up in the autoconfigure list
+                if (tempDevice.min === '' || tempDevice.min === null) {
+                    tempDevice.min = e.min;
+                }
+                if (tempDevice.max === '' || tempDevice.max === null) {
+                    tempDevice.max = e.max;
+                }
                 tempDevice.lastUpdate = dayjs();
                 if (e.units === null || e.units === "null") {
                     tempDevice.units = "N/A";
@@ -213,6 +218,7 @@ const getQSConsoleUrl = () => {
 
 const initializeDeviceList = (devices, setDevices) => {
     //accepts an array of PV objects and sets the full object device state
+    //If devices came from a preconfigured JSON with min/max limits, those limits will override min/max returned from PVWS
     var tempDevices = {};
     var count = 0;
     for (var device of devices) {
@@ -224,8 +230,8 @@ const initializeDeviceList = (devices, setDevices) => {
             isConnected: false,
             value: null,
             units: null,
-            min: null,
-            max: null,
+            min: devices.min !== '' ? devices.min : null,
+            max: devices.max !== '' ? devices.max: null,
             increment: device.increment,
             setValue: '',
             lastUpdate: null

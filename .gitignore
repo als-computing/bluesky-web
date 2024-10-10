@@ -37,3 +37,7 @@ epics-docker/
 server/.ipynb_checkpoints/
 server/Untitled.ipynb
 server/Untitled1.ipynb
+
+pvws/
+
+epics-camera/
