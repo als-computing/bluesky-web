@@ -1,5 +1,10 @@
 import dayjs from 'dayjs';
 
+/**
+ * Closes a websocket connection.
+ * @param {React.MutableRefObject<null | WebSocket>} connection - The websocket connection.
+ * @returns {number} The sum of the two numbers.
+ */
 const closeWebSocket = (connection) => {
     if (connection.current !== null) {
         try {
@@ -14,7 +19,7 @@ const closeWebSocket = (connection) => {
     } else {
         console.log("connection.current is null, removing websocket skipped");
     }
-}
+};
 
 const initializeConnection = (deviceList, wsUrl, setStatus, checkConnectionStatus, timeLimit, isOpened, connection, showResults) => {
     //Ensure wsUrl is not empty
@@ -141,6 +146,10 @@ const updateDevice = (e, setDevices, setUpdatedDeviceKey=()=>{}) => {
 
 }
 
+/**
+ * Determines the path and port to PVWS based on available env variables.
+ * @returns {string} The full url path to PVWS.
+ */
 const getPVWSUrl = () => {
     //if no env variable is set, then assume that the React App is on the same workstation as PVWS
         //having an env variable would be for developers running React on a separate workstation from PVWS

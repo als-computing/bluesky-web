@@ -1,5 +1,5 @@
 export default function CameraControlPanel() {
     return (
-        <div></div>
+        <div>Camera Control Panel</div>
     )
 }

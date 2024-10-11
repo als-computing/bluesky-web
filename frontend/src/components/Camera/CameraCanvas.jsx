@@ -1,5 +1,5 @@
 export default function CameraCanvas() {
     return (
-        <div></div>
+        <div>Camera Canvas</div>
     )
 }
