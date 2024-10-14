@@ -6,12 +6,12 @@ import { useCamera } from "./hooks/useCamera";
 
 //"13SIM1:image1:ArrayData"
 
-export default function CameraContainer({customSetup=false, cameraArrayPV='13SIM1:image1:ArrayData', settingsPrefix='13SIM1:cam1', settings=[], enableControlPanel=true, enableSettings=true }) {
+export default function CameraContainer({customSetup=false, imageArrayDataPV='13SIM1:image1:ArrayData', settingsPrefix='13SIM1:cam1', settings=[], enableControlPanel=true, enableSettings=true }) {
 
     const {
-        cameraControlPVs,
+        cameraControlPV,
         cameraSettingsPVs, 
-    } = useCamera(cameraArrayPV, settingsPrefix, settings);
+    } = useCamera({imageArrayDataPV, settingsPrefix, settings, enableControlPanel, enableSettings});
 
     if (customSetup) {
         return (
@@ -20,9 +20,9 @@ export default function CameraContainer({customSetup=false, cameraArrayPV='13SIM
     } else {
         return (
             <div>
-                <CameraCanvas cameraArrayPV={cameraArrayPV}/>
-                <CameraControlPanel enableControlPanel={enableControlPanel} cameraControlPVs={cameraControlPVs}/>
-                <CameraSettings enableSettings={enableSettings} settings={settings} cameraSettingsPVs={cameraSettingsPVs}/>
+                <CameraCanvas imageArrayDataPV={imageArrayDataPV}/>
+                <CameraControlPanel enableControlPanel={enableControlPanel} cameraControlPV={cameraControlPV}/>
+                <CameraSettings enableSettings={enableSettings} settings={settings} settingsPrefix={settingsPrefix} cameraSettingsPVs={cameraSettingsPVs}/>
             </div>
         )
     }
