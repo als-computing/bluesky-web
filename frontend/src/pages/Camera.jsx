@@ -16,6 +16,6 @@ export default function Camera() {
         <WebSocketImage url={urlSim} width={width} height={height}/>
     ) */
     return (
-        <CameraContainer customSetup={true}/>
+        <CameraContainer customSetup={false}/>
     )
 }

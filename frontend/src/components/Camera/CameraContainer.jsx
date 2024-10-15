@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import CameraCanvas from "./CameraCanvas";
 import CameraControlPanel from "./CameraControlPanel";
 import CameraSettings from "./CameraSettings";
@@ -12,6 +14,8 @@ export default function CameraContainer({customSetup=false, imageArrayDataPV='13
         cameraControlPV,
         cameraSettingsPVs, 
     } = useCamera({imageArrayDataPV, settingsPrefix, settings, enableControlPanel, enableSettings});
+
+
 
     if (customSetup) {
         return (
