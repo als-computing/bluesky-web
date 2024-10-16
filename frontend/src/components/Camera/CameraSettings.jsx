@@ -1,5 +1,20 @@
 export default function CameraSettings({enableSettings=true, settings=[], settingsPrefix='13SIM1:cam1', cameraSettingsPVs={}}) {
     return (
-        <div>Camera Settings</div>
+        <section>
+            <h2 className="text-3xl text-sky-700">Camera Settings</h2>
+            <p className="text-xl underline">Mapped values</p>
+                {Object.keys(cameraSettingsPVs).map((pv) => {
+                    return (
+                        <div key={pv}>
+                            <p className="text-lg">{pv}</p>
+                            <ul>
+                                {Object.keys(cameraSettingsPVs[pv]).map((key) => <li key={key}>{key}: {cameraSettingsPVs[pv][key]}</li> )}
+                            </ul>
+                        </div>
+                    )
+                })}
+            <p className="text-xl underline"> Converted JSON</p>
+            <pre className="text-sm">{JSON.stringify(cameraSettingsPVs, null, 2)}</pre>
+        </section>
     )
 }

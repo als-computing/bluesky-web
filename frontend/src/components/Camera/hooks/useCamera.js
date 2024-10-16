@@ -15,7 +15,7 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
     const wsUrl = getPVWSUrl();
 
     //helper function to return prefix with no whitespace or trailing ':'
-    const sanitizePrefix = (prefix) => {
+    const sanitizeInputPrefix = (prefix) => {
         var santizedPrefix = '';
         if (prefix.trim().slice(-1) === ':') {
             santizedPrefix = prefix.trim().substring(0, prefix.length -1)
@@ -33,7 +33,7 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
             return '';
         }
         let acquireSuffix = 'Acquire'; //the suffix responsible for acquiring images, has a value of 1 or 0
-        var controlPV = `${sanitizePrefix(prefix)}:${acquireSuffix}`;
+        var controlPV = `${sanitizeInputPrefix(prefix)}:${acquireSuffix}`;
         return controlPV;
     };
 
@@ -60,7 +60,7 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         //settings is an array of objects, grouped by setting type
         //ex) a single pv suffix is at settings[0].inputs[0].suffix
 
-        var sanitizePrefix = sanitizePrefix(prefix);
+        var sanitizePrefix = sanitizeInputPrefix(prefix);
 
         var pvArray = [];
         settings.forEach((group) => {
@@ -187,7 +187,7 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
                         //the PV is not connected
                         stateCopy[pv].isConnected = false;
                     }
-                    stateCopy[pv].lastUpdate = dayjs();
+                    stateCopy[pv].lastUpdate = dayjs().format('hh:MM:ss A');
     
                     //copy over all values from e into stateCopy
                     stateCopy[pv] = {...stateCopy[pv], ...e};

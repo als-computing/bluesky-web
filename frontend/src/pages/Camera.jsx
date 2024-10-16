@@ -1,6 +1,7 @@
 import WebSocketImage from "../components/WebGL/WebSocketImage";
 import JPEGCanvas from "../components/JPEGCanvas/JPEGCanvas.jsx";
 import CameraContainer from "../components/Camera/CameraContainer.jsx";
+import { cameraDeviceData } from "../components/Camera/utils/cameraDeviceData.js";
 import { generateImgData } from '../components/WebGL/imgDataGenerator.js';
 
 const width = 256;
@@ -16,6 +17,6 @@ export default function Camera() {
         <WebSocketImage url={urlSim} width={width} height={height}/>
     ) */
     return (
-        <CameraContainer customSetup={false}/>
+        <CameraContainer customSetup={false} settings={cameraDeviceData.ADSimDetector}/>
     )
 }
