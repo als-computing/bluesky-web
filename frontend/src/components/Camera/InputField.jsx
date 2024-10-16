@@ -18,7 +18,7 @@ export default function InputField ({onSubmit=()=>{}}, input={suffix: "Example",
             case 'enum':
                 return <EnumSelect  input={input} onSubmit={onSubmit}/>;
             default:
-                return <div>Unsupported input type</div>;
+                return <p>Input type error</p>;
         }
     };
     
@@ -28,7 +28,6 @@ export default function InputField ({onSubmit=()=>{}}, input={suffix: "Example",
     return (
         <div className="flex">
             {renderInput()}
-
             <p>{pv in cameraSettingsPVs ? cameraSettingsPVs[pv].value : `error, ${pv} not found`}</p>
         </div>
     )
