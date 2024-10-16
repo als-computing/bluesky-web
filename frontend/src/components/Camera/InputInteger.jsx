@@ -1,5 +1,6 @@
 import { useState } from "react";
-export default function InputInteger () {
+
+export default function InputInteger ({input={}, onSubmit=(input)=>{console.log('submit ' + input )}}) {
     const [value, setValue] = useState('');
     const handleChange = (e) => {
         var newValue = e.target.value;
@@ -10,9 +11,9 @@ export default function InputInteger () {
 
     const handleKeyPress = (e) => {
         if (e.key === "Enter") {
-            handleChange(e);
+            onSubmit(value);
         }
-    }
+    };
 
     return (
         <input 
