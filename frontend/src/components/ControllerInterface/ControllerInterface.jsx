@@ -159,16 +159,21 @@ export default function ControllerInterface( {defaultControllerList=[], deviceLi
                                 return (
                                     <li key={devices[key].id} className={` flex flex-col border rounded-md w-60 h-60 list-none m-4 p-1 shadow-sm ${lockedControllerList.includes(key) ? 'bg-slate-100' : 'bg-white'} ${updatedDeviceKey === key ? `animate-flash` : ''}`}>
                                         <div name="Title Heading" className="h-1/6  flex items-start">
-                                            <div name="Lock Device" className="w-1/6 flex justify-start hover:animate-pulse" onClick={() => handleLockClick(key)}><div className="cursor-pointer w-5 flex items-start">{ lockedControllerList.includes(key) ? icons.locked : icons.unlocked}</div></div>
-                                            <div name="Name and Connection Status" className="w-4/6 flex justify-center py-3">
-                                                <div className={`w-5  ${devices[key].isConnected ? 'text-amber-500 animate-pulse' : 'text-slate-700'}`}>{icons.lightning}</div>
-                                                <p>{ devices[key].nickname ? devices[key].nickname : devices[key].prefix}</p>
+                                            <div name="Lock Device and Connection Status" className="w-1/6 flex justify-start" >
+                                                <div className="cursor-pointer w-5 flex items-start hover:animate-pulse" onClick={() => handleLockClick(key)}>{ lockedControllerList.includes(key) ? icons.locked : icons.unlocked}</div>
+                                                <div className={`w-5 aspect-square flex-shrink-0  ${devices[key].isConnected ? 'text-amber-500 animate-pulse' : 'text-slate-700'}`}>{icons.lightning}</div>
+                                            </div>
+                                            <div name="Name" className="w-4/6 flex justify-center py-2">
+                                                <p className="line-clamp-2 py-0 leading-none">{ devices[key].nickname ? devices[key].nickname : devices[key].prefix}</p>
                                             </div>
                                             <div name="Close Box" className="w-1/6 flex justify-end h-auto"><div className="border cursor-pointer w-5" onClick={() => handlePopOutClick(key)}>{icons.minus}</div></div>
                                         </div>
-                                        <div name="Current Value" className="h-1/6  flex justify-center items-center space-x-1 text-lg"><p>{devices[key].isConnected ? parseFloat(devices[key].value.toPrecision(4)) : 'N/A'}</p></div>
-                                        <div name="Jog Heading" className="h-1/6  flex justify-center items-end"> <p>Step</p></div>
-                                        <div name="Jog Buttons" className={`h-1/6  flex justify-center items-start space-x-2`}>
+                                        <div name="Current Value" className="h-1/4  flex justify-center items-end pb-2 space-x-1 ">
+                                            <p className="text-xl">{devices[key].isConnected ? parseFloat(devices[key].value.toPrecision(4)) : 'N/A'}</p>
+                                            <p className="text-md">{devices[key].isConnected ? devices[key].units : ''}</p>
+                                        </div>
+                                        <div name="Jog Heading" className="h-[12%]  flex justify-center items-end"> <p>Step</p></div>
+                                        <div name="Jog Buttons" className={`h-[12%]  flex justify-center items-start space-x-2`}>
                                             <button
                                                 disabled={lockedControllerList.includes(key)} 
                                                 name="Jog Left Button" 
@@ -186,7 +191,7 @@ export default function ControllerInterface( {defaultControllerList=[], deviceLi
                                             </button>
                                         </div>
                                         <div name="Set Heading" className="h-1/6 flex justify-center items-end"><p>Set Absolute Value</p></div>
-                                        <div name="Set Buttons / Input" className="h-1/6  flex justify-center items-start">
+                                        <div name="Set Buttons / Input" className="h-[12%]  flex justify-center items-start">
                                             <input type="number" value={devices[key].setValue} className={`border-b border-black w-4/12 text-right bg-inherit`} onKeyDown={(e) =>handleKeyPress(e, key)} onChange={(e) => setDevices({...devices, [key]: { ...devices[key], setValue: parseFloat(e.target.value)}})}/>
                                             <p className="px-2">{devices[key].units}</p>
                                             <Button 
