@@ -197,7 +197,7 @@ export default function ControllerInterface( {defaultControllerList=[], deviceLi
                                             <Button 
                                                 cb={() => setDeviceValue(devices[key], devices[key].value, devices[key].setValue, connection, lockoutList, setLockoutList)} 
                                                 text="Set" 
-                                                styles={`px-[6px] py-[1px] text-sm  ${lockedControllerList.includes(key) ? 'cursor-not-allowed bg-slate-400' : 'cursor-pointer hover:bg-sky-600 hover:drop-shadow-md'}`}
+                                                styles={`px-[6px] py-[1px] text-sm  ${lockedControllerList.includes(key) ? 'cursor-not-allowed bg-slate-400 hover:cursor-not-allowed' : 'cursor-pointer hover:bg-sky-600 hover:drop-shadow-md'}`}
                                                 disabled={lockedControllerList.includes(key)}
                                             />
                                         </div>

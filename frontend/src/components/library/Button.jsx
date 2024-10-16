@@ -4,6 +4,6 @@ export default function Button( { cb=()=>{}, text='', color='bg-sky-500', hoverC
         cb();
     }
     return(
-        <button disabled={disabled} className={`${color} ${hoverColor} ${textColor} rounded-md hover:cursor-pointer px-2 py-1 font-medium w-fit ${styles}`} onClick={e => handleClick(e)}>{text}</button>
+        <button disabled={disabled} className={`${color} ${disabled ? '' : `${hoverColor} hover:cursor-pointer` } ${textColor} rounded-md px-2 py-1 font-medium w-fit ${styles}`} onClick={e => handleClick(e)}>{text}</button>
     )
 }
