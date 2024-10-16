@@ -157,7 +157,7 @@ export default function ControllerInterface( {defaultControllerList=[], deviceLi
                         {controllerList.map((key) => {
                             if (Object.keys(devices).length > 0) { //prevents error due to devices not being empty during testing 
                                 return (
-                                    <li key={devices[key].id} className={` flex flex-col border rounded-md w-60 h-60 list-none m-4 p-1 shadow-sm ${lockedControllerList.includes(key) ? 'bg-slate-100' : 'bg-white'} ${updatedDeviceKey === key ? `animate-flash` : ''}`}>
+                                    <li key={devices[key].id} className={` flex flex-col border rounded-md ${devices[key].isConnected ? '' : 'border-red-700'} w-60 h-60 list-none m-4 p-1 shadow-sm ${lockedControllerList.includes(key) ? 'bg-slate-100' : 'bg-white'} ${devices[key].isConnected ? '' : 'bg-red-100'} ${updatedDeviceKey === key ? `animate-flash` : ''}`}>
                                         <div name="Title Heading" className="h-1/6  flex items-start">
                                             <div name="Lock Device and Connection Status" className="w-1/6 flex justify-start" >
                                                 <div className="cursor-pointer w-5 flex items-start hover:animate-pulse" onClick={() => handleLockClick(key)}>{ lockedControllerList.includes(key) ? icons.locked : icons.unlocked}</div>
@@ -168,7 +168,7 @@ export default function ControllerInterface( {defaultControllerList=[], deviceLi
                                             </div>
                                             <div name="Close Box" className="w-1/6 flex justify-end h-auto"><div className="border cursor-pointer w-5" onClick={() => handlePopOutClick(key)}>{icons.minus}</div></div>
                                         </div>
-                                        <div name="Current Value" className="h-1/4  flex justify-center items-end pb-2 space-x-1 ">
+                                        <div name="Current Value" className="h-1/4  flex justify-center items-end pb-2 space-x-1 text-sky-700">
                                             <p className="text-xl">{devices[key].isConnected ? parseFloat(devices[key].value.toPrecision(4)) : 'N/A'}</p>
                                             <p className="text-md">{devices[key].isConnected ? devices[key].units : ''}</p>
                                         </div>
