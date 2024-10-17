@@ -1,3 +1,5 @@
+import { type } from "./utils/cameraDeviceData";
+
 export default function InputField ({onSubmit=()=>{}}, input={suffix: "Example", label: "Example", type: 'integer', min:'0', max:'5'}, cameraSettingsPVs={}, settingsPrefix='') {
     const exampleInput = {
         suffix: "DataType",
@@ -9,15 +11,16 @@ export default function InputField ({onSubmit=()=>{}}, input={suffix: "Example",
 
     const renderInput = () => {
         switch (input.type) {
-            case 'integer':
+            case type.input:
                 return <IntegerField  input={input} onSubmit={onSubmit}/>;
-            case 'float':
+            case type.float:
                 return <FloatField input={input} onSubmit={onSubmit}/>;
-            case 'string':
+            case type.string:
                 return <TextField  input={input} onSubmit={onSubmit}/>;
-            case 'enum':
+            case type.enum:
                 return <EnumSelect  input={input} onSubmit={onSubmit}/>;
             default:
+                console.log('Error in InputField, received a type of: ' + input.type + ' which does not match any available input types.');
                 return <p>Input type error</p>;
         }
     };

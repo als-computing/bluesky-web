@@ -38,7 +38,7 @@ export default function InputEnum (input={suffix:'suffix', enums:['test1', 'test
 
     return (
         <div ref={containerRef} className="relative w-5/12 max-w-96 border-2 border-slate-300 rounded-lg mt-2 h-fit">
-            <p id={input.suffic+'ParamInputTooltip'} className="text-sm pl-4 text-gray-500 border-b border-dashed border-slate-300">{`${label} ${required ? '(required)' : '(optional)'}`}</p>
+            <p id={input.suffix + 'ParamInputTooltip'} className="text-sm pl-4 text-gray-500 border-b border-dashed border-slate-300">{`${label} ${required ? '(required)' : '(optional)'}`}</p>
             <Tooltip anchorSelect={'#' + input.suffix + 'ParamInputTooltip'} children={<p className="whitespace-pre-wrap">{description}</p>} place="top" variant="info" style={{'maxWidth' : "500px", 'height': 'fit-content'}} delayShow='400'/> 
             <div className={` flex rounded p-2 hover:cursor-pointer`} onClick={handleInputClick}>
                 <div className="w-10/12 flex justify-center">

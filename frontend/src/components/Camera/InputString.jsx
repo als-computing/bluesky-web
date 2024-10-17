@@ -1,12 +1,9 @@
 import { useState } from "react";
 
-export default function InputFloat (input={}, onSubmit=(input)=>console.log('submit: ' + input)) {
+export default function InputString ({input={}, onSubmit=(input)=>{console.log('submit ' + input )}}) {
     const [value, setValue] = useState('');
     const handleChange = (e) => {
-        var newValue = e.target.value;
-        if (!isNaN(parseFloat(newValue))) {
-            setValue(parseFloat(newValue));
-        }
+        setValue(e.target.value);
     };
 
     const handleKeyPress = (e) => {
@@ -17,7 +14,7 @@ export default function InputFloat (input={}, onSubmit=(input)=>console.log('sub
 
     return (
         <input 
-            type="number" 
+            type="text" 
             value={value} 
             className={``} 
             onKeyDown={handleKeyPress} 

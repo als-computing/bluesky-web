@@ -20,8 +20,8 @@ export default function InputInteger ({input={}, onSubmit=(input)=>{console.log(
             type="number" 
             value={value} 
             className={``} 
-            onKeyDown={(e) =>handleKeyPress(e, key)} 
-            onChange={(e) => handleChange(e)}
+            onKeyDown={handleKeyPress} 
+            onChange={handleChange}
         />
     )
 }

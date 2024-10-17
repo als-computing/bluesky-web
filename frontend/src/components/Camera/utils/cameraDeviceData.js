@@ -1,8 +1,9 @@
 const type = {
     enum: "enum",
     float: "float",
-    integer: "integer"
-}
+    integer: "integer",
+    string: "string"
+};
 
 //Define custom area detector settings here. The suffix should not include the initial prefix
 // ex) For 13sim1:cam1:DataType, the prefix would be "13sim1:cam1:" and the suffix added to this
@@ -89,4 +90,4 @@ const cameraDeviceData = {
     ADSimDetector: adSimDetector
 }
 
-export { cameraDeviceData };
+export { cameraDeviceData, type };
