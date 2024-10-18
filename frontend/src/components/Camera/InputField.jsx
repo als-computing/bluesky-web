@@ -4,7 +4,8 @@ import InputFloat from "./InputFloat";
 import InputInteger from "./InputInteger";
 import InputString from "./InputString";
 
-export default function InputField ({onSubmit=()=>{}}, input={suffix: "Example", label: "Example", type: 'integer', min:'0', max:'5'}, cameraSettingsPVs={}, settingsPrefix='') {
+export default function InputField ({onSubmit=()=>{}, input={suffix: "Example", label: "Example", type: 'integer', min:'0', max:'5'}, cameraSettingsPVs={}, settingsPrefix=''}) {
+    console.log({input});
     const exampleEnumInput = {
         suffix: "DataType",
         label: "Data Type",
@@ -23,7 +24,7 @@ export default function InputField ({onSubmit=()=>{}}, input={suffix: "Example",
 
     const renderInput = () => {
         switch (input.type) {
-            case type.input:
+            case type.integer:
                 return <InputInteger  input={input} onSubmit={onSubmit}/>;
             case type.float:
                 return <InputFloat input={input} onSubmit={onSubmit}/>;
@@ -38,6 +39,8 @@ export default function InputField ({onSubmit=()=>{}}, input={suffix: "Example",
     };
     
     const pv = `${settingsPrefix}:${input.suffix}`;
+    console.log(pv)
+
 
 
     return (

@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-export default function InputFloat (input={}, onSubmit=(input)=>console.log('submit: ' + input)) {
+export default function InputFloat ({input={}, onSubmit=(input)=>console.log('submit: ' + input)}) {
+    console.log({input})
     const [value, setValue] = useState('');
     const handleChange = (e) => {
         var newValue = e.target.value;
@@ -16,12 +17,15 @@ export default function InputFloat (input={}, onSubmit=(input)=>console.log('sub
     };
 
     return (
-        <input 
-            type="number" 
-            value={value} 
-            className={``} 
-            onKeyDown={handleKeyPress} 
-            onChange={handleChange}
-        />
+            <label>
+                {input.label}
+                <input
+                    type="number" 
+                    value={value} 
+                    className='border border-slate-200' 
+                    onKeyDown={handleKeyPress} 
+                    onChange={handleChange}
+                />
+            </label>
     )
 }
