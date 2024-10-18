@@ -147,7 +147,8 @@ export default function QSAddItem({copiedPlan=false, type='default', isGlobalMet
         const requiredParamList = ['detectors', 'detector', 'motor', 'target_field', 'signal', 'npts', 'x_motor', 'start', 'stop', 'x_range'];
         for (var param of allowedPlans[plan].parameters) {
             let defaultValue = multiSelectParamList.includes(param.name) ? [] : '';
-            tempParameters[param.name] = {...param, value: defaultValue, required: requiredParamList.includes(param.name)};
+            let isRequiredByDefinition = ("description" in param && param.description.toLowerCase().trim().startsWith("req"));
+            tempParameters[param.name] = {...param, value: defaultValue, required: requiredParamList.includes(param.name) || isRequiredByDefinition};
         }
         //optional when specific parameter values are passed in
         if (JSON.stringify(parameters) !== '{}') {
