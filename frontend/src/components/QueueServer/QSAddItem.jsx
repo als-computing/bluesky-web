@@ -377,7 +377,7 @@ export default function QSAddItem({copiedPlan=false, type='default', isGlobalMet
                     <div className="bg-gray-200 h-10 flex justify-center items-center shrink-0">
                         <h1 className="text-center">SUMMARY</h1>
                     </div>
-                    <div name="POST body" className="flex items-start justify-start 3xl:justify-center py-4 px-2 flex-grow w-full overflow-y-scroll">
+                    <div name="POST body" className="flex items-start justify-start 3xl:justify-center py-4 px-2 flex-grow w-full overflow-auto">
                         <pre className="text-sm">{JSON.stringify(body, null, 2)}</pre>
                     </div>
                 </div>
@@ -385,7 +385,7 @@ export default function QSAddItem({copiedPlan=false, type='default', isGlobalMet
                     <div className="bg-gray-200 h-10 text-center flex justify-center items-center flex-shrink-0">
                         <h1 className="">SUBMIT</h1>
                     </div>
-                    <div className="flex flex-col space-y-4 items-center py-4 flex-grow overflow-y-scroll">
+                    <div className="flex flex-col space-y-4 items-center py-4 flex-grow overflow-auto">
                         <QItem item={body.item} text={body.name} clickable={false} styles={'hover:cursor-default hover:shadow-none'}/>
                         <label id="positionLabel" className="flex justify-center w-fit items-center">
                             Position: 
