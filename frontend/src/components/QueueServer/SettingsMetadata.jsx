@@ -55,7 +55,7 @@ export default function SettingsMetadata({isGlobalMetadataChecked=false, handleG
     };
 
     return (
-        <div className="w-full h-full flex flex-col space-y-4 justify-start overflow-y-scroll">
+        <div className="w-full h-full flex flex-col space-y-4 justify-start overflow-auto">
             <div className="w-full h-fit flex  ">
                 <div className="w-16 h-10 flex justify-center items-center flex-shrink-0 ">
                     <Checkbox isChecked={isGlobalMetadataChecked} cb={handleGlobalMetadataCheckboxChange}/>
