@@ -1,5 +1,10 @@
 import dayjs from 'dayjs';
 
+/**
+ * Closes a websocket connection.
+ * @param {React.MutableRefObject<null | WebSocket>} connection - The websocket connection.
+ * @returns {number} The sum of the two numbers.
+ */
 const closeWebSocket = (connection) => {
     if (connection.current !== null) {
         try {
@@ -14,7 +19,7 @@ const closeWebSocket = (connection) => {
     } else {
         console.log("connection.current is null, removing websocket skipped");
     }
-}
+};
 
 const initializeConnection = (deviceList, wsUrl, setStatus, checkConnectionStatus, timeLimit, isOpened, connection, showResults) => {
     //Ensure wsUrl is not empty
@@ -105,8 +110,13 @@ const updateDevice = (e, setDevices, setUpdatedDeviceKey=()=>{}) => {
         var tempDevice = devices[prefix];
         if ("value" in e) { //PV is or was previously connected to WS
             if("units" in e) { //First connection response sends units, must initialize
-                tempDevice.min = e.min;
-                tempDevice.max = e.max;
+                //only initialize min & max if they were not set up in the autoconfigure list
+                if (tempDevice.min === '' || tempDevice.min === null) {
+                    tempDevice.min = e.min;
+                }
+                if (tempDevice.max === '' || tempDevice.max === null) {
+                    tempDevice.max = e.max;
+                }
                 tempDevice.lastUpdate = dayjs();
                 if (e.units === null || e.units === "null") {
                     tempDevice.units = "N/A";
@@ -136,6 +146,10 @@ const updateDevice = (e, setDevices, setUpdatedDeviceKey=()=>{}) => {
 
 }
 
+/**
+ * Determines the path and port to PVWS based on available env variables.
+ * @returns {string} The full url path to PVWS.
+ */
 const getPVWSUrl = () => {
     //if no env variable is set, then assume that the React App is on the same workstation as PVWS
         //having an env variable would be for developers running React on a separate workstation from PVWS
@@ -213,6 +227,7 @@ const getQSConsoleUrl = () => {
 
 const initializeDeviceList = (devices, setDevices) => {
     //accepts an array of PV objects and sets the full object device state
+    //If devices came from a preconfigured JSON with min/max limits, those limits will override min/max returned from PVWS
     var tempDevices = {};
     var count = 0;
     for (var device of devices) {
@@ -224,8 +239,8 @@ const initializeDeviceList = (devices, setDevices) => {
             isConnected: false,
             value: null,
             units: null,
-            min: null,
-            max: null,
+            min: devices.min !== '' ? devices.min : null,
+            max: devices.max !== '' ? devices.max: null,
             increment: device.increment,
             setValue: '',
             lastUpdate: null

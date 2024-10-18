@@ -25,7 +25,7 @@ export default function SettingsContainer({isGlobalMetadataChecked=false, handle
   return (
     <div className="flex h-full w-full">
       {/* Sidebar */}
-        <ul className="w-1/4 max-w-48 flex-shrink-0 p-4 bg-gray-100 h-full overflow-y-scroll rounded-bl-md">
+        <ul className="w-1/4 max-w-48 flex-shrink-0 p-4 bg-gray-100 h-full overflow-auto rounded-bl-md">
             {['Metadata', 'Authentication', 'Audio Alerts', 'Screen Lock'].map((setting) => (
             <li
                 key={setting}
@@ -39,7 +39,7 @@ export default function SettingsContainer({isGlobalMetadataChecked=false, handle
 
 
       {/* Content Area */}
-      <div className="flex-grow h-full overflow-y-scroll pt-2">
+      <div className="flex-grow h-full overflow-auto pt-2">
         {renderSettingContent()}
       </div>
     </div>

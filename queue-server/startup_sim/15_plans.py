@@ -27,7 +27,7 @@ from bluesky.plans import (
     rel_spiral_square as _rel_spiral_square,
     relative_inner_product_scan as _relative_inner_product_scan,
     scan as _scan,
-    scan_nd as scan_nd,
+    scan_nd as _scan_nd,
     spiral as _spiral,
     spiral_fermat as _spiral_fermat,
     spiral_square as _spiral_square,
@@ -81,7 +81,7 @@ from bluesky.plans import (
 def scan(detectors, motor, start:float=0.0, stop:float=0.0, num:int=10, *, md:dict=None):
 
     yield from _scan(detectors, motor, start, stop, num,md=md) 
-
+""" 
 # 1D scan for endstation x, z or filters
 @parameter_annotation_decorator({
     "description": "Scan over one multi-motor trajectory.",
@@ -125,13 +125,14 @@ def scan(detectors, motor, start:float=0.0, stop:float=0.0, num:int=10, *, md:di
         },
     }
 })
-def scan_enums(detectors, motor, start:float=0.0, stop:float=0.0, num:int=10, *, md:dict=None):
+ """
+#def _scan_enums(detectors, motor, start:float=0.0, stop:float=0.0, num:int=10, *, md:dict=None):
 
-    yield from _scan(detectors, motor, start, stop, num,md=md) 
+ #   yield from _scan(detectors, motor, start, stop, num,md=md) 
 
 
 
-def marked_up_count(
-    detectors: List[Any], num: int = 1, delay: Optional[float] = None, md: Optional[Dict[str, Any]] = None
-):
-    return (yield from count(detectors, num=num, delay=delay, md=md))
+#def _marked_up_count(
+#    detectors: List[Any], num: int = 1, delay: Optional[float] = None, md: Optional[Dict[str, Any]] = None
+#):
+#    return (yield from count(detectors, num=num, delay=delay, md=md))

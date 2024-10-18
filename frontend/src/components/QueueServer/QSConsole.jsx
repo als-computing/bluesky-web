@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { getQSConsoleUrl } from '../../utilities/connectionHelper';
+import '../../App.css';
 
 import dayjs from 'dayjs';
 
@@ -193,7 +194,7 @@ export default function QSConsole({type="default", title=true, description = tru
                 <p name="status" className="text-slate-500">{statusMessage}</p>
             </div>
             <div className="h-full w-full rounded-b-lg absolute top-0 pt-8">
-                <section ref={messageContainerRef} name="message container" className="overflow-auto h-full w-full rounded-b-lg" style={{'scrollbarColor': 'grey black'}}>
+                <section ref={messageContainerRef} name="message container" className="overflow-auto h-full w-full rounded-b-lg scrollbar-always-visible" >
                     {isOpened ? <p className="text-slate-400 pl-4">Connection Opened. Listening for Queue Server console output.</p> : <p className="animate-pulse text-white pl-4">Waiting for initialization...</p>}
                     <ul className="flex flex-col">
                         {wsMessages.map((msg) => {

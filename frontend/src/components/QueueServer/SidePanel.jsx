@@ -27,9 +27,9 @@ export default function SidePanel({
     }
 
     return (
-        <aside className="w-full h-full flex flex-col relative">
+        <aside className="w-full h-full flex flex-col">
             {/* Upper Half - Variable Height*/}
-            <div className="flex flex-col h-[calc(100%-4rem)] overflow-y-scroll pt-2">
+            <div className="flex flex-col h-[calc(100%-4rem)] overflow-y-auto pt-2 w-full">
                 <span className="flex justify-center items-center relative">
                     <span className="absolute left-2 flex items-center">
                         <div className="aspect-square w-8 mr-1 fill-slate-600">{customIcons.rectangles}</div>
@@ -39,7 +39,7 @@ export default function SidePanel({
                     <div className="aspect-square h-8 hover:cursor-pointer hover:text-sky-800 absolute right-2 -top-1" onClick={()=>handleSidepanelExpandClick(isSidepanelExpanded)}>{isSidepanelExpanded ? tailwindIcons.arrowsPointingIn : tailwindIcons.arrowsPointingOut}</div>
                     <BlurryBar />
                 </span>
-                <div className=" flex-grow overflow-y-scroll scrollbar-always-visible pt-2 mx-1">
+                <div className="flex-grow overflow-auto scrollbar-always-visible pt-2 mx-1">
                     {childrenArray[0] ? childrenArray[0] : null}
                 </div>
             </div>
@@ -69,7 +69,7 @@ export default function SidePanel({
             </div>
 
             {/* Lower Half - Variable Height*/}
-            <div className="flex flex-col h-[calc(100%-4rem)] overflow-y-scroll pt-4">
+            <div className="flex flex-col h-[calc(100%-4rem)] overflow-y-auto pt-4">
                 <span className="flex justify-center items-center relative">
                     <span className="absolute left-2 flex items-center">
                     <div className="aspect-square w-8 mr-1 fill-slate-600">{customIcons.rectangles}</div>
@@ -78,7 +78,7 @@ export default function SidePanel({
                     <p className="text-xl font-semibold text-center text-sky-950">History</p>
                     <BlurryBar />
                 </span>
-                <div className=" flex-grow overflow-y-scroll scrollbar-always-visible mx-1 mb-1">
+                <div className=" flex-grow overflow-auto scrollbar-always-visible mx-1 mb-1">
                     {childrenArray[2] ? childrenArray[2] : null}
                 </div>
             </div>
