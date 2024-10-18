@@ -214,30 +214,42 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
      * 
      * @returns {void} This function does not return anything.
      */
-    const connectWebSocket = (connection, wsUrl, cbOpen=()=>{}, cbMessage=()=>{}) => {
+    const connectWebSocket = (connection=false, wsUrl='', cbOpen=()=>{}, cbMessage=()=>{}, wsTitle='') => {
+        if (connection === false || wsUrl === '') {
+            console.log('Connection/url not provided to websocket connection function, exiting');
+            return;
+        }
         closeWebSocket(connection);
 
         try {
             var socket = new WebSocket(wsUrl);
         } catch (error) {
-            console.log('Unable to establish websocket connection');
+            console.log('Unable to establish websocket connection ' + wsTitle + ' at ' + wsUrl);
             console.log(error);
             return;
         }
     
         socket.addEventListener("open", event => {
-            console.log("Opened connection in socket to: " + wsUrl);
+            console.log("Opened " + wsTitle + " websocket: " + wsUrl);
             connection.current = socket;
             //onWebSocketOpen(connection, socket, wsUrl, cbOpen);
             cbOpen(connection);
         });
     
         socket.addEventListener("message", event => {
-            console.log("Received Message at: " + dayjs().format('hh:mm:ss a'));
+            console.log("Websocket " + wsTitle + " message at: " + dayjs().format('hh:mm:ss a'));
             var eventData = JSON.parse(event.data);
             console.log({eventData});
             cbMessage(eventData);
-        })
+        });
+
+        socket.addEventListener("close", event => {
+            console.log("Closed websocket" + wsTitle + "at: " + dayjs().format('hh:mm:ss a'))
+        });
+
+        socket.addEventListener("error", event => {
+            console.log("Websocket Error:", event)
+        });
     };
     
 
@@ -246,7 +258,7 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
             //create blank controlPV
             initializeControlPVState(createControlPVString(settingsPrefix));
             //create a websocket connection for acquire pv only
-            connectWebSocket(connectionControl, wsUrl, subscribeControlPV, updateControlPV);
+            connectWebSocket(connectionControl, wsUrl, subscribeControlPV, updateControlPV, 'Camera Control');
         }
     
         if (enableSettings === true && settings.length !== 0 && settingsPrefix !== '') {
@@ -254,9 +266,9 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
             var settingsPVArray = createSettingsPVArray(settings, settingsPrefix);
             initializeCameraSettingsPVState(settingsPVArray);
             //create a websocket connection for all camera settings
-            connectWebSocket(connectionSettings, wsUrl, subscribeSettingsPVs, updateSettingsPVs);
+            connectWebSocket(connectionSettings, wsUrl, subscribeSettingsPVs, updateSettingsPVs, 'Camera Settings');
         }
-    }, [])
+    }, []);
 
 
     return {
