@@ -36,7 +36,7 @@ services:
     build: ./queue-server
     networks: 
       - epicsnet
-    command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "redis:6379"]
+    command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "redis:6379", "--startup-dir", "/code/startup_sim", "--keep-re"]
   qserver-api:
     build: ./queue-server-api
     environment:
