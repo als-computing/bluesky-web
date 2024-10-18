@@ -43,6 +43,7 @@ services:
       - QSERVER_ZMQ_CONTROL_ADDRESS=tcp://qserver:60615
       - QSERVER_ZMQ_INFO_ADDRESS=tcp://qserver:60625
       - QSERVER_HTTP_SERVER_ALLOW_ORIGINS=*
+      - QSERVER_HTTP_SERVER_SINGLE_USER_API_KEY=test
     networks: 
       - epicsnet
     command: ["uvicorn", "--host", "0.0.0.0", "--port", "60610", "bluesky_httpserver.server:app"]
