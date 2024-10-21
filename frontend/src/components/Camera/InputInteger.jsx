@@ -15,6 +15,7 @@ export default function InputInteger ({input={}, onSubmit=(input)=>{console.log(
 
     const handleKeyPress = (e) => {
         if (e.key === "Enter") {
+            console.log('enter')
             onSubmit(value);
         }
     };
@@ -25,7 +26,7 @@ export default function InputInteger ({input={}, onSubmit=(input)=>{console.log(
             <input
                 type="text" 
                 value={value} 
-                className='w-1/2 border border-slate-300' 
+                className='w-1/2 border border-slate-300 pl-2' 
                 onKeyDown={handleKeyPress} 
                 onChange={handleChange}
             />

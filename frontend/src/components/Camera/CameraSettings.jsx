@@ -1,11 +1,11 @@
 import InputGroup from './InputGroup';
 
-export default function CameraSettings({enableSettings=true, settings=[], settingsPrefix='13SIM1:cam1', cameraSettingsPVs={}}) {
+export default function CameraSettings({enableSettings=true, settings=[], settingsPrefix='13SIM1:cam1', cameraSettingsPVs={}, onSubmit=()=>{}}) {
     return (
         <section>
             <h2 className="text-3xl text-sky-700">Camera Settings</h2>
             <div>
-                {settings.map((group) => <InputGroup key={group.title} settingsGroup={group} settingsPrefix={settingsPrefix} cameraSettingsPVs={cameraSettingsPVs} />)}
+                {settings.map((group) => <InputGroup key={group.title} settingsGroup={group} settingsPrefix={settingsPrefix} cameraSettingsPVs={cameraSettingsPVs} onSubmit={onSubmit}/>)}
             </div>
             <div className="h-1/4 max-h-96 overflow-scroll border border-sky-500">
                 <p className="text-xl underline">Mapped values</p>

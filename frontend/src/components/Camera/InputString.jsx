@@ -18,7 +18,7 @@ export default function InputString ({input={}, onSubmit=(input)=>{console.log('
             <input
                 type="text" 
                 value={value} 
-                className='w-1/2 border border-slate-200' 
+                className='w-1/2 border border-slate-200 pl-2' 
                 onKeyDown={handleKeyPress} 
                 onChange={handleChange}
             />

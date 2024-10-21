@@ -3,7 +3,7 @@ import { useState } from "react";
 import InputField from "./InputField";
 import { tailwindIcons } from '../../assets/icons';
 
-export default function InputGroup({settingsGroup={}, settingsPrefix='13SIM1:cam1', cameraSettingsPVs={}, showTitleBar=true}) {
+export default function InputGroup({settingsGroup={}, settingsPrefix='13SIM1:cam1', cameraSettingsPVs={}, showTitleBar=true, onSubmit={onSubmit}}) {
     const [ isExpanded, setIsExpanded ] = useState(true);
 
     const handleHeadingClick = () => {
@@ -22,6 +22,7 @@ export default function InputGroup({settingsGroup={}, settingsPrefix='13SIM1:cam
                         input={input}
                         cameraSettingsPVs={cameraSettingsPVs}
                         settingsPrefix={settingsPrefix}
+                        onSubmit={onSubmit}
                     />
                 )}
             </ul>

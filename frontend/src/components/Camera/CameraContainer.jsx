@@ -12,7 +12,9 @@ export default function CameraContainer({customSetup=false, imageArrayDataPV='13
 
     const {
         cameraControlPV,
-        cameraSettingsPVs, 
+        cameraSettingsPVs,
+        onSubmitControl,
+        onSubmitSettings 
     } = useCamera({imageArrayDataPV, settingsPrefix, settings, enableControlPanel, enableSettings});
 
 
@@ -25,8 +27,8 @@ export default function CameraContainer({customSetup=false, imageArrayDataPV='13
         return (
             <div>
                 <CameraCanvas imageArrayDataPV={imageArrayDataPV}/>
-                <CameraControlPanel enableControlPanel={enableControlPanel} cameraControlPV={cameraControlPV}/>
-                <CameraSettings enableSettings={enableSettings} settings={settings} settingsPrefix={settingsPrefix} cameraSettingsPVs={cameraSettingsPVs}/>
+                <CameraControlPanel enableControlPanel={enableControlPanel} cameraControlPV={cameraControlPV} onSubmit={onSubmitControl}/>
+                <CameraSettings enableSettings={enableSettings} settings={settings} settingsPrefix={settingsPrefix} cameraSettingsPVs={cameraSettingsPVs} onSubmit={onSubmitSettings}/>
             </div>
         )
     }

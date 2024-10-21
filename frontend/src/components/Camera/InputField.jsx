@@ -5,7 +5,6 @@ import InputInteger from "./InputInteger";
 import InputString from "./InputString";
 
 export default function InputField ({onSubmit=()=>{}, input={suffix: "Example", label: "Example", type: 'integer', min:'0', max:'5'}, cameraSettingsPVs={}, settingsPrefix=''}) {
-    console.log({input});
     const exampleEnumInput = {
         suffix: "DataType",
         label: "Data Type",
@@ -21,32 +20,36 @@ export default function InputField ({onSubmit=()=>{}, input={suffix: "Example", 
         max: 100
     };
 
+    const pv = `${settingsPrefix}:${input.suffix}`;
+    
+    //create custom wrapper around submit function so we can correctly pass in the pv.
+    //pv is determined in this component but not passed to children to provide more decoupling
+    const handleSubmitWithPV = (newValue) => {
+        console.log('submit with PV: ' + pv + 'and new value: ' + newValue)
+        onSubmit(pv, newValue);
+    };
 
     const renderInput = () => {
         switch (input.type) {
             case type.integer:
-                return <InputInteger  input={input} onSubmit={onSubmit}/>;
+                return <InputInteger  input={input} onSubmit={handleSubmitWithPV}/>;
             case type.float:
-                return <InputFloat input={input} onSubmit={onSubmit}/>;
+                return <InputFloat input={input} onSubmit={handleSubmitWithPV}/>;
             case type.string:
-                return <InputString input={input} onSubmit={onSubmit}/>;
+                return <InputString input={input} onSubmit={handleSubmitWithPV}/>;
             case type.enum:
-                return <InputEnum  input={input} onSubmit={onSubmit}/>;
+                return <InputEnum  input={input} onSubmit={handleSubmitWithPV}/>;
             default:
                 console.log('Error in InputField, received a type of: ' + input.type + ' which does not match any available input types.');
                 return <p>Input type error</p>;
         }
     };
     
-    const pv = `${settingsPrefix}:${input.suffix}`;
-    console.log(pv)
-
-
 
     return (
         <li className="flex">
             {renderInput()}
-            <p className="text-sky-800 ml-6">{pv in cameraSettingsPVs ? cameraSettingsPVs[pv].value : `error, ${pv} not found`}</p>
+            <p className="text-sky-800 ml-6">{pv in cameraSettingsPVs ? ( 'text' in cameraSettingsPVs[pv] ? cameraSettingsPVs[pv].text : cameraSettingsPVs[pv].value) : `error, ${pv} not found`}</p>
         </li>
     )
 }

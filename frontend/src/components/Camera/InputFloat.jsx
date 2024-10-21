@@ -25,7 +25,7 @@ export default function InputFloat ({input={}, onSubmit=(input)=>console.log('su
             <input
                 type="number" 
                 value={value} 
-                className='w-1/2 border border-slate-300' 
+                className='w-1/2 border border-slate-300 pl-2' 
                 onKeyDown={handleKeyPress} 
                 onChange={handleChange}
             />

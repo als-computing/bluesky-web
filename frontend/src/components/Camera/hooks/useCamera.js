@@ -5,7 +5,6 @@ import dayjs from "dayjs";
 export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], enableControlPanel=true, enableSettings=true}) => {
     //definitions
 
-    const [ devicesSettings, setDevicesSettings ] = useState({});
     const [ cameraControlPV, setCameraControlPV ] = useState({});
     const [ cameraSettingsPVs, setCameraSettingsPVs ] = useState({});
 
@@ -25,7 +24,6 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         return santizedPrefix;
     };
 
-
     //creates and returns a string for the acquire suffix
     const createControlPVString = (prefix='') => {
         if (prefix === '') {
@@ -36,7 +34,6 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         var controlPV = `${sanitizeInputPrefix(prefix)}:${acquireSuffix}`;
         return controlPV;
     };
-
 
     //creates object structure for state var
     const initializeControlPVState = (pv='') => {
@@ -52,8 +49,6 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         };
         setCameraControlPV(tempObject);
     };
-
-
 
     //creates and returns an array of PVs for the settings
     const createSettingsPVArray = (settings=[], prefix='') => {
@@ -85,7 +80,6 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         })
         setCameraSettingsPVs(tempSettingsObject);
     };
-
 
     const subscribeControlPV = (connection) => {
         var pv = createControlPVString(settingsPrefix);
@@ -251,6 +245,47 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
             console.log("Websocket Error:", event)
         });
     };
+
+    /**
+     * A function that sends a message to PVWS to write a pv value.
+     *
+     * @param {React.MutableRefObject<WebSocket|null>} connection - A React ref object to store the WebSocket connection.
+     * @param {string} pv - The pv to write the new value to
+     * @param {string} newValue - The new value to assign to the pv
+     * @param {Function} [cb=()=>{}] - Optional callback function to be executed after the Websocket message is sent.
+     * 
+     * @returns {boolean} This function returns a boolean based on success of sending the message
+     */
+    const writePV = (connection=false, pv='', newValue='', cb=()=>{}) => {
+        console.log('writePV')
+        if (connection === false || connection.current === null) {
+            console.log('Cannot send write pv message over websocket, connection not initialized');
+            return false;
+        } else {
+            if (pv !== '' && newValue !== '') {
+                try {
+                    connection.current.send(JSON.stringify({type: "write", pv: pv, value: newValue})); //PVWS api formatting
+                    cb();
+                    return true;
+                } catch (e) {
+                    console.log('Error writing to pv: ' + e);
+                    return false;
+                }
+            } else {
+                console.log('Cannot send write pv message over websocket: pv and/or newValue are empty strings');
+                return false;
+            }
+        }
+    };
+
+    const onSubmitSettings = (pv='', newValue='', cb=()=>{}) => {
+        console.log('submit settings')
+        writePV(connectionSettings, pv, newValue, cb);
+    };
+
+    const onSubmitControl = (pv='', newValue='', cb=()=>{}) => {
+        writePV(connectionControl, pv, newValue, cb);
+    };
     
 
     useEffect(() => {
@@ -275,6 +310,8 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         cameraControlPV,     
         cameraSettingsPVs,
         connectionControl,
-        connectionSettings
+        connectionSettings,
+        onSubmitControl,
+        onSubmitSettings,
     }
 }

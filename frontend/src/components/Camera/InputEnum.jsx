@@ -14,7 +14,6 @@ export default function InputEnum ({input={suffix:'suffix', enums:['test1', 'tes
     };
 
     const handleEnumClick = (item) => {
-        //refactor this to take an arg that does not close dropdown if we came from an 'enter' key
         if (item !== selectedEnum) {
             setSelectedEnum(item);
             onSubmit(item);
@@ -42,7 +41,7 @@ export default function InputEnum ({input={suffix:'suffix', enums:['test1', 'tes
             <div className='w-1/2 border border-slate-300 flex flex-col' onClick={handleInputClick}>
                 <div className="flex w-full">
                     <div className="flex-grow">
-                        <p className=''>{selectedEnum}</p>
+                        <p className='pl-2'>{selectedEnum}</p>
                     </div>
                     <div className="flex-shrink-0">{dropdownVisible ? tailwindIcons.chevronUp : tailwindIcons.chevronDown}</div>
                 </div>
