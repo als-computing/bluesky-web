@@ -39,7 +39,7 @@ export default function InputEnum ({input={suffix:'suffix', enums:['test1', 'tes
     return (
         <div ref={containerRef} className="flex w-full max-w-64">
             <p className="w-1/2">{`${input.label} `}</p>
-            <div className='w-1/2 border border-slate-200 flex flex-col' onClick={handleInputClick}>
+            <div className='w-1/2 border border-slate-300 flex flex-col' onClick={handleInputClick}>
                 <div className="flex w-full">
                     <div className="flex-grow">
                         <p className=''>{selectedEnum}</p>

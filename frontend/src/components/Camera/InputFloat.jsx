@@ -1,12 +1,15 @@
 import { useState } from "react";
 
 export default function InputFloat ({input={}, onSubmit=(input)=>console.log('submit: ' + input)}) {
-    console.log({input})
     const [value, setValue] = useState('');
     const handleChange = (e) => {
         var newValue = e.target.value;
-        if (!isNaN(parseFloat(newValue))) {
-            setValue(parseFloat(newValue));
+        if (!isNaN(parseFloat(newValue)) || newValue==='') {
+            if (newValue === '') {
+                setValue('');
+            } else {
+                setValue(parseFloat(newValue));
+            }
         }
     };
 
@@ -17,15 +20,15 @@ export default function InputFloat ({input={}, onSubmit=(input)=>console.log('su
     };
 
     return (
-            <label>
-                {input.label}
-                <input
-                    type="number" 
-                    value={value} 
-                    className='border border-slate-200' 
-                    onKeyDown={handleKeyPress} 
-                    onChange={handleChange}
-                />
-            </label>
+        <label className="w-full max-w-64 flex justify-between ">
+            {input.label}
+            <input
+                type="number" 
+                value={value} 
+                className='w-1/2 border border-slate-300' 
+                onKeyDown={handleKeyPress} 
+                onChange={handleChange}
+            />
+        </label>
     )
 }

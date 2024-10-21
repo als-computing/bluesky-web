@@ -44,9 +44,9 @@ export default function InputField ({onSubmit=()=>{}, input={suffix: "Example", 
 
 
     return (
-        <div className="flex">
+        <li className="flex">
             {renderInput()}
-            <p>{pv in cameraSettingsPVs ? cameraSettingsPVs[pv].value : `error, ${pv} not found`}</p>
-        </div>
+            <p className="text-sky-800 ml-6">{pv in cameraSettingsPVs ? cameraSettingsPVs[pv].value : `error, ${pv} not found`}</p>
+        </li>
     )
 }

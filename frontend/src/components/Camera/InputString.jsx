@@ -13,12 +13,15 @@ export default function InputString ({input={}, onSubmit=(input)=>{console.log('
     };
 
     return (
-        <input 
-            type="text" 
-            value={value} 
-            className={``} 
-            onKeyDown={handleKeyPress} 
-            onChange={handleChange}
-        />
+        <label className="w-full max-w-64 flex justify-between">
+            {input.label}
+            <input
+                type="text" 
+                value={value} 
+                className='w-1/2 border border-slate-200' 
+                onKeyDown={handleKeyPress} 
+                onChange={handleChange}
+            />
+        </label>
     )
 }

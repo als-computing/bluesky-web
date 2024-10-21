@@ -4,8 +4,12 @@ export default function InputInteger ({input={}, onSubmit=(input)=>{console.log(
     const [value, setValue] = useState('');
     const handleChange = (e) => {
         var newValue = e.target.value;
-        if (!isNaN(parseInt(newValue))) {
-            setValue(parseInt(newValue));
+        if (!newValue.endsWith('.') && (!isNaN(parseInt(newValue)) || newValue==='')) {
+            if (newValue === '') {
+                setValue('')
+            } else {
+                setValue(parseInt(newValue));
+            }
         }
     };
 
@@ -16,12 +20,15 @@ export default function InputInteger ({input={}, onSubmit=(input)=>{console.log(
     };
 
     return (
-        <input 
-            type="number" 
-            value={value} 
-            className={``} 
-            onKeyDown={handleKeyPress} 
-            onChange={handleChange}
-        />
+        <label className="w-full max-w-64 flex justify-between">
+            {input.label}
+            <input
+                type="text" 
+                value={value} 
+                className='w-1/2 border border-slate-300' 
+                onKeyDown={handleKeyPress} 
+                onChange={handleChange}
+            />
+        </label>
     )
 }
