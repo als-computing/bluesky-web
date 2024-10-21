@@ -27,10 +27,14 @@ export default function CameraContainer({customSetup=false, imageArrayDataPV='13
         )
     } else {
         return (
-            <div>
-                <CameraCanvas imageArrayDataPV={imageArrayDataPV}/>
-                <CameraControlPanel enableControlPanel={enableControlPanel} cameraControlPV={cameraControlPV} startAcquire={startAcquire} stopAcquire={stopAcquire}/>
-                <CameraSettings enableSettings={enableSettings} settings={settings} settingsPrefix={settingsPrefix} cameraSettingsPVs={cameraSettingsPVs} onSubmit={onSubmitSettings}/>
+            <div className="w-full flex space-x-4 items-start border border-red-200">
+                <div className="flex flex-col w-1/2">
+                    <CameraCanvas imageArrayDataPV={imageArrayDataPV}/>
+                    <CameraControlPanel enableControlPanel={enableControlPanel} cameraControlPV={cameraControlPV} startAcquire={startAcquire} stopAcquire={stopAcquire}/>
+                </div>
+                <div className="w-1/2">
+                    <CameraSettings enableSettings={enableSettings} settings={settings} settingsPrefix={settingsPrefix} cameraSettingsPVs={cameraSettingsPVs} onSubmit={onSubmitSettings}/>
+                </div>
             </div>
         )
     }
