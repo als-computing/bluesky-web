@@ -26,7 +26,7 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
 
     //creates and returns a string for the acquire suffix
     const createControlPVString = (prefix='') => {
-        if (prefix === '') {
+        if (prefix === '' && enableControlPanel) {
             console.log('Error in concatenating a camera control PV, received empty prefix string');
             return '';
         }
@@ -34,6 +34,8 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         var controlPV = `${sanitizeInputPrefix(prefix)}:${acquireSuffix}`;
         return controlPV;
     };
+
+    const controlPVString = createControlPVString(settingsPrefix);
 
     //creates object structure for state var
     const initializeControlPVState = (pv='') => {
@@ -279,14 +281,30 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
     };
 
     const onSubmitSettings = (pv='', newValue='', cb=()=>{}) => {
-        console.log('submit settings')
         writePV(connectionSettings, pv, newValue, cb);
     };
 
     const onSubmitControl = (pv='', newValue='', cb=()=>{}) => {
         writePV(connectionControl, pv, newValue, cb);
     };
-    
+
+    /**
+     * A function that writes 1 to the area Detector Acquire PV to start acquiring images
+     * 
+     * @returns {void} This function does not return a function
+     */
+    const startAcquire = () => {
+        writePV(connectionControl, controlPVString, 1); //value of 1 starts acquiring
+    };
+
+    /**
+     * A function that writes 0 to the area Detector Acquire PV to stop acquiring images
+     * 
+     * @returns {void} This function does not return a function
+     */
+    const stopAcquire = () => {
+        writePV(connectionControl, controlPVString, 0); //value of 0 stops acquiring
+    };
 
     useEffect(() => {
         if (enableControlPanel && settingsPrefix !== '') {
@@ -313,5 +331,7 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         connectionSettings,
         onSubmitControl,
         onSubmitSettings,
+        startAcquire,
+        stopAcquire
     }
 }
