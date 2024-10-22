@@ -35,8 +35,8 @@ export default function CameraControlPanel({enableControlPanel=true, cameraContr
 
 
     return (
-        <section className="w-full border border-red-300 flex flex-col">
-            <p className="text-center text-slate-600 text-sm">{cameraControlPV.text}</p>
+        <section className="w-full flex flex-col">
+            <p className="text-center text-slate-600 text-sm">Status: {cameraControlPV.text ? cameraControlPV.text : 'acquire PVs are not connected'}</p>
             <div className="flex justify-center space-x-8">
                 <Button cb={startAcquire} text="Acquire" color="bg-blue-500" styles="font-semibold hover:bg-blue-400"/>
                 <Button cb={stopAcquire} text="Pause" color="bg-white" textColor="text-blue-500" styles="border border-blue-500 font-semibold hover:bg-blue-100"/>

@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { phosphorIcons } from "../../assets/icons";
 
-export default function CameraCanvas() {
+export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'}) {
     const canvasRef = useRef(null);
     const [fps, setFps] = useState(0);
     const [socketStatus, setSocketStatus] = useState('closed');
@@ -25,6 +25,8 @@ export default function CameraCanvas() {
             setSocketStatus('Open');
             frameCount.current = 0;
             startTime.current = new Date();
+            //send message to websocket containing the imageArrayDataPV
+            ws.current.send(JSON.stringify({pv: imageArrayDataPV}));
         }
     
         ws.current.onmessage = function (event) {
@@ -39,6 +41,16 @@ export default function CameraCanvas() {
             };
             image.src = 'data:image/jpeg;base64,' + event.data;
         };
+
+        ws.current.onerror = (error) => {
+            console.log("WebSocket Error:", error);
+            setSocketStatus('closed');
+        };
+
+        ws.current.onclose = () => {
+            setSocketStatus('closed');
+            console.log("Camera Web Socket closed");
+        }
     }
 
     const closeWebSocket = () => {

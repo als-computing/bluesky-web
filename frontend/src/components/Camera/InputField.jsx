@@ -4,7 +4,7 @@ import InputFloat from "./InputFloat";
 import InputInteger from "./InputInteger";
 import InputString from "./InputString";
 
-export default function InputField ({onSubmit=()=>{}, input={suffix: "Example", label: "Example", type: 'integer', min:'0', max:'5'}, cameraSettingsPVs={}, settingsPrefix=''}) {
+export default function InputField ({onSubmit=()=>{}, pv='', input={suffix: "Example", label: "Example", type: 'integer', min:'0', max:'5'}, cameraSettingsPVs={}, settingsPrefix=''}) {
     const exampleEnumInput = {
         suffix: "DataType",
         label: "Data Type",
@@ -19,8 +19,6 @@ export default function InputField ({onSubmit=()=>{}, input={suffix: "Example", 
         min: 1,
         max: 100
     };
-
-    const pv = `${settingsPrefix}:${input.suffix}`;
     
     //create custom wrapper around submit function so we can correctly pass in the pv.
     //pv is determined in this component but not passed to children to provide more decoupling
