@@ -35,7 +35,7 @@ export default function CameraControlPanel({enableControlPanel=true, cameraContr
 
 
     return (
-        <section className="flex flex-col">
+        <section className="w-full border border-red-300 flex flex-col">
             <p className="text-center text-slate-600 text-sm">{cameraControlPV.text}</p>
             <div className="flex justify-center space-x-8">
                 <Button cb={startAcquire} text="Acquire" color="bg-blue-500" styles="font-semibold hover:bg-blue-400"/>

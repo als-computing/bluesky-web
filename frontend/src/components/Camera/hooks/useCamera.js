@@ -30,7 +30,7 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
             console.log('Error in concatenating a camera control PV, received empty prefix string');
             return '';
         }
-        let acquireSuffix = 'Acquire'; //the suffix responsible for acquiring images, has a value of 1 or 0
+        let acquireSuffix = 'cam1:Acquire'; //the suffix responsible for acquiring images, has a value of 1 or 0
         var controlPV = `${sanitizeInputPrefix(prefix)}:${acquireSuffix}`;
         return controlPV;
     };
@@ -57,12 +57,13 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         //settings is an array of objects, grouped by setting type
         //ex) a single pv suffix is at settings[0].inputs[0].suffix
 
-        var sanitizePrefix = sanitizeInputPrefix(prefix);
+        var sanitizedPrefix = sanitizeInputPrefix(prefix);
 
         var pvArray = [];
         settings.forEach((group) => {
             group.inputs.forEach((input) => {
-                let pv = `${prefix}:${input.suffix}`
+                console.log(group.prefix)
+                let pv = `${sanitizedPrefix}:${group.prefix !== null ? group.prefix + ':' : ''}${input.suffix}`
                 pvArray.push(pv);
             })
         })
