@@ -98,11 +98,14 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
 
     return (
         <div className="bg-slate-300 w-full aspect-square relative">
-            <canvas className="m-auto border " ref={canvasRef} width={512} height={512} />
+            <canvas className={`${socketStatus === 'closed' ? 'opacity-25' : ''} m-auto border`} ref={canvasRef} width={512} height={512} />
             {/* <img src={src} alt='test' className='w-64 h-64'/> */}
             <p className="absolute z-10 top-1 left-2">{fps} fps</p>
             <div className="absolute z-10 top-2 right-2 w-6 aspect-square text-slate-500 hover:cursor-pointer hover:text-slate-400" onClick={socketStatus === 'closed' ? startWebSocket : closeWebSocket}>
                 {socketStatus === 'closed' ? phosphorIcons.eyeSlash : phosphorIcons.eye}
+            </div>
+            <div className={`${socketStatus === 'closed' ? '' : 'hidden'} absolute top-0 left-0 w-full h-full flex justify-center items-center`}>
+                <p className="text-2xl font-bold text-slate-700">Websocket Disconnected</p>
             </div>
         </div>
     )
