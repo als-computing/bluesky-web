@@ -10,9 +10,14 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
     const startTime = useRef(null);
     const [src, setSrc] = useState('');
 
+
     const startWebSocket = () => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
+
+        let isFrameReady = false;
+        let nextFrame = null;
+    
 
         try {
             //ws.current = new WebSocket('ws://localhost:8000/pvsim/jpeg');
@@ -29,18 +34,42 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
             ws.current.send(JSON.stringify({pv: imageArrayDataPV}));
         }
     
-        ws.current.onmessage = function (event) {
+/*         ws.current.onmessage = function (event) {
             const image = new Image();
             image.onload = function () {
                 context.clearRect(0, 0, canvas.width, canvas.height);
                 context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+
                 let currentTime = new Date();
                 var totalDurationSeconds = currentTime.getTime()/1000 - startTime.current.getTime()/1000;
                 setFps(((frameCount.current + 1) / totalDurationSeconds).toPrecision(3));
                 frameCount.current = frameCount.current + 1;
             };
             image.src = 'data:image/jpeg;base64,' + event.data;
+        }; */
+
+        ws.current.onmessage = async function (event) {
+            const blob = new Blob([event.data], { type: 'image/jpeg' });  // Create Blob from WebSocket data
+            const imageBitmap = await createImageBitmap(blob);  // Use createImageBitmap for faster decoding
+            nextFrame = imageBitmap;
+            isFrameReady = true;  // Mark frame as ready
         };
+    
+        // Rendering loop with requestAnimationFrame
+        const render= () => {
+            if (isFrameReady) {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                context.drawImage(nextFrame, 0, 0, canvas.width, canvas.height);
+                isFrameReady = false;
+            }
+            requestAnimationFrame(render);
+        };
+    
+        requestAnimationFrame(render);  // Start the rendering loop
+
+
+
 
         ws.current.onerror = (error) => {
             console.log("WebSocket Error:", error);
@@ -62,6 +91,7 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
         }
         setSocketStatus('closed');
         frameCount.current = 0;
+        setFps(0);
     }
 
 

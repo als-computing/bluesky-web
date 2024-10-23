@@ -22,7 +22,7 @@ export default function CameraSettings({enableSettings=true, settings=[], settin
     }
     
     return (
-        <section>
+        <section className="w-full h-full min-w-96">
             <div>
                 {settings.map((group) => <InputGroup key={group.title} settingsGroup={group} settingsPrefix={settingsPrefix} cameraSettingsPVs={cameraSettingsPVs} onSubmit={onSubmit}/>)}
             </div>

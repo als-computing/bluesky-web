@@ -139,9 +139,6 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
 
                 //copy over all values from e into stateCopy
                 stateCopy = {...stateCopy, ...e};
-
-                console.log('setting new state');
-                console.log({stateCopy})
                 return stateCopy;
             });
         }
