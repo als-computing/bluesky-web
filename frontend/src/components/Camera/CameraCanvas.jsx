@@ -104,8 +104,9 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
             <div className="absolute z-10 top-2 right-2 w-6 aspect-square text-slate-500 hover:cursor-pointer hover:text-slate-400" onClick={socketStatus === 'closed' ? startWebSocket : closeWebSocket}>
                 {socketStatus === 'closed' ? phosphorIcons.eyeSlash : phosphorIcons.eye}
             </div>
-            <div className={`${socketStatus === 'closed' ? '' : 'hidden'} absolute top-0 left-0 w-full h-full flex justify-center items-center`}>
+            <div className={`${socketStatus === 'closed' ? '' : 'hidden'} absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center`}>
                 <p className="text-2xl font-bold text-slate-700">Websocket Disconnected</p>
+                <div className="w-24 aspect-square text-slate-700">{phosphorIcons.plugs}</div>
             </div>
         </div>
     )

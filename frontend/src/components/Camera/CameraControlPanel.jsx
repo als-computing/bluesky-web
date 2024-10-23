@@ -1,4 +1,6 @@
-import Button from "../library/Button"
+import Button from "../library/Button";
+import ButtonWithIcon from "../library/ButtonWithIcon";
+import { phosphorIcons } from "../../assets/icons";
 
 export default function CameraControlPanel({enableControlPanel=true, cameraControlPV={}, startAcquire=()=>{}, stopAcquire=()=>{}}) {
     
@@ -36,10 +38,10 @@ export default function CameraControlPanel({enableControlPanel=true, cameraContr
 
     return (
         <section className="w-full flex flex-col">
-            <p className="text-center text-slate-600 text-sm">Status: {cameraControlPV.text ? cameraControlPV.text : 'acquire PVs are not connected'}</p>
+            <p className="text-center text-slate-600 text-sm py-1">Acquisition Status: {cameraControlPV.text ? cameraControlPV.text : 'acquire PVs are not connected'}</p>
             <div className="flex justify-center space-x-8">
-                <Button cb={startAcquire} text="Acquire" color="bg-blue-500" styles="font-semibold hover:bg-blue-400"/>
-                <Button cb={stopAcquire} text="Pause" color="bg-white" textColor="text-blue-500" styles="border border-blue-500 font-semibold hover:bg-blue-100"/>
+                <ButtonWithIcon cb={startAcquire} text="Acquire" icon={phosphorIcons.camera} color="bg-blue-500" styles="font-semibold hover:bg-blue-400"/>
+                <ButtonWithIcon cb={stopAcquire} text="Pause" icon={phosphorIcons.cameraSlash} color="bg-white" textColor="text-blue-500" styles="border border-blue-500 font-semibold hover:bg-blue-100"/>
             </div>
         </section>
     )
