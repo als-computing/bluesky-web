@@ -63,11 +63,12 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
 
             # Convert image to base64 to send through WebSocket
             buffered = io.BytesIO()
-            img.save(buffered, format="JPEG")
+            img.save(buffered, format="JPEG", quality=100)
             img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
 
             # Send the base64 encoded image
-            await websocket.send_text(img_str)
+            #await websocket.send_text(img_str)
+            await websocket.send_bytes(buffered.getvalue())
 
     except WebSocketDisconnect:
         await websocket.close()
