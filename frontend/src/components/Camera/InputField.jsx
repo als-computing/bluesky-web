@@ -27,16 +27,18 @@ export default function InputField ({onSubmit=()=>{}, pv='', input={suffix: "Exa
         onSubmit(pv, newValue);
     };
 
+    const isPVConnected = pv in cameraSettingsPVs ? cameraSettingsPVs[pv].isConnected : false;
+
     const renderInput = () => {
         switch (input.type) {
             case type.integer:
-                return <InputInteger  input={input} onSubmit={handleSubmitWithPV}/>;
+                return <InputInteger  label={input.label} onSubmit={handleSubmitWithPV} isDisabled={!isPVConnected}/>;
             case type.float:
-                return <InputFloat input={input} onSubmit={handleSubmitWithPV}/>;
+                return <InputFloat label={input.label} onSubmit={handleSubmitWithPV} isDisabled={!isPVConnected}/>;
             case type.string:
-                return <InputString input={input} onSubmit={handleSubmitWithPV}/>;
+                return <InputString label={input.label} onSubmit={handleSubmitWithPV} isDisabled={!isPVConnected}/>;
             case type.enum:
-                return <InputEnum  input={input} onSubmit={handleSubmitWithPV}/>;
+                return <InputEnum  label={input.label} enums={input.enums} onSubmit={handleSubmitWithPV} isDisabled={!isPVConnected}/>;
             default:
                 console.log('Error in InputField, received a type of: ' + input.type + ' which does not match any available input types.');
                 return <p>Input type error</p>;
@@ -47,7 +49,7 @@ export default function InputField ({onSubmit=()=>{}, pv='', input={suffix: "Exa
     return (
         <li className="flex">
             {renderInput()}
-            <p className="text-sky-800 ml-6">{pv in cameraSettingsPVs ? ( 'text' in cameraSettingsPVs[pv] ? cameraSettingsPVs[pv].text : cameraSettingsPVs[pv].value) : `error, ${pv} not found`}</p>
+            <p className={`${isPVConnected ? 'text-sky-800' : 'text-red-400'} ml-6`}>{isPVConnected ? ( 'text' in cameraSettingsPVs[pv] ? cameraSettingsPVs[pv].text : cameraSettingsPVs[pv].value) : `${pv} disconnected`}</p>
         </li>
     )
 }

@@ -54,6 +54,11 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
             const imageBitmap = await createImageBitmap(blob);  // Use createImageBitmap for faster decoding
             nextFrame = imageBitmap;
             isFrameReady = true;  // Mark frame as ready
+
+            let currentTime = new Date();
+            var totalDurationSeconds = currentTime.getTime()/1000 - startTime.current.getTime()/1000;
+            setFps(((frameCount.current + 1) / totalDurationSeconds).toPrecision(3));
+            frameCount.current = frameCount.current + 1;
         };
     
         // Rendering loop with requestAnimationFrame
@@ -99,14 +104,24 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
     return (
         <div className="bg-slate-300 w-full aspect-square relative">
             <canvas className={`${socketStatus === 'closed' ? 'opacity-25' : ''} m-auto border`} ref={canvasRef} width={512} height={512} />
-            {/* <img src={src} alt='test' className='w-64 h-64'/> */}
             <p className="absolute z-10 top-1 left-2">{fps} fps</p>
             <div className="absolute z-10 top-2 right-2 w-6 aspect-square text-slate-500 hover:cursor-pointer hover:text-slate-400" onClick={socketStatus === 'closed' ? startWebSocket : closeWebSocket}>
                 {socketStatus === 'closed' ? phosphorIcons.eyeSlash : phosphorIcons.eye}
             </div>
-            <div className={`${socketStatus === 'closed' ? '' : 'hidden'} absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center`}>
-                <p className="text-2xl font-bold text-slate-700">Websocket Disconnected</p>
-                <div className="w-24 aspect-square text-slate-700">{phosphorIcons.plugs}</div>
+            <div className={`${socketStatus === 'closed' ? '' : 'hidden'} absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center group`}>
+                <div className="flex justify-center items-center w-full h-full">
+                    <div className="relative group-hover:cursor-pointer w-full max-w-xs h-32">
+                        <div className="group-hover:opacity-0 opacity-100 transition-opacity duration-700 flex content-center items-center flex-col absolute top-0 w-full h-full ">
+                            <p className="text-2xl font-bold text-slate-700">Websocket Disconnected</p>
+                            <div className="w-24 aspect-square text-slate-700 m-auto">{phosphorIcons.plugs}</div>
+                        </div>
+
+                        <div className="opacity-0 transition-opacity duration-700 group-hover:opacity-100 text-center absolute top-0 w-full h-full" onClick={startWebSocket}>
+                            <p className="text-2xl font-bold text-slate-700">Connect?</p>
+                            <div className="w-24 aspect-square text-slate-700 m-auto">{phosphorIcons.plugsConnected}</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     )

@@ -2,15 +2,15 @@ import { useState, useRef, useEffect } from 'react';
 import { tailwindIcons } from '../../assets/icons';
 import { Tooltip } from 'react-tooltip';
 
-export default function InputEnum ({input={suffix:'suffix', enums:['test1', 'test2'], label:'label'}, onSubmit=(input) => console.log('submit: ' + input)}) {
+export default function InputEnum ({label='label', enums=['blank1','blank2'], onSubmit=(input) => console.log('submit: ' + input), isDisabled=false}) {
     const [selectedEnum, setSelectedEnum] = useState('');
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const enums = input.enums;
+   
 
     const containerRef = useRef(null);
 
     const handleInputClick = () => {
-        setDropdownVisible(!dropdownVisible);
+        if (!isDisabled) setDropdownVisible(!dropdownVisible);
     };
 
     const handleEnumClick = (item) => {
@@ -36,9 +36,9 @@ export default function InputEnum ({input={suffix:'suffix', enums:['test1', 'tes
     }, []);
 
     return (
-        <div ref={containerRef} className="flex w-full max-w-64">
-            <p className="w-1/2">{`${input.label} `}</p>
-            <div className='w-1/2 border border-slate-300 flex flex-col' onClick={handleInputClick}>
+        <div ref={containerRef} className={`${isDisabled ? 'text-slate-400' : 'text-black'} flex w-full max-w-64`}>
+            <p className="w-1/2">{`${label} `}</p>
+            <div className={`${isDisabled ? 'hover:cursor-not-allowed' : ''} w-1/2 border border-slate-300 flex flex-col`} onClick={handleInputClick}>
                 <div className="flex w-full">
                     <div className="flex-grow">
                         <p className='pl-2'>{selectedEnum}</p>
