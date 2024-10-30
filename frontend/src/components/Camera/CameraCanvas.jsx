@@ -20,8 +20,8 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
     
 
         try {
-            //ws.current = new WebSocket('ws://localhost:8000/pvsim/jpeg');
-            ws.current = new WebSocket('ws://localhost:8000/pvws/pv');
+            //ws.current = new WebSocket('ws://localhost:8000/pvws/pv');
+            ws.current = new WebSocket('ws://localhost/api/camera');
         } catch (error) {
             console.log({error});
             return;

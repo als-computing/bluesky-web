@@ -153,7 +153,7 @@ const updateDevice = (e, setDevices, setUpdatedDeviceKey=()=>{}) => {
 const getPVWSUrl = () => {
     //if no env variable is set, then assume that the React App is on the same workstation as PVWS
         //having an env variable would be for developers running React on a separate workstation from PVWS
-    const currentWebsiteIP = window.location.hostname;
+/*     const currentWebsiteIP = window.location.hostname;
     const pathname = "/pvws/pv";
     const port = ":8080";
     var wsUrl;
@@ -161,8 +161,9 @@ const getPVWSUrl = () => {
         wsUrl = process.env.REACT_APP_PVWS_URL;
     } else {
         wsUrl = "ws://" + currentWebsiteIP + port + pathname;
-    }
+    } */
 
+    const wsUrl = "ws://localhost/api/pvws";
     return wsUrl;
 }
 
@@ -182,7 +183,7 @@ const getQServerKey = () => {
 const getFastAPIUrl = () => {
     //if no env variable is set, then assume that the React App is on the same workstation as the fastAPI server
         //having an env variable would be for developers running React on a separate workstation from fastAPI
-    const currentWebsiteIP = window.location.hostname;
+/*     const currentWebsiteIP = window.location.hostname;
     const pathname = "/";
     const port = ":8000";
     var httpUrl;
@@ -190,7 +191,9 @@ const getFastAPIUrl = () => {
         httpUrl = process.env.REACT_APP_FASTAPI_URL;
     } else {
         httpUrl = "http://" + currentWebsiteIP + port + pathname;
-    }
+    } */
+
+    const httpUrl = 'api/';
 
     return httpUrl;
 }
@@ -198,7 +201,7 @@ const getFastAPIUrl = () => {
 const getHttpServerUrl = () => {
     //if no env variable is set, then assume that the React App is on the same workstation as PVWS
         //having an env variable would be for developers running React on a separate workstation from PVWS
-    const currentWebsiteIP = window.location.hostname;
+/*     const currentWebsiteIP = window.location.hostname;
     const pathname = "/";
     const port = ":60610";
     var httpUrl;
@@ -206,13 +209,14 @@ const getHttpServerUrl = () => {
         httpUrl = process.env.REACT_APP_HTTP_SERVER_URL;
     } else {
         httpUrl = "http://" + currentWebsiteIP + port + pathname;
-    }
+    } */
+   const httpUrl = '/api/qserver';
     return httpUrl;
 }
 const getQSConsoleUrl = () => {
     //if no env variable is set, then assume that the React App is on the same workstation as the fastAPI server
         //having an env variable would be for developers running React on a separate workstation from fastAPI
-    const currentWebsiteIP = window.location.hostname;
+/*     const currentWebsiteIP = window.location.hostname;
     const pathname = "/queue_server";
     const port = ":8000";
     var wsUrl;
@@ -220,7 +224,8 @@ const getQSConsoleUrl = () => {
         wsUrl = process.env.REACT_APP_QS_CONSOLE_URL;
     } else {
         wsUrl = "ws://" + currentWebsiteIP + port + pathname;
-    }
+    } */
+   const wsUrl='ws://localhost/queue_server'
 
     return wsUrl;
 }
