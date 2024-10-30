@@ -19,14 +19,24 @@ router = APIRouter()
 async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
     await websocket.accept()
 
+    # Parse the incoming message for the PV
+    try:
+        data = await websocket.receive_text()
+        message = json.loads(data)
+        pv = message.get("pv", "13SIM1:image1:ArrayData")
+    except:
+        pv = "13SIM1:image1:ArrayData"  # Default to the hardcoded PV
+
     buffer = asyncio.Queue(maxsize=1000)
 
     # This is called each time the value of the signal changes.
     def array_cb(value, timestamp, **kwargs):
-        buffer.put_nowait((value, timestamp))
+        try:
+            buffer.put_nowait((value, timestamp))
+        except asyncio.QueueFull:
+            print("Buffer full, dropping frame")
 
-    #array_signal = EpicsSignalRO("IOC:m1")
-    array_signal = EpicsSignalRO("13SIM1:image1:ArrayData")
+    array_signal = EpicsSignalRO(pv)
     array_signal.subscribe(array_cb)
     buffer.put_nowait((array_signal.get(), time.time()))
 
@@ -53,11 +63,12 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
 
             # Convert image to base64 to send through WebSocket
             buffered = io.BytesIO()
-            img.save(buffered, format="JPEG")
+            img.save(buffered, format="JPEG", quality=100)
             img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
 
             # Send the base64 encoded image
-            await websocket.send_text(img_str)
+            #await websocket.send_text(img_str)
+            await websocket.send_bytes(buffered.getvalue())
 
     except WebSocketDisconnect:
         await websocket.close()

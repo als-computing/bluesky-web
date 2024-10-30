@@ -2,7 +2,8 @@ const type = {
     enum: "enum",
     float: "float",
     integer: "integer",
-    string: "string"
+    string: "string",
+    boolean: "boolean"
 };
 
 //Define custom area detector settings here. The suffix should not include the initial prefix
@@ -12,6 +13,7 @@ const adSimDetector = [
     {
         title: "Acquisition Settings",
         icon: null,
+        prefix: 'cam1',
         inputs: [
             {
                 suffix: "DataType",
@@ -51,6 +53,7 @@ const adSimDetector = [
     {
         title: "Size Settings",
         icon: null,
+        prefix: 'cam1',
         inputs: [
             {
                 suffix: "MinX",
@@ -79,6 +82,19 @@ const adSimDetector = [
                 type: type.integer,
                 min: 1,
                 max: 1024
+            },
+        ]
+    },
+    {
+        title: "Plugins",
+        icon: null,
+        prefix: null,
+        inputs: [
+            {
+                suffix: "image1:EnableCallbacks",
+                label: "ND Array Port",
+                type: type.enum,
+                enums: ['Enable', 'Disable']
             },
         ]
     }

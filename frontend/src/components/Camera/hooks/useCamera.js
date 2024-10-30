@@ -5,7 +5,6 @@ import dayjs from "dayjs";
 export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], enableControlPanel=true, enableSettings=true}) => {
     //definitions
 
-    const [ devicesSettings, setDevicesSettings ] = useState({});
     const [ cameraControlPV, setCameraControlPV ] = useState({});
     const [ cameraSettingsPVs, setCameraSettingsPVs ] = useState({});
 
@@ -25,18 +24,18 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         return santizedPrefix;
     };
 
-
     //creates and returns a string for the acquire suffix
     const createControlPVString = (prefix='') => {
-        if (prefix === '') {
+        if (prefix === '' && enableControlPanel) {
             console.log('Error in concatenating a camera control PV, received empty prefix string');
             return '';
         }
-        let acquireSuffix = 'Acquire'; //the suffix responsible for acquiring images, has a value of 1 or 0
+        let acquireSuffix = 'cam1:Acquire'; //the suffix responsible for acquiring images, has a value of 1 or 0
         var controlPV = `${sanitizeInputPrefix(prefix)}:${acquireSuffix}`;
         return controlPV;
     };
 
+    const controlPVString = createControlPVString(settingsPrefix);
 
     //creates object structure for state var
     const initializeControlPVState = (pv='') => {
@@ -53,19 +52,18 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         setCameraControlPV(tempObject);
     };
 
-
-
     //creates and returns an array of PVs for the settings
     const createSettingsPVArray = (settings=[], prefix='') => {
         //settings is an array of objects, grouped by setting type
         //ex) a single pv suffix is at settings[0].inputs[0].suffix
 
-        var sanitizePrefix = sanitizeInputPrefix(prefix);
+        var sanitizedPrefix = sanitizeInputPrefix(prefix);
 
         var pvArray = [];
         settings.forEach((group) => {
             group.inputs.forEach((input) => {
-                let pv = `${prefix}:${input.suffix}`
+                console.log(group.prefix)
+                let pv = `${sanitizedPrefix}:${group.prefix !== null ? group.prefix + ':' : ''}${input.suffix}`
                 pvArray.push(pv);
             })
         })
@@ -85,7 +83,6 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         })
         setCameraSettingsPVs(tempSettingsObject);
     };
-
 
     const subscribeControlPV = (connection) => {
         var pv = createControlPVString(settingsPrefix);
@@ -142,9 +139,6 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
 
                 //copy over all values from e into stateCopy
                 stateCopy = {...stateCopy, ...e};
-
-                console.log('setting new state');
-                console.log({stateCopy})
                 return stateCopy;
             });
         }
@@ -251,7 +245,64 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
             console.log("Websocket Error:", event)
         });
     };
-    
+
+    /**
+     * A function that sends a message to PVWS to write a pv value.
+     *
+     * @param {React.MutableRefObject<WebSocket|null>} connection - A React ref object to store the WebSocket connection.
+     * @param {string} pv - The pv to write the new value to
+     * @param {string} newValue - The new value to assign to the pv
+     * @param {Function} [cb=()=>{}] - Optional callback function to be executed after the Websocket message is sent.
+     * 
+     * @returns {boolean} This function returns a boolean based on success of sending the message
+     */
+    const writePV = (connection=false, pv='', newValue='', cb=()=>{}) => {
+        console.log('writePV')
+        if (connection === false || connection.current === null) {
+            console.log('Cannot send write pv message over websocket, connection not initialized');
+            return false;
+        } else {
+            if (pv !== '' && newValue !== '') {
+                try {
+                    connection.current.send(JSON.stringify({type: "write", pv: pv, value: newValue})); //PVWS api formatting
+                    cb();
+                    return true;
+                } catch (e) {
+                    console.log('Error writing to pv: ' + e);
+                    return false;
+                }
+            } else {
+                console.log('Cannot send write pv message over websocket: pv and/or newValue are empty strings');
+                return false;
+            }
+        }
+    };
+
+    const onSubmitSettings = (pv='', newValue='', cb=()=>{}) => {
+        writePV(connectionSettings, pv, newValue, cb);
+    };
+
+    const onSubmitControl = (pv='', newValue='', cb=()=>{}) => {
+        writePV(connectionControl, pv, newValue, cb);
+    };
+
+    /**
+     * A function that writes 1 to the area Detector Acquire PV to start acquiring images
+     * 
+     * @returns {void} This function does not return a function
+     */
+    const startAcquire = () => {
+        writePV(connectionControl, controlPVString, 1); //value of 1 starts acquiring
+    };
+
+    /**
+     * A function that writes 0 to the area Detector Acquire PV to stop acquiring images
+     * 
+     * @returns {void} This function does not return a function
+     */
+    const stopAcquire = () => {
+        writePV(connectionControl, controlPVString, 0); //value of 0 stops acquiring
+    };
 
     useEffect(() => {
         if (enableControlPanel && settingsPrefix !== '') {
@@ -275,6 +326,10 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         cameraControlPV,     
         cameraSettingsPVs,
         connectionControl,
-        connectionSettings
+        connectionSettings,
+        onSubmitControl,
+        onSubmitSettings,
+        startAcquire,
+        stopAcquire
     }
 }

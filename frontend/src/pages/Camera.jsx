@@ -17,6 +17,8 @@ export default function Camera() {
         <WebSocketImage url={urlSim} width={width} height={height}/>
     ) */
     return (
-        <CameraContainer customSetup={false} settings={cameraDeviceData.ADSimDetector}/>
+        <div className="w-full h-full">
+            <CameraContainer customSetup={false} settings={cameraDeviceData.ADSimDetector}/>
+        </div>
     )
 }
