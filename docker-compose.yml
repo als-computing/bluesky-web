@@ -13,10 +13,7 @@ services:
       - EPICS_CA_ADDR_LIST=${EPICS_CA_ADDR_LIST}
       - EPICS_CA_AUTO_ADDR_LIST=NO
       - PV_WRITE_SUPPORT=true
-    ports:
-      - "8080:8080"
-    networks: 
-      - qnet
+    network_mode: "host"
   python-server:
     build: ./python-server
     environment:
@@ -24,17 +21,13 @@ services:
       - EPICS_CA_AUTO_ADDR_LIST=NO
       - ZMQ_HOST=qserver
       - ZMQ_PORT=60625
-    ports:
-      - "8000:8000"
-    networks: 
-      - qnet
+    network_mode: "host"
   qserver:
     build: ./queue-server
     environment:
       - EPICS_CA_ADDR_LIST=${EPICS_CA_ADDR_LIST}
       - EPICS_CA_AUTO_ADDR_LIST=NO
-    networks: 
-      - qnet
+    network_mode: "host"
     command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "redis:6379", "--startup-dir", "/code/startup_blank", "--keep-re"]
   qserver-api:
     build: ./queue-server-api
