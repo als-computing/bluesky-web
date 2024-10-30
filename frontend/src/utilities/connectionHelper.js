@@ -239,8 +239,8 @@ const initializeDeviceList = (devices, setDevices) => {
             isConnected: false,
             value: null,
             units: null,
-            min: devices.min !== '' ? devices.min : null,
-            max: devices.max !== '' ? devices.max: null,
+            min: device.min !== '' ? device.min : null,
+            max: device.max !== '' ? device.max: null,
             increment: device.increment,
             setValue: '',
             lastUpdate: null

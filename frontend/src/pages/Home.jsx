@@ -6,13 +6,13 @@ export default function Home() {
 
     useEffect(() => {
         // Redirect to /queueserver when the component loads
-        setTimeout(()=> navigate('/queueserver'), 2000);
+        setTimeout(()=> navigate('/beamlines/bl531'), 2000);
         //navigate('/queueserver');
     }, [navigate]);
 
     return (
         <section className='w-full h-40 flex items-center justify-center'>
-            <p>Nothing to see here yet, redirecting to Queue Server</p>
+            <p>Nothing to see here yet, redirecting</p>
         </section>
     )
 }
