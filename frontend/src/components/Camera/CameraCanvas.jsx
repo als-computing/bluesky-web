@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { phosphorIcons } from "../../assets/icons";
+import { getCameraUrl } from '../../utilities/connectionHelper';
 
 export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'}) {
     const canvasRef = useRef(null);
@@ -20,8 +21,10 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
     
 
         try {
+            var wsUrl = getCameraUrl();
             //ws.current = new WebSocket('ws://localhost:8000/pvws/pv');
-            ws.current = new WebSocket('ws://localhost/api/camera');
+            //ws.current = new WebSocket('ws://localhost/api/camera');
+            ws.current = new WebSocket(wsUrl);
         } catch (error) {
             console.log({error});
             return;
@@ -97,7 +100,7 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
         setSocketStatus('closed');
         frameCount.current = 0;
         setFps(0);
-    }
+    };
 
 
 
