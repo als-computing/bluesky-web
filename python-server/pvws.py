@@ -32,7 +32,7 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
     # This is called each time the value of the signal changes.
     def array_cb(value, timestamp, **kwargs):
         try:
-            buffer.put_nowait((value, timestamp))
+            buffer.put_nowait((value, timestamp, False))
         except asyncio.QueueFull:
             print("Buffer full, dropping frame")
 
@@ -48,25 +48,40 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
     sizeX_signal = EpicsSignalRO(sizeX_pv , name="sizeX_signal")
     sizeY_signal = EpicsSignalRO(sizeY_pv, name="sizeY_signal")
 
-    dimensions = {
-        'x' : sizeX_signal.get() - startX_signal.get(),
-        'y' : sizeY_signal.get() - startY_signal.get(),
-        'startX_pv' : startX_signal.get(),
-        'startY_pv' : startY_signal.get(),
-        'sizeX_pv' : sizeX_signal.get(),
-        'sizeY_pv' : sizeY_signal.get()
-    }
+    class Dimensions:
+        def __init__(self):
+            self.data = {
+                'x': sizeX_signal.get() - startX_signal.get(),
+                'y': sizeY_signal.get() - startY_signal.get(),
+                'startX_pv': startX_signal.get(),
+                'startY_pv': startY_signal.get(),
+                'sizeX_pv': sizeX_signal.get(),
+                'sizeY_pv': sizeY_signal.get()
+            }
 
-    didDimensionsChange = True
+        def update(self, name, value):
+            self.data[name] = value
+            self.data['x'] = self.data['sizeX_pv'] - self.data['startX_pv']
+            self.data['y'] = self.data['sizeY_pv'] - self.data['startY_pv']
+
+    dimensions = Dimensions()
+
 
     #Update dimensions whenever a size PV changes
     def size_cb(value, timestamp, **kwargs):
         name = kwargs.get("obj").name
-        dimensions[name] = value
-        dimensions['x'] = dimensions['sizeX_pv'] - dimensions['startX_pv']
-        dimensions['y'] = dimensions['sizeY_pv'] - dimensions['startY_pv']
-        didDimensionsChange = True #set flag so we send dimensions on the next frame
-        print('changed the dimensions')
+        dimensions.update(name, value)
+        print(f"Received new value for {name} = {value}")
+        try:
+            print(f"Epics signal values are startX: {startX_signal.value}, startY: {startY_signal.value}, sizeX: {sizeX_signal.value}, sizeY: {sizeY_signal.value}")
+            tempDimensions = {
+                'x': sizeX_signal.value - startX_signal.value,
+                'y': sizeY_signal.value - startY_signal.value
+            }
+            print(f"temp Dimensions are x={dimensions.data['x']} and y={dimensions.data['y']}")
+            buffer.put_nowait((None, timestamp, tempDimensions))
+        except asyncio.QueueFull:
+            print("Buffer full when trying to update dimensions, danger")
 
     startX_signal.subscribe(size_cb)
     startY_signal.subscribe(size_cb)
@@ -76,19 +91,28 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
     array_signal = EpicsSignalRO(pv)
 
     array_signal.subscribe(array_cb)
-    buffer.put_nowait((array_signal.get(), time.time()))
+    buffer.put_nowait((array_signal.get(), time.time(), False))
 
     i = 0
     try:
+        currentDimensions = dimensions
         while True:
             # This will wait until there is something in the buffer.
-            value, timestamp = await buffer.get()
+            value, timestamp, updated_dimensions = await buffer.get()
+
+            # Check for dimension updates
+            if updated_dimensions:
+                currentDimensions = updated_dimensions
+                print(f"current Dimensions sent to client are x={currentDimensions['x']} and y={currentDimensions['y']}")
+                await websocket.send_text(json.dumps(currentDimensions))
+                continue
+
             rgb_data = np.array(value, dtype=np.uint8)
 
             # Reshape the array into a 3D RGB image
             if len(rgb_data.shape) == 1:  # Assuming 1D array, reshape as needed for RGB
                 try:
-                    height, width, channels = dimensions['y'], dimensions['x'], 3  # Adjust dimensions as needed
+                    height, width, channels = currentDimensions['y'], currentDimensions['x'], 3  # Adjust dimensions as needed
                     rgb_data = rgb_data.reshape((height, width, channels))
                 except Exception as e: 
                     print('Skipping this image, mismatch between array data and pv dimensions')
@@ -114,9 +138,6 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
 
             try:
                 print('sending')
-                if didDimensionsChange:
-                    await websocket.send_text(json.dumps(dimensions))
-                    didDimensionsChange = False
 
                 await websocket.send_bytes(buffered.getvalue())
             except WebSocketDisconnect:
