@@ -36,7 +36,41 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
         except asyncio.QueueFull:
             print("Buffer full, dropping frame")
 
+
+    startX_pv = "13SIM1:cam1:MinX"
+    startY_pv = "13SIM1:cam1:MinY"
+    sizeX_pv = "13SIM1:cam1:SizeX"
+    sizeY_pv = "13SIM1:cam1:SizeY"
+
+
+    startX_signal = EpicsSignalRO(startX_pv, name="startX_signal")
+    startY_signal = EpicsSignalRO(startY_pv, name="startY_signal")
+    sizeX_signal = EpicsSignalRO(sizeX_pv , name="sizeX_signal")
+    sizeY_signal = EpicsSignalRO(sizeY_pv, name="sizeY_signal")
+
+    dimensions = {
+        'x' : sizeX_signal.get() - startX_signal.get(),
+        'y' : sizeY_signal.get() - startY_signal.get(),
+        'startX_pv' : startX_signal.get(),
+        'startY_pv' : startY_signal.get(),
+        'sizeX_pv' : sizeX_signal.get(),
+        'sizeY_pv' : sizeY_signal.get()
+    }
+
+    #Update dimensions whenever a size PV changes
+    def size_cb(value, timestamp, **kwargs):
+        name = kwargs.get("obj").name
+        dimensions[name] = value
+        dimensions['x'] = dimensions['sizeX_pv'] - dimensions['startX_pv']
+        dimensions['y'] = dimensions['sizeY_pv'] - dimensions['startY_pv']
+
+    startX_signal.subscribe(size_cb)
+    startY_signal.subscribe(size_cb)
+    sizeX_signal.subscribe(size_cb)
+    sizeY_signal.subscribe(size_cb)
+
     array_signal = EpicsSignalRO(pv)
+
     array_signal.subscribe(array_cb)
     buffer.put_nowait((array_signal.get(), time.time()))
 
@@ -49,7 +83,7 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
 
             # Reshape the array into a 3D RGB image
             if len(rgb_data.shape) == 1:  # Assuming 1D array, reshape as needed for RGB
-                height, width, channels = 512, 512, 3  # Adjust dimensions as needed
+                height, width, channels = dimensions['y'], dimensions['x'], 3  # Adjust dimensions as needed
                 rgb_data = rgb_data.reshape((height, width, channels))
 
             # Resize the image if it exceeds maximum dimension limits
