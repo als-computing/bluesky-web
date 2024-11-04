@@ -60,7 +60,7 @@ const getQueue = async (cb, mock=false) => {
         return;
     }
     try {
-        const response = await axios.get(httpServerUrl + 'api/queue/get', 
+        const response = await axios.get(httpServerUrl + '/api/queue/get', 
             {headers : {
                 'Authorization' : 'ApiKey ' + qServerKey
             }}
@@ -77,7 +77,7 @@ const getQueueHistory = async (cb, mock=false) => {
         return;
     }
     try {
-        const response = await axios.get(httpServerUrl + 'api/history/get', 
+        const response = await axios.get(httpServerUrl + '/api/history/get', 
             {headers : {
                 'Authorization' : 'ApiKey ' + qServerKey
             }}
@@ -95,7 +95,7 @@ const getStatus = async (cb, mock = false) => {
         return;
     }
     try {
-        const response = await axios.get(httpServerUrl + 'api/status', 
+        const response = await axios.get(httpServerUrl + '/api/status', 
             {headers : {
                 'Authorization' : 'ApiKey ' + qServerKey
             }}
@@ -112,7 +112,7 @@ const getPlansAllowed = async (cb, mock = false) => {
         return;
     }
     try {
-        const response = await axios.get(httpServerUrl + 'api/plans/allowed',
+        const response = await axios.get(httpServerUrl + '/api/plans/allowed',
             {headers : {
                 'Authorization' : 'ApiKey ' + qServerKey
             }}
@@ -129,7 +129,7 @@ const getDevicesAllowed = async (cb, mock = false) => {
         return;
     }
     try {
-        const response = await axios.get(httpServerUrl + 'api/devices/allowed',
+        const response = await axios.get(httpServerUrl + '/api/devices/allowed',
             {headers : {
                 'Authorization' : 'ApiKey ' + qServerKey
             }}
@@ -143,7 +143,7 @@ const getDevicesAllowed = async (cb, mock = false) => {
 const startRE = async () => {
     //returns true if no errors encountered
     try {
-        const response = await axios.post(httpServerUrl + 'api/queue/start', 
+        const response = await axios.post(httpServerUrl + '/api/queue/start', 
             {},
             {headers : {
                 'Authorization' : 'ApiKey ' + qServerKey
@@ -159,7 +159,7 @@ const startRE = async () => {
 
 const postQueueItem = async (body={}, cb=()=>{}) => {
     try {
-        const response = await axios.post(httpServerUrl + 'api/queue/item/add', 
+        const response = await axios.post(httpServerUrl + '/api/queue/item/add', 
         body,
         {headers : {
             'Authorization' : 'ApiKey ' + qServerKey
@@ -175,7 +175,7 @@ const postQueueItem = async (body={}, cb=()=>{}) => {
 
 const executeItem = async (body={}, cb=()=>{}) => {
     try {
-        const response = await axios.post(httpServerUrl + 'api/queue/item/execute', 
+        const response = await axios.post(httpServerUrl + '/api/queue/item/execute', 
         body,
         {headers : {
             'Authorization' : 'ApiKey ' + qServerKey
@@ -195,7 +195,7 @@ const getQueueItem = async (uid='', cb=()=>{}, mock=false) => {
         return;
     }
     try {
-        const response = await axios.get(httpServerUrl + 'api/queue/item/get', {
+        const response = await axios.get(httpServerUrl + '/api/queue/item/get', {
             params: {uid: uid},
             headers : {
                 'uid' : uid,
@@ -211,7 +211,7 @@ const getQueueItem = async (uid='', cb=()=>{}, mock=false) => {
 
 const deleteQueueItem = async (body={}, cb=()=>{}) => {
     try {
-        const response = await axios.post(httpServerUrl + 'api/queue/item/remove', 
+        const response = await axios.post(httpServerUrl + '/api/queue/item/remove', 
         body,
         {headers : {
             'Authorization' : 'ApiKey ' + qServerKey
@@ -227,7 +227,7 @@ const deleteQueueItem = async (body={}, cb=()=>{}) => {
 
 const openWorkerEnvironment = async (cb=()=>{}) => {
     try {
-        const response = await axios.post(httpServerUrl + 'api/environment/open',
+        const response = await axios.post(httpServerUrl + '/api/environment/open',
         {}, 
         {headers : {
             'Authorization' : 'ApiKey ' + qServerKey
