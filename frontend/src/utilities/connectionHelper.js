@@ -229,7 +229,7 @@ const getQSConsoleUrl = () => {
         if (process.env.REACT_APP_PROXY_WS && process.env.REACT_APP_PROXY_WS === 'false') {
             wsUrl = "ws://" + currentWebsiteIP + port + pathname; //default when ran locally
         } else {
-            wsUrl='ws://localhost/queue_server' //reverse proxy, does not work with React live dev server
+            wsUrl='ws://localhost/api/queue_server' //reverse proxy, does not work with React live dev server
         }
     }
 

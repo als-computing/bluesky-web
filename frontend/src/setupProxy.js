@@ -31,7 +31,7 @@ module.exports = function(app) {
     );
 
     app.use(
-        '/queue_server',
+        '/api/queue_server',
         createProxyMiddleware({
             target: 'ws://localhost:8000',
             changeOrigin: true,

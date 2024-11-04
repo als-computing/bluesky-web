@@ -3,10 +3,6 @@ services:
     image: redis:7.4-rc2-alpine
     networks: 
       - qnet
-  frontend:
-    build: ./frontend
-    ports:
-      - "8081:80"
   pvws:
     build: ./pvws/docker
     environment:
@@ -48,6 +44,16 @@ services:
     ports:
       - "60610:60610"
     command: ["uvicorn", "--host", "0.0.0.0", "--port", "60610", "bluesky_httpserver.server:app"]
+  frontend:
+    build: ./frontend
+    ports:
+      - "8081:80"
+    env_file:
+      - ./frontend/.env.production
+    depends_on:
+      - pvws
+      - python-server
+      - qserver-api
   
 networks:
   qnet:
