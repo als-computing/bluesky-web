@@ -53,15 +53,24 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
         }; */
 
         ws.current.onmessage = async function (event) {
-            const blob = new Blob([event.data], { type: 'image/jpeg' });  // Create Blob from WebSocket data
-            const imageBitmap = await createImageBitmap(blob);  // Use createImageBitmap for faster decoding
-            nextFrame = imageBitmap;
-            isFrameReady = true;  // Mark frame as ready
-
-            let currentTime = new Date();
-            var totalDurationSeconds = currentTime.getTime()/1000 - startTime.current.getTime()/1000;
-            setFps(((frameCount.current + 1) / totalDurationSeconds).toPrecision(3));
-            frameCount.current = frameCount.current + 1;
+            if (typeof event.data === "string") {
+                // Handle JSON message for dimensions
+                const dimensions = JSON.parse(event.data);
+                console.log("Received dimensions:", dimensions);
+                canvasRef.current.width = dimensions.x;
+                canvasRef.current.height = dimensions.y;
+            } else {
+                // Handle binary image data
+                const blob = new Blob([event.data], { type: 'image/jpeg' });
+                const imageBitmap = await createImageBitmap(blob);
+                nextFrame = imageBitmap;
+                isFrameReady = true;  // Mark frame as ready
+        
+                let currentTime = new Date();
+                var totalDurationSeconds = currentTime.getTime()/1000 - startTime.current.getTime()/1000;
+                setFps(((frameCount.current + 1) / totalDurationSeconds).toPrecision(3));
+                frameCount.current = frameCount.current + 1;
+            }
         };
     
         // Rendering loop with requestAnimationFrame

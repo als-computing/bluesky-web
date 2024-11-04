@@ -57,12 +57,16 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
         'sizeY_pv' : sizeY_signal.get()
     }
 
+    didDimensionsChange = True
+
     #Update dimensions whenever a size PV changes
     def size_cb(value, timestamp, **kwargs):
         name = kwargs.get("obj").name
         dimensions[name] = value
         dimensions['x'] = dimensions['sizeX_pv'] - dimensions['startX_pv']
         dimensions['y'] = dimensions['sizeY_pv'] - dimensions['startY_pv']
+        didDimensionsChange = True #set flag so we send dimensions on the next frame
+        print('changed the dimensions')
 
     startX_signal.subscribe(size_cb)
     startY_signal.subscribe(size_cb)
@@ -83,8 +87,13 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
 
             # Reshape the array into a 3D RGB image
             if len(rgb_data.shape) == 1:  # Assuming 1D array, reshape as needed for RGB
-                height, width, channels = dimensions['y'], dimensions['x'], 3  # Adjust dimensions as needed
-                rgb_data = rgb_data.reshape((height, width, channels))
+                try:
+                    height, width, channels = dimensions['y'], dimensions['x'], 3  # Adjust dimensions as needed
+                    rgb_data = rgb_data.reshape((height, width, channels))
+                except Exception as e: 
+                    print('Skipping this image, mismatch between array data and pv dimensions')
+                    print(e)
+                    continue
 
             # Resize the image if it exceeds maximum dimension limits
             max_dimension = 65500
@@ -102,10 +111,41 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
 
             # Send the base64 encoded image
             #await websocket.send_text(img_str)
-            await websocket.send_bytes(buffered.getvalue())
+
+            try:
+                print('sending')
+                if didDimensionsChange:
+                    await websocket.send_text(json.dumps(dimensions))
+                    didDimensionsChange = False
+
+                await websocket.send_bytes(buffered.getvalue())
+            except WebSocketDisconnect:
+                print("Client disconnected")
+                break
 
     except WebSocketDisconnect:
         await websocket.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
