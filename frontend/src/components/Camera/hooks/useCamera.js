@@ -62,7 +62,7 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         var pvArray = [];
         settings.forEach((group) => {
             group.inputs.forEach((input) => {
-                console.log(group.prefix)
+                //console.log(group.prefix)
                 let pv = `${sanitizedPrefix}:${group.prefix !== null ? group.prefix + ':' : ''}${input.suffix}`
                 pvArray.push(pv);
             })
@@ -119,7 +119,6 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
                 "seconds": 1729016308,
                 "nanos": 775234300
             };
-            console.log('about to set camera control pv')
             //set state of pv
             setCameraControlPV((prevState) => {
                 var stateCopy = JSON.parse(JSON.stringify(prevState));
@@ -231,7 +230,7 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         });
     
         socket.addEventListener("message", event => {
-            console.log("Websocket " + wsTitle + " message at: " + dayjs().format('hh:mm:ss a'));
+            //console.log("Websocket " + wsTitle + " message at: " + dayjs().format('hh:mm:ss a'));
             var eventData = JSON.parse(event.data);
             //console.log({eventData});
             cbMessage(eventData);

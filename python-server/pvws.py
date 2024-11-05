@@ -59,40 +59,22 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
     sizeX_signal = EpicsSignalRO(sizeX_pv , name="sizeX_signal")
     sizeY_signal = EpicsSignalRO(sizeY_pv, name="sizeY_signal")
 
-    class Dimensions:
-        def __init__(self):
-            self.data = {
-                'x': sizeX_signal.get() - startX_signal.get(),
-                'y': sizeY_signal.get() - startY_signal.get(),
-                'startX_pv': startX_signal.get(),
-                'startY_pv': startY_signal.get(),
-                'sizeX_pv': sizeX_signal.get(),
-                'sizeY_pv': sizeY_signal.get()
-            }
-
-        def update(self, name, value):
-            self.data[name] = value
-            self.data['x'] = self.data['sizeX_pv'] - self.data['startX_pv']
-            self.data['y'] = self.data['sizeY_pv'] - self.data['startY_pv']
-
-    dimensions = Dimensions()
-
+    #Call get so there is a .value in each ophyd signal
+    startX_signal.get()
+    startY_signal.get()
+    sizeX_signal.get()
+    sizeY_signal.get()
 
     #Update dimensions whenever a size PV changes
     def size_cb(value, timestamp, **kwargs):
         # Drop the oldest item if the buffer is full
         if buffer.qsize() >= buffer.maxsize:
             buffer.get_nowait()  # Remove the oldest item to make space
-        name = kwargs.get("obj").name
-        dimensions.update(name, value)
-        print(f"Received new value for {name} = {value}")
         try:
-            print(f"Epics signal values are startX: {startX_signal.value}, startY: {startY_signal.value}, sizeX: {sizeX_signal.value}, sizeY: {sizeY_signal.value}")
             tempDimensions = {
                 'x': sizeX_signal.value - startX_signal.value,
                 'y': sizeY_signal.value - startY_signal.value
             }
-            print(f"temp Dimensions are x={dimensions.data['x']} and y={dimensions.data['y']}")
             buffer.put_nowait((None, timestamp, tempDimensions))
         except asyncio.QueueFull:
             print("Buffer full when trying to update dimensions, danger")
@@ -107,9 +89,7 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
     array_signal.subscribe(array_cb)
     buffer.put_nowait((array_signal.get(), time.time(), False))
 
-    i = 0
     try:
-        currentDimensions = dimensions
         while True:
             # This will wait until there is something in the buffer.
             value, timestamp, updated_dimensions = await buffer.get()
@@ -117,7 +97,6 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
             # Check for dimension updates
             if updated_dimensions:
                 currentDimensions = updated_dimensions
-                print(f"current Dimensions sent to client are x={currentDimensions['x']} and y={currentDimensions['y']}")
                 await websocket.send_text(json.dumps(currentDimensions))
                 continue
 
@@ -145,14 +124,12 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
             # Convert image to base64 to send through WebSocket
             buffered = io.BytesIO()
             img.save(buffered, format="JPEG", quality=100)
-            img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
+            #img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
 
             # Send the base64 encoded image
             #await websocket.send_text(img_str)
 
             try:
-                print('sending')
-
                 await websocket.send_bytes(buffered.getvalue())
             except WebSocketDisconnect:
                 print("Client disconnected")
