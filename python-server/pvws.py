@@ -23,9 +23,17 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
     try:
         data = await websocket.receive_text()
         message = json.loads(data)
-        pv = message.get("pv", "13SIM1:image1:ArrayData")
+        imageArray_pv = message.get("imageArray_pv", "13SIM1:image1:ArrayData")
+        startX_pv = message.get("startX_pv", "13SIM1:cam1:MinX") 
+        startY_pv = message.get("startY_pv", "13SIM1:cam1:MinY")
+        sizeX_pv = message.get( "sizeX_pv", "13SIM1:cam1:SizeX")
+        sizeY_pv = message.get("sizeY_pv", "13SIM1:cam1:SizeY")
     except:
-        pv = "13SIM1:image1:ArrayData"  # Default to the hardcoded PV
+        imageArray_pv = "13SIM1:image1:ArrayData"  # Default to the hardcoded PVs
+        startX_pv = "13SIM1:cam1:MinX"
+        startY_pv = "13SIM1:cam1:MinY"
+        sizeX_pv = "13SIM1:cam1:SizeX"
+        sizeY_pv = "13SIM1:cam1:SizeY"
 
     buffer = asyncio.Queue(maxsize=1000)
 
@@ -94,7 +102,7 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
     sizeX_signal.subscribe(size_cb)
     sizeY_signal.subscribe(size_cb)
 
-    array_signal = EpicsSignalRO(pv)
+    array_signal = EpicsSignalRO(imageArray_pv)
 
     array_signal.subscribe(array_cb)
     buffer.put_nowait((array_signal.get(), time.time(), False))

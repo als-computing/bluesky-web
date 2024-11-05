@@ -2,7 +2,19 @@ import { useState, useRef } from 'react';
 import { phosphorIcons } from "../../assets/icons";
 import { getCameraUrl } from '../../utilities/connectionHelper';
 
-export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData', canvasSize='medium'}) {
+export default function CameraCanvas(
+    {
+        imageArrayDataPV='13SIM1:image1:ArrayData', 
+        sizePVs={
+            startX_pv: "13SIM1:cam1:MinX",
+            startY_pv: "13SIM1:cam1:MinY",
+            sizeX_pv: "13SIM1:cam1:SizeX",
+            sizeY_pv: "13SIM1:cam1:SizeY"
+        }, 
+        canvasSize='medium'
+    }) 
+    {
+
     const canvasRef = useRef(null);
     const [fps, setFps] = useState(0);
     const [socketStatus, setSocketStatus] = useState('closed');
@@ -17,11 +29,6 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
         large: 1024,
         automatic: 512
     };
-
-    const minWidthDict = {
-        small: 'max-w-[256px]'
-    }
-
 
     const startWebSocket = () => {
         const canvas = canvasRef.current;
@@ -44,8 +51,14 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
             setSocketStatus('Open');
             frameCount.current = 0;
             startTime.current = new Date();
-            //send message to websocket containing the imageArrayDataPV
-            ws.current.send(JSON.stringify({pv: imageArrayDataPV}));
+            //send message to websocket containing the pvs for the image and pixel size
+            let wsMessage = {
+                imageArray_pv: imageArrayDataPV
+            }
+            for (const key in sizePVs) {
+                wsMessage[key]= sizePVs[key];
+            }
+            ws.current.send(JSON.stringify(wsMessage));
         }
     
 /*         ws.current.onmessage = function (event) {
