@@ -31,6 +31,9 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
 
     # This is called each time the value of the signal changes.
     def array_cb(value, timestamp, **kwargs):
+        # Drop the oldest item if the buffer is full
+        if buffer.qsize() >= buffer.maxsize:
+            buffer.get_nowait()  # Remove the oldest item to make space
         try:
             buffer.put_nowait((value, timestamp, False))
         except asyncio.QueueFull:
@@ -69,6 +72,9 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
 
     #Update dimensions whenever a size PV changes
     def size_cb(value, timestamp, **kwargs):
+        # Drop the oldest item if the buffer is full
+        if buffer.qsize() >= buffer.maxsize:
+            buffer.get_nowait()  # Remove the oldest item to make space
         name = kwargs.get("obj").name
         dimensions.update(name, value)
         print(f"Received new value for {name} = {value}")

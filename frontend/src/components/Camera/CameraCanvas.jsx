@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { phosphorIcons } from "../../assets/icons";
 import { getCameraUrl } from '../../utilities/connectionHelper';
 
-export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'}) {
+export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData', canvasSize='medium'}) {
     const canvasRef = useRef(null);
     const [fps, setFps] = useState(0);
     const [socketStatus, setSocketStatus] = useState('closed');
@@ -10,6 +10,13 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
     const frameCount = useRef(null);
     const startTime = useRef(null);
     const [src, setSrc] = useState('');
+
+    const sizeDict = {
+        small: 256,
+        medium: 512,
+        large: 1024,
+        automatic: 512
+    };
 
 
     const startWebSocket = () => {
@@ -54,22 +61,27 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
 
         ws.current.onmessage = async function (event) {
             if (typeof event.data === "string") {
-                // Handle JSON message for dimensions
-                const dimensions = JSON.parse(event.data);
-                console.log("Received dimensions:", dimensions);
-                canvasRef.current.width = dimensions.x;
-                canvasRef.current.height = dimensions.y;
+                if (canvasSize === 'automatic') {
+                    // Resize canvas when size is set to automatic and ws sends string msg of dim changes
+                    const dimensions = JSON.parse(event.data);
+                    console.log("Received dimensions:", dimensions);
+                    canvasRef.current.width = dimensions.x;
+                    canvasRef.current.height = dimensions.y;
+                }
             } else {
                 // Handle binary image data
-                const blob = new Blob([event.data], { type: 'image/jpeg' });
-                const imageBitmap = await createImageBitmap(blob);
-                nextFrame = imageBitmap;
-                isFrameReady = true;  // Mark frame as ready
-        
-                let currentTime = new Date();
-                var totalDurationSeconds = currentTime.getTime()/1000 - startTime.current.getTime()/1000;
-                setFps(((frameCount.current + 1) / totalDurationSeconds).toPrecision(3));
-                frameCount.current = frameCount.current + 1;
+                try {
+                    const blob = new Blob([event.data], { type: 'image/jpeg' });
+                    const imageBitmap = await createImageBitmap(blob);
+                    nextFrame = imageBitmap;
+                    isFrameReady = true;  // Mark frame as ready
+                    let currentTime = new Date();
+                    var totalDurationSeconds = currentTime.getTime()/1000 - startTime.current.getTime()/1000;
+                    setFps(((frameCount.current + 1) / totalDurationSeconds).toPrecision(3));
+                    frameCount.current = frameCount.current + 1;
+                } catch (e) {
+                    console.log('Error decoding/displaying camera frame: ' + e);
+                }
             }
         };
     
@@ -84,9 +96,6 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
         };
     
         requestAnimationFrame(render);  // Start the rendering loop
-
-
-
 
         ws.current.onerror = (error) => {
             console.log("WebSocket Error:", error);
@@ -114,8 +123,8 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
 
 
     return (
-        <div className="bg-slate-300 w-full aspect-square relative">
-            <canvas className={`${socketStatus === 'closed' ? 'opacity-25' : ''} m-auto border`} ref={canvasRef} width={512} height={512} />
+        <div className="bg-slate-300 relative">
+            <canvas id='canvas' className={`${socketStatus === 'closed' ? 'opacity-25' : ''} m-auto border`} ref={canvasRef} width={sizeDict[canvasSize] ? sizeDict[canvasSize] : 512} height={sizeDict[canvasSize] ? sizeDict[canvasSize] : 512} />
             <p className="absolute z-10 top-1 left-2">{fps} fps</p>
             <div className="absolute z-10 top-2 right-2 w-6 aspect-square text-slate-500 hover:cursor-pointer hover:text-slate-400" onClick={socketStatus === 'closed' ? startWebSocket : closeWebSocket}>
                 {socketStatus === 'closed' ? phosphorIcons.eyeSlash : phosphorIcons.eye}

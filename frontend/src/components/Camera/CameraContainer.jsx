@@ -8,7 +8,7 @@ import { useCamera } from "./hooks/useCamera";
 
 //"13SIM1:image1:ArrayData"
 
-export default function CameraContainer({customSetup=false, imageArrayDataPV='13SIM1:image1:ArrayData', settingsPrefix='13SIM1', settings=[], enableControlPanel=true, enableSettings=true }) {
+export default function CameraContainer({customSetup=false, imageArrayDataPV='13SIM1:image1:ArrayData', settingsPrefix='13SIM1', settings=[], enableControlPanel=true, enableSettings=true, canvasSize='small' }) {
 
     const {
         cameraControlPV,
@@ -29,7 +29,7 @@ export default function CameraContainer({customSetup=false, imageArrayDataPV='13
         return (
             <div className="w-full h-full flex space-x-4 items-start justify-center">
                 <div className="flex flex-col min-w-[512px] flex-shrink-0">
-                    <CameraCanvas imageArrayDataPV={imageArrayDataPV}/>
+                    <CameraCanvas imageArrayDataPV={imageArrayDataPV} canvasSize={canvasSize}/>
                     <CameraControlPanel enableControlPanel={enableControlPanel} cameraControlPV={cameraControlPV} startAcquire={startAcquire} stopAcquire={stopAcquire}/>
                 </div>
                 <div className="overflow-x-auto overflow-y-auto">

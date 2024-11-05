@@ -233,7 +233,7 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         socket.addEventListener("message", event => {
             console.log("Websocket " + wsTitle + " message at: " + dayjs().format('hh:mm:ss a'));
             var eventData = JSON.parse(event.data);
-            console.log({eventData});
+            //console.log({eventData});
             cbMessage(eventData);
         });
 
