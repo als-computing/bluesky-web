@@ -18,6 +18,10 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
         automatic: 512
     };
 
+    const minWidthDict = {
+        small: 'max-w-[256px]'
+    }
+
 
     const startWebSocket = () => {
         const canvas = canvasRef.current;
@@ -123,7 +127,7 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
 
 
     return (
-        <div className="bg-slate-300 relative">
+        <div className={`${canvasSize === 'small' ? 'max-w-[256px]' : ''} bg-slate-300 relative`}>
             <canvas id='canvas' className={`${socketStatus === 'closed' ? 'opacity-25' : ''} m-auto border`} ref={canvasRef} width={sizeDict[canvasSize] ? sizeDict[canvasSize] : 512} height={sizeDict[canvasSize] ? sizeDict[canvasSize] : 512} />
             <p className="absolute z-10 top-1 left-2">{fps} fps</p>
             <div className="absolute z-10 top-2 right-2 w-6 aspect-square text-slate-500 hover:cursor-pointer hover:text-slate-400" onClick={socketStatus === 'closed' ? startWebSocket : closeWebSocket}>
