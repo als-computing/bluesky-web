@@ -13,14 +13,14 @@ const urlJPEG = 'ws://localhost:8000/pvsim/jpeg'; //text
 const imgData = generateImgData(width, height);
 
 const sizePVs={
-    startX_pv: "13SIM1:cam1:MinX",
-    startY_pv: "13SIM1:cam1:MinY",
-    sizeX_pv: "13SIM1:cam1:SizeX",
-    sizeY_pv: "13SIM1:cam1:SizeY"
+    startX_pv: "Basler5472:cam1:MinX",
+    startY_pv: "Basler5472:cam1:MinY",
+    sizeX_pv: "Basler5472:cam1:SizeX",
+    sizeY_pv: "Basler5472:cam1:SizeY"
 };
 
-const imageArrayDataPV='13SIM1:image1:ArrayData';
-const settingsPrefix='13SIM1';
+const imageArrayDataPV='Basler5472:image1:ArrayData';
+const settingsPrefix='Basler5472';
 
 export default function Camera() {
 /*     return (

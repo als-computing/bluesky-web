@@ -18,6 +18,7 @@ router = APIRouter()
 @router.websocket("/pvws/pv")
 async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
     await websocket.accept()
+    print('after accept')
 
     # Parse the incoming message for the PV
     try:
@@ -28,12 +29,16 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
         startY_pv = message.get("startY_pv", "13SIM1:cam1:MinY")
         sizeX_pv = message.get( "sizeX_pv", "13SIM1:cam1:SizeX")
         sizeY_pv = message.get("sizeY_pv", "13SIM1:cam1:SizeY")
+        colorMode_pv = message.get("colorMode_pv", "Basler5472:cam1:ColorMode")
+        dataType_pv = message.get("dataType_pv", "Basler5472:cam1:DataType")
     except:
         imageArray_pv = "13SIM1:image1:ArrayData"  # Default to the hardcoded PVs
         startX_pv = "13SIM1:cam1:MinX"
         startY_pv = "13SIM1:cam1:MinY"
         sizeX_pv = "13SIM1:cam1:SizeX"
         sizeY_pv = "13SIM1:cam1:SizeY"
+        colorMode_pv = "Basler5472:cam1:ColorMode"
+        dataType_pv = "Basler5472:cam1:DataType"
 
     buffer = asyncio.Queue(maxsize=1000)
 
@@ -48,32 +53,40 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
             print("Buffer full, dropping frame")
 
 
-    startX_pv = "13SIM1:cam1:MinX"
-    startY_pv = "13SIM1:cam1:MinY"
-    sizeX_pv = "13SIM1:cam1:SizeX"
-    sizeY_pv = "13SIM1:cam1:SizeY"
-
-
     startX_signal = EpicsSignalRO(startX_pv, name="startX_signal")
     startY_signal = EpicsSignalRO(startY_pv, name="startY_signal")
     sizeX_signal = EpicsSignalRO(sizeX_pv , name="sizeX_signal")
     sizeY_signal = EpicsSignalRO(sizeY_pv, name="sizeY_signal")
+    colorMode_signal = EpicsSignalRO(colorMode_pv, name="colorMode_signal")
+    dataType_signal = EpicsSignalRO(dataType_pv, name="dataType_pv")
 
     #Call get so there is a .value in each ophyd signal
     startX_signal.get()
     startY_signal.get()
     sizeX_signal.get()
     sizeY_signal.get()
+    colorMode_signal.get()
+    dataType_signal.get()
 
-    #Update dimensions whenever a size PV changes
+    #Update all dimensions whenever a single size/color PV changes
     def size_cb(value, timestamp, **kwargs):
         # Drop the oldest item if the buffer is full
         if buffer.qsize() >= buffer.maxsize:
             buffer.get_nowait()  # Remove the oldest item to make space
         try:
+            colorMode = colorMode_signal.get()
+            print(f'color mode = {colorMode_signal.get()}')
+            if colorMode == 'Mono' or colorMode == 0 :
+                print('setting channels to 1')
+                channels = 1
+            else:
+                print('setting channels to 3')
+                channels = 3
+
             tempDimensions = {
-                'x': sizeX_signal.value - startX_signal.value,
-                'y': sizeY_signal.value - startY_signal.value
+                'x': sizeX_signal.get() - startX_signal.get(),
+                'y': sizeY_signal.get() - startY_signal.get(),
+                'channels': channels
             }
             buffer.put_nowait((None, timestamp, tempDimensions))
         except asyncio.QueueFull:
@@ -83,6 +96,7 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
     startY_signal.subscribe(size_cb)
     sizeX_signal.subscribe(size_cb)
     sizeY_signal.subscribe(size_cb)
+    colorMode_signal.subscribe(size_cb)
 
     array_signal = EpicsSignalRO(imageArray_pv)
 
@@ -93,6 +107,7 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
         while True:
             # This will wait until there is something in the buffer.
             value, timestamp, updated_dimensions = await buffer.get()
+            print('got something')
 
             # Check for dimension updates
             if updated_dimensions:
@@ -105,31 +120,40 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
             # Reshape the array into a 3D RGB image
             if len(rgb_data.shape) == 1:  # Assuming 1D array, reshape as needed for RGB
                 try:
-                    height, width, channels = currentDimensions['y'], currentDimensions['x'], 3  # Adjust dimensions as needed
-                    rgb_data = rgb_data.reshape((height, width, channels))
+                    print('trying to reshape data')
+                    height, width, channels = currentDimensions['y'], currentDimensions['x'], currentDimensions['channels']
+                    if channels <=1:
+                        rgb_data = rgb_data.reshape((height, width))
+                    else:
+                        rgb_data = rgb_data.reshape((height, width, channels))
                 except Exception as e: 
                     print('Skipping this image, mismatch between array data and pv dimensions')
                     print(e)
                     continue
 
             # Resize the image if it exceeds maximum dimension limits
-            max_dimension = 65500
-            if rgb_data.shape[0] > max_dimension or rgb_data.shape[1] > max_dimension:
-                print("Resizing the image to fit within the limit.")
-                new_size = (min(rgb_data.shape[1], max_dimension), min(rgb_data.shape[0], max_dimension))
-                img = Image.fromarray(rgb_data, 'RGB').resize(new_size, Image.ANTIALIAS)
-            else:
-                img = Image.fromarray(rgb_data, 'RGB')
+            try:
+                max_dimension = 65500
+                if currentDimensions['channels'] == 1:
+                    mode = 'L' #8 bit pixel grayscale
+                else:
+                    mode = 'RGB' #3x8 pixel RGB
+                print('mode selected: ' + mode)
+                if rgb_data.shape[0] > max_dimension or rgb_data.shape[1] > max_dimension:
+                    print("Resizing the image to fit within the limit.")
+                    new_size = (min(rgb_data.shape[1], max_dimension), min(rgb_data.shape[0], max_dimension))
+                    img = Image.fromarray(rgb_data, mode).resize(new_size, Image.ANTIALIAS)
+                else:
+                    img = Image.fromarray(rgb_data, mode)
 
-            # Convert image to base64 to send through WebSocket
-            buffered = io.BytesIO()
-            img.save(buffered, format="JPEG", quality=100)
-            #img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
-
-            # Send the base64 encoded image
-            #await websocket.send_text(img_str)
+                buffered = io.BytesIO()
+                img.save(buffered, format="JPEG", quality=100)
+            except Exception as e:
+                print(e)
+                continue
 
             try:
+                print(f"sending a frame of size x:{currentDimensions['x']}, y:{currentDimensions['y']}, channels: {currentDimensions['channels']} ")
                 await websocket.send_bytes(buffered.getvalue())
             except WebSocketDisconnect:
                 print("Client disconnected")

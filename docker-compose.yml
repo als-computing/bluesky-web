@@ -3,6 +3,8 @@ services:
     image: redis:7.4-rc2-alpine
     networks: 
       - qnet
+    ports:
+     - "127.0.0.1:6379:6379"
   pvws:
     build: ./pvws/docker
     environment:
@@ -24,19 +26,18 @@ services:
       - EPICS_CA_ADDR_LIST=${EPICS_CA_ADDR_LIST}
       - EPICS_CA_AUTO_ADDR_LIST=NO
     network_mode: "host"
-    command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "127.0.0.1:6379", "--startup-dir", "/code/startup_bl531", "--keep-re"]
+    command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "127.0.0.1:6379", "--startup-dir", "/code/startup_blank", "--keep-re"]
     depends_on:
       - redis
   qserver-api:
-    build: ./queue-server-api
-    environment:
-      - QSERVER_HTTP_SERVER_ALLOW_ORIGINS=*
-      - QSERVER_HTTP_SERVER_SINGLE_USER_API_KEY=test
-    networks: 
-      - qnet
-    ports:
-      - "60610:60610"
-    command: ["uvicorn", "--host", "0.0.0.0", "--port", "60610", "bluesky_httpserver.server:app"]
+   build: ./queue-server-api
+   environment:
+     - QSERVER_HTTP_SERVER_ALLOW_ORIGINS=*
+     - QSERVER_HTTP_SERVER_SINGLE_USER_API_KEY=test
+   network_mode: "host"
+   command: ["uvicorn", "--host", "localhost", "--port", "60610", "bluesky_httpserver.server:app"]
+   depends_on:
+     - qserver
   frontend:
     build: ./frontend
     ports:
