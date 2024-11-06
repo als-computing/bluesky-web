@@ -3,14 +3,6 @@ services:
     image: redis:7.4-rc2-alpine
     networks: 
       - qnet
-    ports:
-      - "127.0.0.1:6379:6379"
-  frontend:
-    build: ./frontend
-    ports:
-      - "8081:80"
-    networks:
-      - qnet
   pvws:
     build: ./pvws/docker
     environment:
@@ -40,10 +32,21 @@ services:
     environment:
       - QSERVER_HTTP_SERVER_ALLOW_ORIGINS=*
       - QSERVER_HTTP_SERVER_SINGLE_USER_API_KEY=test
-    network_mode: "host"
-    command: ["uvicorn", "--host", "localhost", "--port", "60610", "bluesky_httpserver.server:app"]
+    networks: 
+      - qnet
+    ports:
+      - "60610:60610"
+    command: ["uvicorn", "--host", "0.0.0.0", "--port", "60610", "bluesky_httpserver.server:app"]
+  frontend:
+    build: ./frontend
+    ports:
+      - "8081:80"
+    env_file:
+      - ./frontend/.env.production
     depends_on:
-      - qserver
+      - pvws
+      - python-server
+      - qserver-api
   
 networks:
   qnet:

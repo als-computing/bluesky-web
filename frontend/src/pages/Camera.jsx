@@ -12,13 +12,29 @@ const urlPNG = 'ws://localhost:8000/pvsim/png'; //blob
 const urlJPEG = 'ws://localhost:8000/pvsim/jpeg'; //text
 const imgData = generateImgData(width, height);
 
+const sizePVs={
+    startX_pv: "13SIM1:cam1:MinX",
+    startY_pv: "13SIM1:cam1:MinY",
+    sizeX_pv: "13SIM1:cam1:SizeX",
+    sizeY_pv: "13SIM1:cam1:SizeY"
+};
+
+const imageArrayDataPV='13SIM1:image1:ArrayData';
+const settingsPrefix='13SIM1';
+
 export default function Camera() {
 /*     return (
         <WebSocketImage url={urlSim} width={width} height={height}/>
     ) */
     return (
         <div className="w-full h-full">
-            <CameraContainer customSetup={false} settings={cameraDeviceData.ADSimDetector}/>
+            <CameraContainer 
+                customSetup={false} 
+                settings={cameraDeviceData.ADSimDetector} 
+                sizePVs={sizePVs}
+                imageArrayDataPV={imageArrayDataPV}
+                settingsPrefix={settingsPrefix}
+            />
         </div>
     )
 }
