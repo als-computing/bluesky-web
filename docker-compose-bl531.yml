@@ -38,7 +38,7 @@ services:
      - EPICS_CA_ADDR_LIST=${EPICS_CA_ADDR_LIST}
      - EPICS_CA_AUTO_ADDR_LIST=NO
    network_mode: "host"
-   command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "127.0.0.1:6379", "--startup-dir", "/code/startup_blank", "--keep-re"]
+   command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "127.0.0.1:6379", "--startup-dir", "/code/startup_bl531", "--keep-re"]
    depends_on:
      - redis
  qserver-api:
@@ -50,6 +50,7 @@ services:
    command: ["uvicorn", "--host", "localhost", "--port", "60610", "bluesky_httpserver.server:app"]
    depends_on:
      - qserver
- networks:
- qnet:
-   driver: bridge
+
+networks:
+  qnet:
+    driver: bridge
