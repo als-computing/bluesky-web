@@ -38,10 +38,10 @@ export default function CameraControlPanel({enableControlPanel=true, cameraContr
 
     return (
         <section className="w-full flex flex-col">
-            <p className="text-center text-slate-600 text-sm py-1">Acquisition Status: {cameraControlPV.text ? cameraControlPV.text : 'acquire PVs are not connected'}</p>
-            <div className="flex justify-center space-x-8">
-                <ButtonWithIcon cb={startAcquire} text="Acquire" icon={phosphorIcons.camera} color="bg-blue-500" styles="font-semibold hover:bg-blue-400"/>
-                <ButtonWithIcon cb={stopAcquire} text="Pause" icon={phosphorIcons.cameraSlash} color="bg-white" textColor="text-blue-500" styles="border border-blue-500 font-semibold hover:bg-blue-100"/>
+            <p className="text-center text-slate-600 text-sm py-1">Acquisition Status: {cameraControlPV.text ? cameraControlPV.text : 'PV not connected'}</p>
+            <div className="flex justify-center space-x-8 opacity-50 group">
+                <ButtonWithIcon cb={startAcquire} text="Acquire" disabled={cameraControlPV.text ? false : true} icon={phosphorIcons.camera} color="bg-blue-500" hoverBackground="hover:bg-blue-400" styles="font-semibold group-hover:cursor-not-allowed"/>
+                <ButtonWithIcon cb={stopAcquire} text="Pause" disabled={cameraControlPV.text ? false : true} icon={phosphorIcons.cameraSlash} color="bg-white" textColor="text-blue-500" hoverBackground="hover:bg-blue-100" styles="border border-blue-500 font-semibold group-hover:cursor-not-allowed"/>
             </div>
         </section>
     )

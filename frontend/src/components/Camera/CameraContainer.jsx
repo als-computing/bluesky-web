@@ -8,7 +8,23 @@ import { useCamera } from "./hooks/useCamera";
 
 //"13SIM1:image1:ArrayData"
 
-export default function CameraContainer({customSetup=false, imageArrayDataPV='13SIM1:image1:ArrayData', settingsPrefix='13SIM1', settings=[], enableControlPanel=true, enableSettings=true }) {
+export default function CameraContainer(
+    {
+        customSetup=false, 
+        imageArrayDataPV='13SIM1:image1:ArrayData', 
+        settingsPrefix='13SIM1', 
+        settings=[], 
+        enableControlPanel=true, 
+        enableSettings=true, 
+        canvasSize='medium',
+        sizePVs={
+            startX_pv: "13SIM1:cam1:MinX",
+            startY_pv: "13SIM1:cam1:MinY",
+            sizeX_pv: "13SIM1:cam1:SizeX",
+            sizeY_pv: "13SIM1:cam1:SizeY"
+        },  
+    }) 
+    {
 
     const {
         cameraControlPV,
@@ -27,9 +43,9 @@ export default function CameraContainer({customSetup=false, imageArrayDataPV='13
         )
     } else {
         return (
-            <div className="w-full h-full flex space-x-4 items-start justify-center">
-                <div className="flex flex-col min-w-[512px] flex-shrink-0">
-                    <CameraCanvas imageArrayDataPV={imageArrayDataPV}/>
+            <div className="w-full h-full flex flex-wrap space-x-4 items-start justify-center">
+                <div className="flex flex-col flex-shrink-0 items-center">
+                    <CameraCanvas imageArrayDataPV={imageArrayDataPV} canvasSize={canvasSize} sizePVs={sizePVs}/>
                     <CameraControlPanel enableControlPanel={enableControlPanel} cameraControlPV={cameraControlPV} startAcquire={startAcquire} stopAcquire={stopAcquire}/>
                 </div>
                 <div className="overflow-x-auto overflow-y-auto">
