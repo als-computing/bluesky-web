@@ -16,7 +16,13 @@ export default function CameraContainer(
         settings=[], 
         enableControlPanel=true, 
         enableSettings=true, 
-        canvasSize='medium' 
+        canvasSize='medium',
+        sizePVs={
+            startX_pv: "13SIM1:cam1:MinX",
+            startY_pv: "13SIM1:cam1:MinY",
+            sizeX_pv: "13SIM1:cam1:SizeX",
+            sizeY_pv: "13SIM1:cam1:SizeY"
+        },  
     }) 
     {
 
@@ -39,7 +45,7 @@ export default function CameraContainer(
         return (
             <div className="w-full h-full flex flex-wrap space-x-4 items-start justify-center">
                 <div className="flex flex-col flex-shrink-0 items-center">
-                    <CameraCanvas imageArrayDataPV={imageArrayDataPV} canvasSize={canvasSize}/>
+                    <CameraCanvas imageArrayDataPV={imageArrayDataPV} canvasSize={canvasSize} sizePVs={sizePVs}/>
                     <CameraControlPanel enableControlPanel={enableControlPanel} cameraControlPV={cameraControlPV} startAcquire={startAcquire} stopAcquire={stopAcquire}/>
                 </div>
                 <div className="overflow-x-auto overflow-y-auto">
