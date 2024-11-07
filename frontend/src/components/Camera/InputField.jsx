@@ -4,7 +4,7 @@ import InputFloat from "./InputFloat";
 import InputInteger from "./InputInteger";
 import InputString from "./InputString";
 
-export default function InputField ({onSubmit=()=>{}, pv='', input={suffix: "Example", label: "Example", type: 'integer', min:'0', max:'5'}, cameraSettingsPVs={}, settingsPrefix=''}) {
+export default function InputField ({onSubmit=()=>{}, pv='', input={suffix: "Example", label: "Example", type: 'integer', min:'0', max:'5'}, cameraSettingsPVs={}}) {
     const exampleEnumInput = {
         suffix: "DataType",
         label: "Data Type",
