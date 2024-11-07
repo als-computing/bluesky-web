@@ -16,18 +16,6 @@ const adSimDetector = [
         prefix: 'cam1',
         inputs: [
             {
-                suffix: "DataType",
-                label: "Data Type",
-                type: type.enum,
-                enums: ["Int8", "UInt8","Int16", "UInt16"]
-            },
-            {
-                suffix: "ColorMode",
-                label: "Color Mode",
-                type: type.enum,
-                enums: ["Mono", "RGB1", "RGB2", "RGB3"]
-            },
-            {
                 suffix:"AcquireTime",
                 label: "Exposure Time",
                 type: type.float,
@@ -47,6 +35,39 @@ const adSimDetector = [
                 type: type.integer,
                 min: 1,
                 max: 100
+            },
+            {
+                suffix: "ColorMode",
+                label: "Color Mode",
+                type: type.enum,
+                enums: ["Mono", "RGB1", "RGB2", "RGB3"]
+            },
+            {
+                suffix: "GainRed",
+                label: "Gain Red",
+                type: type.float,
+                min: 0,
+                max: 100
+            },
+            {
+                suffix: "GainGreen",
+                label: "Gain Green",
+                type: type.float,
+                min: 0,
+                max: 100
+            },
+            {
+                suffix: "GainBlue",
+                label: "Gain Blue",
+                type: type.float,
+                min: 0,
+                max: 100
+            },
+            {
+                suffix: "DataType",
+                label: "Data Type",
+                type: type.enum,
+                enums: ["Int8", "UInt8","Int16", "UInt16"]
             },
         ],
     },

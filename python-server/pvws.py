@@ -73,26 +73,14 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
 
     settingSignals = {}
     for item in settingsList:
-        print(item['pv'])
-        print(item['name'])
         settingSignals[item['name']] = EpicsSignalRO(item['pv'], name=item['name'])
-        settingSignals[item['name']].get()
-
-    #startX_signal = EpicsSignalRO(startX_pv, name="startX_signal")
-    #startY_signal = EpicsSignalRO(startY_pv, name="startY_signal")
-    #sizeX_signal = EpicsSignalRO(sizeX_pv , name="sizeX_signal")
-    #sizeY_signal = EpicsSignalRO(sizeY_pv, name="sizeY_signal")
-    #colorMode_signal = EpicsSignalRO(colorMode_pv, name="colorMode_signal")
-    #dataType_signal = EpicsSignalRO(dataType_pv, name="dataType_pv")
-
-    #Call get() so there is a .value in each ophyd signal
-
+        settingSignals[item['name']].get() #initialize connection
 
     #check if settings PVs connected before continuing
     for key in settingSignals:
         if settingSignals[key].connected is not True:
             #send client message and close ws
-            print('error in ' + key)
+            print('error connecting to ' + key)
             print(settingSignals[key].connected)
             await websocket.send_text(json.dumps({'error': key + ' pv could not connect'}))
             await websocket.close()
