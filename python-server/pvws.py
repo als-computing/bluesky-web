@@ -17,32 +17,94 @@ router = APIRouter()
 # Use query parameter num to avoid this.
 @router.websocket("/pvws/pv")
 async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
+
     await websocket.accept()
-    print('after accept')
 
     # Parse the incoming message for the PV
     try:
         data = await websocket.receive_text()
         message = json.loads(data)
+        settingsList = [
+            {
+                'name': 'startX',
+                'defaultPV': '13SIM1:cam1:MinX'
+            },
+            {
+                'name': 'startY',
+                'defaultPV': '13SIM1:cam1:MinY'
+            },
+            {
+                'name': 'sizeX',
+                'defaultPV': '13SIM1:cam1:SizeX'
+            },
+            {
+                'name': 'sizeY',
+                'defaultPV': '13SIM1:cam1:SizeY'
+            },
+            {
+                'name': 'colorMode',
+                'defaultPV': '13SIM1:cam1:ColorMode'
+            },
+            {
+                'name': 'dataType',
+                'defaultPV': '13SIM1:cam1:DataType'
+            },
+        ]
+
         imageArray_pv = message.get("imageArray_pv", "13SIM1:image1:ArrayData")
-        startX_pv = message.get("startX_pv", "13SIM1:cam1:MinX") 
-        startY_pv = message.get("startY_pv", "13SIM1:cam1:MinY")
-        sizeX_pv = message.get( "sizeX_pv", "13SIM1:cam1:SizeX")
-        sizeY_pv = message.get("sizeY_pv", "13SIM1:cam1:SizeY")
-        colorMode_pv = message.get("colorMode_pv", "Basler5472:cam1:ColorMode")
-        dataType_pv = message.get("dataType_pv", "Basler5472:cam1:DataType")
-    except:
-        imageArray_pv = "13SIM1:image1:ArrayData"  # Default to the hardcoded PVs
-        startX_pv = "13SIM1:cam1:MinX"
-        startY_pv = "13SIM1:cam1:MinY"
-        sizeX_pv = "13SIM1:cam1:SizeX"
-        sizeY_pv = "13SIM1:cam1:SizeY"
-        colorMode_pv = "Basler5472:cam1:ColorMode"
-        dataType_pv = "Basler5472:cam1:DataType"
+
+        for id, item in enumerate(settingsList):
+            settingsList[id]['pv'] = message.get(item['name'], item['defaultPV'])
+
+        #startX_pv = message.get("startX_pv", "13SIM1:cam1:MinX") 
+        #startY_pv = message.get("startY_pv", "13SIM1:cam1:MinY")
+        #sizeX_pv = message.get( "sizeX_pv", "13SIM1:cam1:SizeX")
+        #sizeY_pv = message.get("sizeY_pv", "13SIM1:cam1:SizeY")
+        #colorMode_pv = message.get("colorMode_pv", "13SIM1:cam1:ColorMode")
+        #dataType_pv = message.get("dataType_pv", "13SIM1:cam1:DataType")
+    except Exception as e:
+        try:
+            await websocket.send_text(json.dumps({'error': e}))
+        except:
+            await websocket.close()
+        await websocket.close()
 
     buffer = asyncio.Queue(maxsize=1000)
 
-    # This is called each time the value of the signal changes.
+    settingSignals = {}
+    for item in settingsList:
+        print(item['pv'])
+        print(item['name'])
+        settingSignals[item['name']] = EpicsSignalRO(item['pv'], name=item['name'])
+        settingSignals[item['name']].get()
+
+    #startX_signal = EpicsSignalRO(startX_pv, name="startX_signal")
+    #startY_signal = EpicsSignalRO(startY_pv, name="startY_signal")
+    #sizeX_signal = EpicsSignalRO(sizeX_pv , name="sizeX_signal")
+    #sizeY_signal = EpicsSignalRO(sizeY_pv, name="sizeY_signal")
+    #colorMode_signal = EpicsSignalRO(colorMode_pv, name="colorMode_signal")
+    #dataType_signal = EpicsSignalRO(dataType_pv, name="dataType_pv")
+
+    #Call get() so there is a .value in each ophyd signal
+
+
+    #check if settings PVs connected before continuing
+    for key in settingSignals:
+        if settingSignals[key].connected is not True:
+            #send client message and close ws
+            print('error in ' + key)
+            print(settingSignals[key].connected)
+            await websocket.send_text(json.dumps({'error': key + ' pv could not connect'}))
+            await websocket.close()
+            return
+
+    #color PV returns a numeric value corresponding to enum text
+    colorModeEnumList = ['Mono', 'RGB1', 'RGB2', 'RGB3'] #typical enum layout
+    if hasattr(settingSignals['colorMode'], 'enum_strs'): #overwrite defaults if enums available
+        for index, mode in enumerate(settingSignals['colorMode'].enum_strs):
+            colorModeEnumList[index] = mode
+
+    # Put image array data into buffer
     def array_cb(value, timestamp, **kwargs):
         # Drop the oldest item if the buffer is full
         if buffer.qsize() >= buffer.maxsize:
@@ -51,63 +113,56 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
             buffer.put_nowait((value, timestamp, False))
         except asyncio.QueueFull:
             print("Buffer full, dropping frame")
-
-
-    startX_signal = EpicsSignalRO(startX_pv, name="startX_signal")
-    startY_signal = EpicsSignalRO(startY_pv, name="startY_signal")
-    sizeX_signal = EpicsSignalRO(sizeX_pv , name="sizeX_signal")
-    sizeY_signal = EpicsSignalRO(sizeY_pv, name="sizeY_signal")
-    colorMode_signal = EpicsSignalRO(colorMode_pv, name="colorMode_signal")
-    dataType_signal = EpicsSignalRO(dataType_pv, name="dataType_pv")
-
-    #Call get so there is a .value in each ophyd signal
-    startX_signal.get()
-    startY_signal.get()
-    sizeX_signal.get()
-    sizeY_signal.get()
-    colorMode_signal.get()
-    dataType_signal.get()
-
+            
     #Update all dimensions whenever a single size/color PV changes
     def size_cb(value, timestamp, **kwargs):
         # Drop the oldest item if the buffer is full
         if buffer.qsize() >= buffer.maxsize:
             buffer.get_nowait()  # Remove the oldest item to make space
         try:
-            colorMode = colorMode_signal.get()
-            print(f'color mode = {colorMode_signal.get()}')
-            if colorMode == 'Mono' or colorMode == 0 :
-                print('setting channels to 1')
+            colorModeValue = settingSignals['colorMode'].get()
+            colorModeText = colorModeEnumList[colorModeValue]
+
+            #print(f'color mode = {colorMode_signal.get()}')
+            if colorModeText == 'Mono' :
+                #print('setting channels to 1')
                 channels = 1
             else:
-                print('setting channels to 3')
+                #print('setting channels to 3')
                 channels = 3
 
             tempDimensions = {
-                'x': sizeX_signal.get() - startX_signal.get(),
-                'y': sizeY_signal.get() - startY_signal.get(),
+                'x': settingSignals['sizeX'].get() - settingSignals['startX'].get(),
+                'y': settingSignals['sizeY'].get() - settingSignals['startY'].get(),
                 'channels': channels
             }
             buffer.put_nowait((None, timestamp, tempDimensions))
         except asyncio.QueueFull:
-            print("Buffer full when trying to update dimensions, danger")
+            print("Buffer full when trying to update dimensions, np array may not format correctly")
 
-    startX_signal.subscribe(size_cb)
-    startY_signal.subscribe(size_cb)
-    sizeX_signal.subscribe(size_cb)
-    sizeY_signal.subscribe(size_cb)
-    colorMode_signal.subscribe(size_cb)
+    for key in settingSignals:
+        settingSignals[key].subscribe(size_cb)
 
-    array_signal = EpicsSignalRO(imageArray_pv)
+    array_signal = EpicsSignalRO(imageArray_pv, name='array_signal')
+    array_signal.get()
+
+    #Check if connected before continuing
+    if array_signal.connected is not True:
+        #send client message and close ws
+        print('Error connecting to array signal pv ' + imageArray_pv)
+        await websocket.send_text(json.dumps({'error': 'The image array pv could not connect'}))
+        await websocket.close()
+        return
 
     array_signal.subscribe(array_cb)
+
+    #load up a single image (if available) into the buffer
     buffer.put_nowait((array_signal.get(), time.time(), False))
 
     try:
         while True:
-            # This will wait until there is something in the buffer.
+            # Wait until there is something in the buffer.
             value, timestamp, updated_dimensions = await buffer.get()
-            print('got something')
 
             # Check for dimension updates
             if updated_dimensions:
@@ -120,7 +175,6 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
             # Reshape the array into a 3D RGB image
             if len(rgb_data.shape) == 1:  # Assuming 1D array, reshape as needed for RGB
                 try:
-                    print('trying to reshape data')
                     height, width, channels = currentDimensions['y'], currentDimensions['x'], currentDimensions['channels']
                     if channels <=1:
                         rgb_data = rgb_data.reshape((height, width))
@@ -138,7 +192,7 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
                     mode = 'L' #8 bit pixel grayscale
                 else:
                     mode = 'RGB' #3x8 pixel RGB
-                print('mode selected: ' + mode)
+                #print('mode selected: ' + mode)
                 if rgb_data.shape[0] > max_dimension or rgb_data.shape[1] > max_dimension:
                     print("Resizing the image to fit within the limit.")
                     new_size = (min(rgb_data.shape[1], max_dimension), min(rgb_data.shape[0], max_dimension))
@@ -153,7 +207,7 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
                 continue
 
             try:
-                print(f"sending a frame of size x:{currentDimensions['x']}, y:{currentDimensions['y']}, channels: {currentDimensions['channels']} ")
+                #print(f"sending a frame of size x:{currentDimensions['x']}, y:{currentDimensions['y']}, channels: {currentDimensions['channels']} ")
                 await websocket.send_bytes(buffered.getvalue())
             except WebSocketDisconnect:
                 print("Client disconnected")
