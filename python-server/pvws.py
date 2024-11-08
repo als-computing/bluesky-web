@@ -140,7 +140,7 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
             tempDimensions = {
                 'x': settingSignals['sizeX'].get() - settingSignals['startX'].get(),
                 'y': settingSignals['sizeY'].get() - settingSignals['startY'].get(),
-                'channels': channels,
+                'colorMode': colorModeText,
                 'dataType': dataTypeText
             }
             buffer.put_nowait((None, timestamp, tempDimensions))
@@ -181,10 +181,10 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
                 await websocket.send_text(json.dumps(currentDimensions))
                 continue
 
-            height, width, channels, dataType = currentDimensions['y'], currentDimensions['x'], currentDimensions['channels'], currentDimensions['dataType']
+            height, width, colorMode, dataType = currentDimensions['y'], currentDimensions['x'], currentDimensions['colorMode'], currentDimensions['dataType']
             try:
                 array_data = np.array(value, dtype=dtype_map[dataType])
-                
+
                 #scale down anything above 8 bit to avoid partial image displays on client
                 if dataType != 'UInt8' and dataType !='Int8':
                     max_val = array_data.max() if array_data.max() > 0 else 1
@@ -194,24 +194,37 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
                 await websocket.send_text(json.dumps({'error': e}))
                 continue
 
-            # Reshape the array into 2d
+            # Reshape based on color mode
             try:
-                if channels <=1:
+                if colorMode == 'Mono':
                     array_data = array_data.reshape((height, width))
+                    mode = 'L'  # Grayscale
+                elif colorMode == 'RGB1':
+                    array_data = array_data.reshape((height, width, 3))
+                    mode = 'RGB'
+                elif colorMode == 'RGB2':
+                    # Reshape to (height, width * 3) and split each row into R, G, B channels
+                    array_data = array_data.reshape((height, width * 3))
+                    red = array_data[:, 0:width]  # Red channel
+                    green = array_data[:, width:2*width]  # Green channel
+                    blue = array_data[:, 2*width:3*width]  # Blue channel
+                    array_data = np.stack((red, green, blue), axis=-1)
+                    mode = 'RGB'
+                elif colorMode == 'RGB3':
+                    red = array_data[0:height * width].reshape((height, width))
+                    green = array_data[height * width:2 * height * width].reshape((height, width))
+                    blue = array_data[2 * height * width:3 * height * width].reshape((height, width))
+                    array_data = np.stack((red, green, blue), axis=-1)
+                    mode = 'RGB'
                 else:
-                    array_data = array_data.reshape((height, width, channels))
-            except Exception as e: 
-                print('Skipping this image, mismatch between array data and pv dimensions') #may occur to a few frames after dimension changes
-                print(e)
+                    raise ValueError(f"Unsupported color mode: {colorMode}")
+            except Exception as e:
+                print(f'Skipping this image due to reshape error: {e}')
                 continue
 
             # Resize the image if it exceeds maximum dimension limits
             try:
                 max_dimension = 65500
-                if currentDimensions['channels'] == 1:
-                    mode = 'L' #8 bit pixel grayscale
-                else:
-                    mode = 'RGB' #3x8 pixel RGB #we need more options including rgb1, rgb2, rgb3
 
                 #print('mode selected: ' + mode)
                 if array_data.shape[0] > max_dimension or array_data.shape[1] > max_dimension:
