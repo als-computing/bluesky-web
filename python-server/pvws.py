@@ -23,358 +23,192 @@ dtype_map = {
     'Float64': np.float64 
 }
 
-dataTypeEnumList = [
+colorModeEnumList = ['Mono', 'RGB1', 'RGB2', 'RGB3']
+dataTypeEnumList = ['Int8', 'UInt8', 'Int16', 'UInt16', 'Int32', 'UInt32', 'Int64', 'UInt64', 'Float32', 'Float64']
 
-]
+
 
 router = APIRouter()
 
-# The TestClient context_manager doesn't close if there is an infinite loop.
-# Use query parameter num to avoid this.
+
 @router.websocket("/pvws/pv")
 async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
-
     await websocket.accept()
 
-    # Parse the incoming message for the PV
-    try:
-        data = await websocket.receive_text()
-        message = json.loads(data)
-        settingsList = [
-            {
-                'name': 'startX',
-                'defaultPV': '13SIM1:cam1:MinX'
-            },
-            {
-                'name': 'startY',
-                'defaultPV': '13SIM1:cam1:MinY'
-            },
-            {
-                'name': 'sizeX',
-                'defaultPV': '13SIM1:cam1:SizeX'
-            },
-            {
-                'name': 'sizeY',
-                'defaultPV': '13SIM1:cam1:SizeY'
-            },
-            {
-                'name': 'colorMode',
-                'defaultPV': '13SIM1:cam1:ColorMode'
-            },
-            {
-                'name': 'dataType',
-                'defaultPV': '13SIM1:cam1:DataType'
-            },
-        ]
-
-        imageArray_pv = message.get("imageArray_pv", "13SIM1:image1:ArrayData")
-
-        for id, item in enumerate(settingsList):
-            settingsList[id]['pv'] = message.get(item['name'], item['defaultPV'])
-
-    except Exception as e:
-        try:
-            await websocket.send_text(json.dumps({'error': e}))
-        except:
-            await websocket.close()
-        await websocket.close()
-
     buffer = asyncio.Queue(maxsize=1000)
+    settingsList, imageArray_pv = await initialize_settings(websocket)
 
-    settingSignals = {}
-    for item in settingsList:
-        settingSignals[item['name']] = EpicsSignalRO(item['pv'], name=item['name'])
-        settingSignals[item['name']].get() #initialize connection
+    settingSignals = setup_signals(settingsList)
+    if not await check_connections(settingSignals, websocket):
+        return
 
-    #check if settings PVs connected before continuing
-    for key in settingSignals:
-        if settingSignals[key].connected is not True:
-            #send client message and close ws
-            print('error connecting to ' + key)
-            print(settingSignals[key].connected)
-            await websocket.send_text(json.dumps({'error': key + ' pv could not connect'}))
-            await websocket.close()
-            return
+    # Reassign the updated enum lists
+    global colorModeEnumList, dataTypeEnumList
+    colorModeEnumList, dataTypeEnumList = update_enum_lists(settingSignals, colorModeEnumList, dataTypeEnumList)
 
-    #color PV and dataType PV return a numeric value corresponding to enum text
-    colorModeEnumList = ['Mono', 'RGB1', 'RGB2', 'RGB3'] #typical enum layout for color mode pv
-    dataTypeEnumList = ['Int8', 'UInt8', 'Int16', 'UInt16', 'Int32', 'UInt32', 'Int64', 'UInt64', 'Float32', 'Float64'] #typical enum layout for data type pv
-    #Overwrite the defaults
-    if hasattr(settingSignals['colorMode'], 'enum_strs'):
-        for index, mode in enumerate(settingSignals['colorMode'].enum_strs):
-            colorModeEnumList[index] = mode
-
-    if hasattr(settingSignals['dataType'], 'enum_strs'): 
-        for index, dtype in enumerate(settingSignals['dataType'].enum_strs):
-            dataTypeEnumList[index] = dtype
-
-    # Put image array data into buffer
     def array_cb(value, timestamp, **kwargs):
-        # Drop the oldest item if the buffer is full
         if buffer.qsize() >= buffer.maxsize:
-            buffer.get_nowait()  # Remove the oldest item to make space
+            buffer.get_nowait()
         try:
             buffer.put_nowait((value, timestamp, False))
         except asyncio.QueueFull:
             print("Buffer full, dropping frame")
-            
-    #Update all dimensions whenever a single size/color PV changes
-    def size_cb(value, timestamp, **kwargs):
-        # Drop the oldest item if the buffer is full
-        if buffer.qsize() >= buffer.maxsize:
-            buffer.get_nowait()  # Remove the oldest item to make space
-        try:
-            colorModeValue = settingSignals['colorMode'].get()
-            colorModeText = colorModeEnumList[colorModeValue]
-            dataTypeValue = settingSignals['dataType'].get()
-            dataTypeText = dataTypeEnumList[dataTypeValue]
 
-            #print(f'color mode = {colorMode_signal.get()}')
-            if colorModeText == 'Mono' :
-                #print('setting channels to 1')
-                channels = 1
-            else:
-                #print('setting channels to 3')
-                channels = 3
+    def settings_cb(value, timestamp, **kwargs):
+        update_dimensions(settingSignals, buffer)
 
-            tempDimensions = {
-                'x': settingSignals['sizeX'].get() - settingSignals['startX'].get(),
-                'y': settingSignals['sizeY'].get() - settingSignals['startY'].get(),
-                'colorMode': colorModeText,
-                'dataType': dataTypeText
-            }
-            buffer.put_nowait((None, timestamp, tempDimensions))
-        except asyncio.QueueFull:
-            print("Buffer full when trying to update dimensions, np array may not format correctly")
 
     for key in settingSignals:
-        settingSignals[key].subscribe(size_cb)
+        settingSignals[key].subscribe(settings_cb)
 
     array_signal = EpicsSignalRO(imageArray_pv, name='array_signal')
     array_signal.get()
-
-    #Check if connected before continuing
-    if array_signal.connected is not True:
-        #send client message and close ws
-        print('Error connecting to array signal pv ' + imageArray_pv)
-        await websocket.send_text(json.dumps({'error': 'The image array pv could not connect'}))
-        await websocket.close()
+    if not await check_signal_connection(array_signal, imageArray_pv, websocket):
         return
-
-    array_signal.subscribe(array_cb) 
-
-    #initialize dimensions prior to first frame decode
-    size_cb(None, None)
-
-    #load up a single image (if available) into the buffer
-    buffer.put_nowait((array_signal.get(), time.time(), False))
-
-
-    try:
-        while True:
-            # Wait until there is something in the buffer.
-            value, timestamp, updated_dimensions = await buffer.get()
-
-            # Check for dimension updates
-            if updated_dimensions:
-                currentDimensions = updated_dimensions
-                await websocket.send_text(json.dumps(currentDimensions))
-                continue
-
-            height, width, colorMode, dataType = currentDimensions['y'], currentDimensions['x'], currentDimensions['colorMode'], currentDimensions['dataType']
-            try:
-                array_data = np.array(value, dtype=dtype_map[dataType])
-
-                #scale down anything above 8 bit to avoid partial image displays on client
-                if dataType != 'UInt8' and dataType !='Int8':
-                    max_val = array_data.max() if array_data.max() > 0 else 1
-                    array_data = (array_data / max_val * 255).astype(np.uint8)
-            except Exception as e:
-                print(f'error decoding array_data: {e}') #may occur to a few frames after data Type change
-                await websocket.send_text(json.dumps({'error': e}))
-                continue
-
-            # Reshape based on color mode
-            try:
-                if colorMode == 'Mono':
-                    array_data = array_data.reshape((height, width))
-                    mode = 'L'  # Grayscale
-                elif colorMode == 'RGB1':
-                    array_data = array_data.reshape((height, width, 3))
-                    mode = 'RGB'
-                elif colorMode == 'RGB2':
-                    # Reshape to (height, width * 3) and split each row into R, G, B channels
-                    array_data = array_data.reshape((height, width * 3))
-                    red = array_data[:, 0:width]  # Red channel
-                    green = array_data[:, width:2*width]  # Green channel
-                    blue = array_data[:, 2*width:3*width]  # Blue channel
-                    array_data = np.stack((red, green, blue), axis=-1)
-                    mode = 'RGB'
-                elif colorMode == 'RGB3':
-                    red = array_data[0:height * width].reshape((height, width))
-                    green = array_data[height * width:2 * height * width].reshape((height, width))
-                    blue = array_data[2 * height * width:3 * height * width].reshape((height, width))
-                    array_data = np.stack((red, green, blue), axis=-1)
-                    mode = 'RGB'
-                else:
-                    raise ValueError(f"Unsupported color mode: {colorMode}")
-            except Exception as e:
-                print(f'Skipping this image due to reshape error: {e}')
-                continue
-
-            # Resize the image if it exceeds maximum dimension limits
-            try:
-                max_dimension = 65500
-
-                #print('mode selected: ' + mode)
-                if array_data.shape[0] > max_dimension or array_data.shape[1] > max_dimension:
-                    print("Resizing the image to fit within the limit.")
-                    new_size = (min(array_data.shape[1], max_dimension), min(array_data.shape[0], max_dimension))
-                    img = Image.fromarray(array_data, mode).resize(new_size, Image.ANTIALIAS)
-                else:
-                    img = Image.fromarray(array_data, mode)
-
-                
-
-                buffered = io.BytesIO()
-                img.save(buffered, format="JPEG", quality=100)
-            except Exception as e:
-                print(e)
-                continue
-
-            try:
-                #print(f"sending a frame of size x:{currentDimensions['x']}, y:{currentDimensions['y']}, channels: {currentDimensions['channels']} ")
-                await websocket.send_bytes(buffered.getvalue())
-            except WebSocketDisconnect:
-                print("Client disconnected")
-                break
-
-    except WebSocketDisconnect:
-        await websocket.close()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@router.websocket("/pvws/mono")
-async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
-    await websocket.accept()
-
-    buffer = asyncio.Queue(maxsize=1000)
-
-    # This is called each time the value of the signal changes.
-    def array_cb(value, timestamp, **kwargs):
-        buffer.put_nowait((value, timestamp))
-
-    #array_signal = EpicsSignalRO("IOC:m1")
-    array_signal = EpicsSignalRO("13SIM1:image1:ArrayData")
     array_signal.subscribe(array_cb)
-    buffer.put_nowait((array_signal.get(), time.time()))
 
-    i = 0
+    settings_cb(None, None) #call once to initialize all dimensions prior to loading images
+    buffer.put_nowait((array_signal.get(), time.time(), False)) #call once to load the current frame
+
+
+    await handle_streaming(websocket, buffer)
+
+# Setup and initialization functions
+
+async def initialize_settings(websocket):
     try:
-        while True:
-            # This will wait until there is something in the buffer.
-            value, timestamp = await buffer.get()
-            mono_data = np.array(value, dtype=np.uint8)
-            # Reshape the array if it's too large
-            max_dimension = 65500
-            if len(mono_data.shape) == 1:  # Assuming 1D array, reshape as needed
-                height, width = 512, 512  # Adjust these values based on actual image dimensions
-                mono_data = mono_data.reshape((height, width))
+        data = await websocket.receive_text()
+        message = json.loads(data)
+        settingsList = [
+            {'name': 'startX', 'defaultPV': '13SIM1:cam1:MinX'},
+            {'name': 'startY', 'defaultPV': '13SIM1:cam1:MinY'},
+            {'name': 'sizeX', 'defaultPV': '13SIM1:cam1:SizeX'},
+            {'name': 'sizeY', 'defaultPV': '13SIM1:cam1:SizeY'},
+            {'name': 'colorMode', 'defaultPV': '13SIM1:cam1:ColorMode'},
+            {'name': 'dataType', 'defaultPV': '13SIM1:cam1:DataType'}
+        ]
 
-            # Resize the image if it exceeds maximum dimension limits
-            if mono_data.shape[0] > max_dimension or mono_data.shape[1] > max_dimension:
-                print("Resizing the image to fit within the limit.")
-                new_size = (min(mono_data.shape[1], max_dimension), min(mono_data.shape[0], max_dimension))
-                img = Image.fromarray(mono_data, 'L').resize(new_size, Image.ANTIALIAS)
-            else:
-                img = Image.fromarray(mono_data, 'L')
-
-            # Convert image to base64 to send through WebSocket
-            buffered = io.BytesIO()
-            img.save(buffered, format="JPEG")
-            img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
-
-            # Send the base64 encoded image
-            await websocket.send_text(img_str)
-
-    except WebSocketDisconnect:
-        await websocket.close()
-
-
-
-
-
-@router.websocket("/pvsim/jpeg")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    try:
-        while True:
-            # Generate a random RGB image
-            array = np.random.randint(256, size=(512, 512, 3), dtype=np.uint8)
-            img = Image.fromarray(array, 'RGB')
-            
-            # Convert image to base64 to send through WebSocket
-            buffered = io.BytesIO()
-            img.save(buffered, format="JPEG")
-            img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
-
-            # Send the base64 encoded image
-            await websocket.send_text(img_str)
-            await asyncio.sleep(0.1 )  # Sending a new image every second
+        imageArray_pv = message.get("imageArray_pv", "13SIM1:image1:ArrayData")
+        for item in settingsList:
+            item['pv'] = message.get(item['name'], item['defaultPV'])
+            if len(item['pv']) == 0:
+                item['pv'] = item['defaultPV']
+        return settingsList, imageArray_pv
     except Exception as e:
-        print("Error:", e)
-    finally:
+        await websocket.send_text(json.dumps({'error': str(e)}))
         await websocket.close()
+        return None, None
 
-@router.websocket("/pvws/blob")
-async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
-    await websocket.accept()
+def setup_signals(settingsList):
+    settingSignals = {}
+    for item in settingsList:
+        signal = EpicsSignalRO(item['pv'], name=item['name'])
+        signal.get()
+        settingSignals[item['name']] = signal
+    return settingSignals
 
-    buffer = asyncio.Queue(maxsize=1000)
+async def check_connections(settingSignals, websocket):
+    for key, signal in settingSignals.items():
+        if not signal.connected:
+            print('setting PV ' + key + ' not connected')
+            await websocket.send_text(json.dumps({'error': f"{key} pv could not connect"}))
+            await websocket.close()
+            return False
+    return True
 
-    # This is called each time the value of the signal changes.
-    def array_cb(value, timestamp, **kwargs):
-        buffer.put_nowait((value, timestamp))
+async def check_signal_connection(signal, name, websocket):
+    if not signal.connected:
+        print('array data pv not connected, exiting')
+        await websocket.send_text(json.dumps({'error': f"The {name} pv could not connect"}))
+        await websocket.close()
+        return False
+    return True
 
-    #array_signal = EpicsSignalRO("IOC:m1")
-    array_signal = EpicsSignalRO("13SIM1:image1:ArrayData")
-    array_signal.subscribe(array_cb)
-    buffer.put_nowait((array_signal.get(), time.time()))
+def update_enum_lists(settingSignals, colorModeEnumList, dataTypeEnumList):
+    colorModeEnumList = getattr(settingSignals['colorMode'], 'enum_strs', colorModeEnumList)
+    dataTypeEnumList = getattr(settingSignals['dataType'], 'enum_strs', dataTypeEnumList)
+    return colorModeEnumList, dataTypeEnumList
 
-    i = 0
+def update_dimensions(settingSignals, buffer):
+    colorModeValue = settingSignals['colorMode'].get()
+    dataTypeValue = settingSignals['dataType'].get()
+    tempDimensions = {
+        'x': settingSignals['sizeX'].get() - settingSignals['startX'].get(),
+        'y': settingSignals['sizeY'].get() - settingSignals['startY'].get(),
+        'colorMode': colorModeEnumList[colorModeValue],
+        'dataType': dataTypeEnumList[dataTypeValue]
+    }
+    buffer.put_nowait((None, time.time(), tempDimensions))
+
+# Main loop for streaming images
+
+async def handle_streaming(websocket, buffer):
     try:
         while True:
-            # This will wait until there is something in the buffer.
-            value, timestamp = await buffer.get()
-            rgb_data = np.array(value, dtype=np.uint8)
-            flat_data = rgb_data.tobytes()
+            rawImageArray, timestamp, updatedSettings = await buffer.get()
 
-            await websocket.send_bytes(flat_data)
+            if updatedSettings:
+                currentSettings = updatedSettings
+                await websocket.send_text(json.dumps(currentSettings))
+                continue
 
+            height, width, colorMode, dataType = currentSettings['y'], currentSettings['x'], currentSettings['colorMode'], currentSettings['dataType']
+
+            try:
+                array_data = np.array(rawImageArray, dtype=dtype_map[dataType])
+                array_data = normalize_array_data(array_data, dataType)
+                array_data, mode = reshape_array(array_data, height, width, colorMode)
+
+                await send_image(array_data, websocket, mode)
+            except Exception as e:
+                print(f'Skipping image due to error: {e}')
+                continue
     except WebSocketDisconnect:
         await websocket.close()
 
+def normalize_array_data(array_data, dataType):
+    if dataType not in ['UInt8', 'Int8']:
+        max_val = array_data.max() if array_data.max() > 0 else 1
+        array_data = (array_data / max_val * 255).astype(np.uint8)
+    return array_data
+
+def reshape_array(array_data, height, width, colorMode):
+    if colorMode == 'Mono':
+        reshaped_data = array_data.reshape((height, width))
+        mode = 'L'  # Grayscale
+    elif colorMode == 'RGB1':
+        reshaped_data = array_data.reshape((height, width, 3))
+        mode = 'RGB'
+    elif colorMode == 'RGB2':
+        # Reshape to (height, width * 3) and split each row into R, G, B channels
+        array_data = array_data.reshape((height, width * 3))
+        red = array_data[:, 0:width]
+        green = array_data[:, width:2*width]
+        blue = array_data[:, 2*width:3*width]
+        reshaped_data = np.stack((red, green, blue), axis=-1)
+        mode = 'RGB'
+    elif colorMode == 'RGB3':
+        red = array_data[0:height * width].reshape((height, width))
+        green = array_data[height * width:2 * height * width].reshape((height, width))
+        blue = array_data[2 * height * width:3 * height * width].reshape((height, width))
+        reshaped_data = np.stack((red, green, blue), axis=-1)
+        mode = 'RGB'
+    else:
+        raise ValueError(f"Unsupported color mode: {colorMode}")
+    
+    return reshaped_data, mode
+
+async def send_image(array_data, websocket, mode):
+    max_dimension = 2500 #maximum pixel width or height to be sent out. Increase if higher fidelity is needed
+    try:
+        if array_data.shape[0] > max_dimension or array_data.shape[1] > max_dimension:
+            new_size = (min(array_data.shape[1], max_dimension), min(array_data.shape[0], max_dimension))
+            img = Image.fromarray(array_data, mode).resize(new_size, Image.LANCZOS)
+        else:
+            img = Image.fromarray(array_data, mode)
+
+        buffered = io.BytesIO()
+        img.save(buffered, format="JPEG", quality=100)
+        await websocket.send_bytes(buffered.getvalue())
+    except Exception as e:
+        print(f"Error sending image: {e}")
