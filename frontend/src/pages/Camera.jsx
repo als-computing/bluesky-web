@@ -7,7 +7,7 @@ export default function Camera() {
     return (
         <div className="w-full h-full">
             <CameraContainer
-                prefix='13SIM1' 
+                customSetup={true}
             />
         </div>
     )
