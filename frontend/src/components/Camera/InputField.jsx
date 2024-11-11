@@ -49,7 +49,7 @@ export default function InputField ({onSubmit=()=>{}, pv='', input={suffix: "Exa
     return (
         <li className="flex">
             {renderInput()}
-            <p className={`${isPVConnected ? 'text-sky-800' : 'text-red-400'} ml-6`}>{isPVConnected ? ( 'text' in cameraSettingsPVs[pv] ? cameraSettingsPVs[pv].text : cameraSettingsPVs[pv].value) : `${pv} disconnected`}</p>
+            <p className={`${isPVConnected ? 'text-sky-800' : 'text-red-400'} ml-6 overflow-auto text-nowrap`}>{isPVConnected ? ( 'text' in cameraSettingsPVs[pv] ? cameraSettingsPVs[pv].text : cameraSettingsPVs[pv].value) : `${pv} disconnected`}</p>
         </li>
     )
 }
