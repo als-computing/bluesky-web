@@ -42,11 +42,11 @@ export default function CameraCustomSetup() {
         )
     } else {
         return (
-            <div className="m-auto flex flex-col justify-center items-center w-full h-screen border border-red-300 max-w-96">
+            <div className="m-auto flex flex-col justify-center items-center w-full max-w-64 h-screen border border-red-300 space-y-4">
                 <h1>Custom Camera Setup</h1>
-                <InputStringBoxRounded label='PV prefix' required={true} value={prefix} cb={(val) => setPrefix(val)}/>
-                <InputEnumBoxRounded label= 'Area Detector Type' required={true} value={detectorType} cb={(val) => setDetectorType(val)} enums={Object.keys(cameraDeviceData)} />
-                <InputEnumBoxRounded label= 'Size' required={true} value={canvasSize} cb={(val) => setCanvasSize(val)} enums={Object.keys(sizeMap)} />
+                <InputStringBoxRounded label='PV prefix' required={true} value={prefix} cb={(val) => setPrefix(val)} width='w-full'/>
+                <InputEnumBoxRounded label= 'Area Detector Type' required={true} value={detectorType} cb={(val) => setDetectorType(val)} enums={Object.keys(cameraDeviceData)} width='w-full' />
+                <InputEnumBoxRounded label= 'Canvas Size' required={true} value={sizeMap[canvasSize]} cb={(val) => setCanvasSize(val)} enums={Object.keys(sizeMap)} width='w-full'/>
 
                 <Button text='Connect' cb={handleSubmitClick} />
             </div>

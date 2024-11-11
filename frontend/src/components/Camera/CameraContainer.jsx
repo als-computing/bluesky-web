@@ -43,7 +43,9 @@ export default function CameraContainer(
 
     if (customSetup) {
         return (
-            <CameraCustomSetup />
+            <div className="w-full">
+                <CameraCustomSetup />
+            </div>
         )
     } else {
         return (
