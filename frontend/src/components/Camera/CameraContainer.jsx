@@ -52,11 +52,12 @@ export default function CameraContainer(
             <div className="w-full h-full flex flex-wrap space-x-4 items-start justify-center">
                 <div className="flex flex-col flex-shrink-0 items-center">
                     <CameraCanvas imageArrayPV={imageArrayPV} canvasSize={canvasSize} sizePVs={sizePVs} prefix={prefix}/>
-                    <CameraControlPanel enableControlPanel={enableControlPanel} cameraControlPV={cameraControlPV} startAcquire={startAcquire} stopAcquire={stopAcquire}/>
+                    { enableControlPanel ? <CameraControlPanel enableControlPanel={enableControlPanel} cameraControlPV={cameraControlPV} startAcquire={startAcquire} stopAcquire={stopAcquire}/> : ''}
                 </div>
-                <div className="overflow-x-auto overflow-y-auto">
-                    <CameraSettings enableSettings={enableSettings} settings={settings} prefix={prefix} cameraSettingsPVs={cameraSettingsPVs} onSubmit={onSubmitSettings}/>
+                <div className='overflow-x-auto overflow-y-auto'>
+                    {enableSettings ? <CameraSettings enableSettings={enableSettings} settings={settings} prefix={prefix} cameraSettingsPVs={cameraSettingsPVs} onSubmit={onSubmitSettings}/> : ''}
                 </div>
+
             </div>
         )
     }
