@@ -31,7 +31,7 @@ dataTypeEnumList = ['Int8', 'UInt8', 'Int16', 'UInt16', 'Int32', 'UInt32', 'Int6
 router = APIRouter()
 
 
-@router.websocket("/pvws/pv")
+@router.websocket("/pvcamera")
 async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
     await websocket.accept()
 
