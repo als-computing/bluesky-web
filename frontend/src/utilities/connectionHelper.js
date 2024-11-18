@@ -178,6 +178,7 @@ const getQServerKey = () => {
     } else {
         key = defaultKey;
     }
+    console.log({key})
     return key;
 }
 
@@ -211,7 +212,7 @@ const getHttpServerUrl = () => {
     } else {
         httpUrl = "http://" + currentWebsiteIP + port + pathname;
     } */
-   const httpUrl = '/api/qserver';
+   const httpUrl = 'api/qserver';
     return httpUrl;
 };
 
