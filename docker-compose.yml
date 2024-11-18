@@ -50,10 +50,10 @@ services:
       - "8081:80"
     env_file:
       - ./frontend/.env.production
-    depends_on:
-      - pvws
-      - python-server
-      - qserver-api
+    networks:
+      - qnet
+    environment:
+      - HOST_IP=${HOST_IP}
   
 networks:
   qnet:
