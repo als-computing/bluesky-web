@@ -18,7 +18,9 @@ export default function Home() {
         {url: 'api/python', response: ''}
     ];
 
-    const wsUrl = 'ws://127.0.0.1:8000/ws';
+    //const wsUrl = 'ws://127.0.0.1:8000/ws'; //this works when we don't use the nginx port fowrarding
+
+    const wsUrl = `ws://${window.location.hostname}:${window.location.port}/api/qserver/console`;
 
     const [ responseData, setResponseData ] = useState(blankResponseData);
     const [ wsMessage, setWsMessage ] = useState('');
@@ -74,7 +76,7 @@ export default function Home() {
         }
         ws.current.onopen = (event) => {
             if (ws.current.readyState === 1) {
-                ws.current.send('testing');
+                //ws.current.send('testing');
             }
         }
     
