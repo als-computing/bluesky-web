@@ -7,6 +7,8 @@ frontend/.pnp.js
 
 # testing
 frontend/coverage
+python-server/test/__pycache__
+python-server/test/.pytest_cache
 
 # production
 frontend/build

@@ -38,7 +38,9 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
     buffer = asyncio.Queue(maxsize=1000)
     settingsList, imageArray_pv = await initialize_settings(websocket)
 
-    settingSignals = setup_signals(settingsList)
+    settingSignals = await setup_signals(settingsList, websocket)
+    if settingSignals == False:
+        return
     if not await check_connections(settingSignals, websocket):
         return
 
@@ -61,8 +63,14 @@ async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
     for key in settingSignals:
         settingSignals[key].subscribe(settings_cb)
 
-    array_signal = EpicsSignalRO(imageArray_pv, name='array_signal')
-    array_signal.get()
+    try:
+        array_signal = EpicsSignalRO(imageArray_pv, name='array_signal')
+        array_signal.get()
+    except Exception as e:
+        await websocket.send_text(json.dumps({'error': str(e)}))
+        await websocket.close()
+        return
+
     if not await check_signal_connection(array_signal, imageArray_pv, websocket):
         return
     array_signal.subscribe(array_cb)
@@ -99,12 +107,17 @@ async def initialize_settings(websocket):
         await websocket.close()
         return None, None
 
-def setup_signals(settingsList):
+async def setup_signals(settingsList, websocket):
     settingSignals = {}
-    for item in settingsList:
-        signal = EpicsSignalRO(item['pv'], name=item['name'])
-        signal.get()
-        settingSignals[item['name']] = signal
+    try:
+        for item in settingsList:
+            signal = EpicsSignalRO(item['pv'], name=item['name'])
+            signal.get()
+            settingSignals[item['name']] = signal
+    except Exception as e:
+        await websocket.send_text(json.dumps({'error': str(e)}))
+        await websocket.close()
+        return False
     return settingSignals
 
 async def check_connections(settingSignals, websocket):
