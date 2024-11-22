@@ -97,6 +97,8 @@ async def initialize_settings(websocket):
         ]
 
         imageArray_pv = message.get("imageArray_pv", "13SIM1:image1:ArrayData")
+        if len(imageArray_pv) == 0:
+            imageArray_pv = "13SIM1:image1:ArrayData"
         for item in settingsList:
             item['pv'] = message.get(item['name'], item['defaultPV'])
             if len(item['pv']) == 0:
@@ -138,6 +140,9 @@ async def check_signal_connection(signal, name, websocket):
     return True
 
 def update_enum_lists(settingSignals, colorModeEnumList, dataTypeEnumList):
+    #ColorMode and DataType should have an enum_strs attribute containing an array of
+    #strings whose index corresponds to the value held by the pv
+    #Overwrite the defaults with the actual values, if values don't exist than accept default
     colorModeEnumList = getattr(settingSignals['colorMode'], 'enum_strs', colorModeEnumList)
     dataTypeEnumList = getattr(settingSignals['dataType'], 'enum_strs', dataTypeEnumList)
     return colorModeEnumList, dataTypeEnumList
