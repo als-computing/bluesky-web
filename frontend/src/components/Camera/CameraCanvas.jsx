@@ -2,7 +2,19 @@ import { useState, useRef } from 'react';
 import { phosphorIcons } from "../../assets/icons";
 import { getCameraUrl } from '../../utilities/connectionHelper';
 
-export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'}) {
+export default function CameraCanvas(
+    {
+        imageArrayDataPV='13SIM1:image1:ArrayData', 
+        sizePVs={
+            startX_pv: "13SIM1:cam1:MinX",
+            startY_pv: "13SIM1:cam1:MinY",
+            sizeX_pv: "13SIM1:cam1:SizeX",
+            sizeY_pv: "13SIM1:cam1:SizeY"
+        }, 
+        canvasSize='medium'
+    }) 
+    {
+
     const canvasRef = useRef(null);
     const [fps, setFps] = useState(0);
     const [socketStatus, setSocketStatus] = useState('closed');
@@ -11,6 +23,12 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
     const startTime = useRef(null);
     const [src, setSrc] = useState('');
 
+    const sizeDict = {
+        small: 256,
+        medium: 512,
+        large: 1024,
+        automatic: 512
+    };
 
     const startWebSocket = () => {
         const canvas = canvasRef.current;
@@ -33,8 +51,14 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
             setSocketStatus('Open');
             frameCount.current = 0;
             startTime.current = new Date();
-            //send message to websocket containing the imageArrayDataPV
-            ws.current.send(JSON.stringify({pv: imageArrayDataPV}));
+            //send message to websocket containing the pvs for the image and pixel size
+            let wsMessage = {
+                imageArray_pv: imageArrayDataPV
+            }
+            for (const key in sizePVs) {
+                wsMessage[key]= sizePVs[key];
+            }
+            ws.current.send(JSON.stringify(wsMessage));
         }
     
 /*         ws.current.onmessage = function (event) {
@@ -53,15 +77,29 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
         }; */
 
         ws.current.onmessage = async function (event) {
-            const blob = new Blob([event.data], { type: 'image/jpeg' });  // Create Blob from WebSocket data
-            const imageBitmap = await createImageBitmap(blob);  // Use createImageBitmap for faster decoding
-            nextFrame = imageBitmap;
-            isFrameReady = true;  // Mark frame as ready
-
-            let currentTime = new Date();
-            var totalDurationSeconds = currentTime.getTime()/1000 - startTime.current.getTime()/1000;
-            setFps(((frameCount.current + 1) / totalDurationSeconds).toPrecision(3));
-            frameCount.current = frameCount.current + 1;
+            if (typeof event.data === "string") {
+                if (canvasSize === 'automatic') {
+                    // Resize canvas when size is set to automatic and ws sends string msg of dim changes
+                    const dimensions = JSON.parse(event.data);
+                    console.log("Received dimensions:", dimensions);
+                    canvasRef.current.width = dimensions.x;
+                    canvasRef.current.height = dimensions.y;
+                }
+            } else {
+                // Handle binary image data
+                try {
+                    const blob = new Blob([event.data], { type: 'image/jpeg' });
+                    const imageBitmap = await createImageBitmap(blob);
+                    nextFrame = imageBitmap;
+                    isFrameReady = true;  // Mark frame as ready
+                    let currentTime = new Date();
+                    var totalDurationSeconds = currentTime.getTime()/1000 - startTime.current.getTime()/1000;
+                    setFps(((frameCount.current + 1) / totalDurationSeconds).toPrecision(3));
+                    frameCount.current = frameCount.current + 1;
+                } catch (e) {
+                    console.log('Error decoding/displaying camera frame: ' + e);
+                }
+            }
         };
     
         // Rendering loop with requestAnimationFrame
@@ -75,9 +113,6 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
         };
     
         requestAnimationFrame(render);  // Start the rendering loop
-
-
-
 
         ws.current.onerror = (error) => {
             console.log("WebSocket Error:", error);
@@ -105,12 +140,19 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
 
 
     return (
-        <div className="bg-slate-300 w-full aspect-square relative">
-            <canvas className={`${socketStatus === 'closed' ? 'opacity-25' : ''} m-auto border`} ref={canvasRef} width={512} height={512} />
+        <div className={`${canvasSize === 'small' ? 'max-w-[256px]' : ''} bg-slate-300 relative`}>
+            {/* Canvas Element - background*/}
+            <canvas id='canvas' className={`${socketStatus === 'closed' ? 'opacity-25' : ''} m-auto border`} ref={canvasRef} width={sizeDict[canvasSize] ? sizeDict[canvasSize] : 512} height={sizeDict[canvasSize] ? sizeDict[canvasSize] : 512} />
+            
+            {/* FPS counter - top left */}
             <p className="absolute z-10 top-1 left-2">{fps} fps</p>
+
+            {/* Connect websocket icon - top right */}
             <div className="absolute z-10 top-2 right-2 w-6 aspect-square text-slate-500 hover:cursor-pointer hover:text-slate-400" onClick={socketStatus === 'closed' ? startWebSocket : closeWebSocket}>
                 {socketStatus === 'closed' ? phosphorIcons.eyeSlash : phosphorIcons.eye}
             </div>
+
+            {/* Overlay when disconnected */}
             <div className={`${socketStatus === 'closed' ? '' : 'hidden'} absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center group`}>
                 <div className="flex justify-center items-center w-full h-full">
                     <div className="relative group-hover:cursor-pointer w-full max-w-xs h-32">
@@ -119,13 +161,14 @@ export default function CameraCanvas({imageArrayDataPV='13SIM1:image1:ArrayData'
                             <div className="w-24 aspect-square text-slate-700 m-auto">{phosphorIcons.plugs}</div>
                         </div>
 
-                        <div className="opacity-0 transition-opacity duration-700 group-hover:opacity-100 text-center absolute top-0 w-full h-full" onClick={startWebSocket}>
-                            <p className="text-2xl font-bold text-slate-700">Connect?</p>
-                            <div className="w-24 aspect-square text-slate-700 m-auto">{phosphorIcons.plugsConnected}</div>
+                        <div className="opacity-0 transition-opacity duration-700 group-hover:opacity-100 group/connect text-center absolute top-0 w-full h-full" onClick={startWebSocket}>
+                            <p className="text-2xl font-bold text-slate-700 group-hover/connect:text-slate-900 group-hover/connect:animate-pulse">Connect?</p>
+                            <div className="w-24 aspect-square text-slate-700 m-auto group-hover/connect:text-slate-900 group-hover/connect:animate-pulse">{phosphorIcons.plugsConnected}</div>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     )
 }

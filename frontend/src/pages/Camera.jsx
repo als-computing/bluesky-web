@@ -12,13 +12,29 @@ const urlPNG = 'ws://localhost:8000/pvsim/png'; //blob
 const urlJPEG = 'ws://localhost:8000/pvsim/jpeg'; //text
 const imgData = generateImgData(width, height);
 
+const sizePVs={
+    startX_pv: "Basler5472:cam1:MinX",
+    startY_pv: "Basler5472:cam1:MinY",
+    sizeX_pv: "Basler5472:cam1:SizeX",
+    sizeY_pv: "Basler5472:cam1:SizeY"
+};
+
+const imageArrayDataPV='Basler5472:image1:ArrayData';
+const settingsPrefix='Basler5472';
+
 export default function Camera() {
 /*     return (
         <WebSocketImage url={urlSim} width={width} height={height}/>
     ) */
     return (
         <div className="w-full h-full">
-            <CameraContainer customSetup={false} settings={cameraDeviceData.ADSimDetector}/>
+            <CameraContainer 
+                customSetup={false} 
+                settings={cameraDeviceData.ADSimDetector} 
+                sizePVs={sizePVs}
+                imageArrayDataPV={imageArrayDataPV}
+                settingsPrefix={settingsPrefix}
+            />
         </div>
     )
 }

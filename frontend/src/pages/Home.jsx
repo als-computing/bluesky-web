@@ -8,7 +8,7 @@ export default function Home() {
 
 /*     useEffect(() => {
         // Redirect to /queueserver when the component loads
-        setTimeout(()=> navigate('/queueserver'), 2000);
+        setTimeout(()=> navigate('/beamlines/bl531'), 2000);
         //navigate('/queueserver');
     }, [navigate]);
  */
