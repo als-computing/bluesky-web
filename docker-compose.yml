@@ -46,8 +46,6 @@ services:
       - ./frontend/.env.production
     networks:
       - qnet
-    environment:
-      - HOST_IP=${HOST_IP}
   
 networks:
   qnet:

@@ -1,5 +1,6 @@
-#This dockerfile allows the frontend service to run isolated without needing other containers for port forwarding
-#The regular dockerfile uses proxy pass to named containers only
+#This dockerfile is for use when the frontend container is running in bridge network, and the other services are
+#running directly on the host outside of containers.
+#The host OS can be Mac or Linux.
 FROM node:18-alpine AS builder
 
 WORKDIR /frontend
