@@ -1,6 +1,7 @@
-#Default NGINX conf assumes that frontend is running in a container, and all other APIs are running
-#in docker 'host' network mode. Proxy pass goes to the default Docker gateway address 172.17.0.1 
-#to get outside the container
+#This docker file is for use when the frontend container is in bridge mode, and the other services are running directly
+#on the host outside of containers. To enable this to work with both Mac OSX and Linux, an env variable is used in place
+#of the IP address. On Mac, docker can access the host via a host.docker.internal keyword. On Linux, docker can access the host
+#via the default bridge gateway 172.17.0.1. These are set in the .env file at the root directory.
 
 # For more information on configuration, see:
 #   * Official English Documentation: http://nginx.org/en/docs/
@@ -65,7 +66,7 @@ http {
 
          # Proxy for python server
         location /api/python {
-            proxy_pass http://172.17.0.1:8000/;
+            proxy_pass http://$HOST_IP:8000/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -75,7 +76,7 @@ http {
         # Proxy for /api/pvws with WebSocket support
         location /api/pvws {
             rewrite ^/api/pvws(/.*)$ $1 break; # Strip /api/pvws from the path
-            proxy_pass http://172.17.0.1:8080/pvws/pv;
+            proxy_pass http://$HOST_IP:8080/pvws/pv;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
@@ -85,7 +86,7 @@ http {
         # Proxy for /api/qserver
         location /api/qserver {
             rewrite ^/api/qserver(/.*)$ $1 break; # Strip /api/qserver from the path
-            proxy_pass http://172.17.0.1:60610;
+            proxy_pass http://$HOST_IP:60610;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -95,7 +96,7 @@ http {
         # Proxy for /api/camera to python server with WebSocket support
         location /api/camera {
             rewrite ^/api/camera(/.*)$ $1 break; # Strip /api/camera from the path
-            proxy_pass http://172.17.0.1:8000/pvCamera;
+            proxy_pass http://$HOST_IP:8000/pvCamera;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
@@ -105,7 +106,7 @@ http {
         # Proxy for /queue_server to python server with WebSocket support
         location /api/qserver/console {
             rewrite ^/api/qserver/console(/.*)$ $1 break; # Strip /api/qserver/console from the path
-            proxy_pass http://172.17.0.1:8000/queue_server;
+            proxy_pass http://$HOST_IP:8000/queue_server;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";

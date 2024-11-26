@@ -7,6 +7,7 @@ frontend/.pnp.js
 
 # testing
 frontend/coverage
+python-server/test
 
 # production
 frontend/build
