@@ -32,10 +32,10 @@ services:
   qserver-api:
    build: ./queue-server-api
    environment:
-     - QSERVER_HTTP_SERVER_ALLOW_ORIGINS=*
+     - QSERVER_HTTP_SERVER_ALLOW_ORIGINS=http://frontend frontend
      - QSERVER_HTTP_SERVER_SINGLE_USER_API_KEY=test
    network_mode: "host"
-   command: ["uvicorn", "--host", "localhost", "--port", "60610", "bluesky_httpserver.server:app"]
+   command: ["uvicorn", "--host", "0.0.0.0", "--port", "60610", "bluesky_httpserver.server:app"]
    depends_on:
      - qserver
   frontend:
