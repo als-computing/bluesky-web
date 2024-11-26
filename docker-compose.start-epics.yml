@@ -1,9 +1,7 @@
 #Mac or Linux
+#This dockerfile runs all services in a bridge network to isolate the EPICS service from the host network, which can cause port conflicts
+#if the host OS has any EPICS services running
 services:
-  frontend:
-      build: ./frontend
-      ports:
-        - "8081:80"
   epics:
     image: seijdeleon/epics-motor-sim:latest
     platform: linux/amd64
@@ -53,6 +51,14 @@ services:
     image: redis:7.4-rc2-alpine
     networks: 
       - epicsnet
+  frontend:
+      build:
+        context: ./frontend
+        dockerfile: Dockerfile.dev
+      ports:
+        - "8081:80"
+      environment:
+        - HOST_IP=${HOST_IP}
 
 networks:
   epicsnet:
