@@ -32,7 +32,7 @@ services:
   qserver-api:
    build: ./queue-server-api
    environment:
-     - QSERVER_HTTP_SERVER_ALLOW_ORIGINS=http://frontend frontend
+     - QSERVER_HTTP_SERVER_ALLOW_ORIGINS=http://192.168.1.100
      - QSERVER_HTTP_SERVER_SINGLE_USER_API_KEY=test
    network_mode: "host"
    command: ["uvicorn", "--host", "0.0.0.0", "--port", "60610", "bluesky_httpserver.server:app"]
@@ -45,9 +45,13 @@ services:
     env_file:
       - ./frontend/.env.production
     networks:
-      - qnet
+      qnet:
+        ipv4_address: 192.168.1.100
   
 networks:
   qnet:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
 
