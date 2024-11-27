@@ -10,6 +10,7 @@ import QueueServerV0 from './pages/QueueServerV0.jsx';
 import BL601 from './pages/BL601.jsx';
 import BL531 from './pages/BL531.jsx';
 import ControllerInterface from './components/ControllerInterface/ControllerInterface.jsx';
+import Scattering from './pages/Scattering.jsx';
 
 import { autoDeviceList } from './data/device_names.js';
 
@@ -40,6 +41,7 @@ function App() {
             <Route path="/queueserver/v0" element={<QueueServerV0 />} />
             <Route path="/beamlines/BL601" element={<BL601 />} />
             <Route path="/beamlines/BL531" element={<BL531 />} />
+            <Route path="/scattering" element={<Scattering />} />
             <Route path="controller" element={<ControllerInterface defaultControllerList={['IOC:m1', 'IOC:m2', 'IOC:m3']}/>} />
           </Routes>      
         </div>

@@ -8,6 +8,7 @@ frontend/.pnp.js
 # testing
 frontend/coverage
 python-server/test
+python-server/.ipynb_checkpoints
 
 # production
 frontend/build

@@ -7,6 +7,7 @@ from pydantic import BaseModel
 import pvws
 import pvsim
 import queue_server
+import pyfai
 
 try:
     from ophyd.signal import EpicsSignal
@@ -46,6 +47,7 @@ app.add_middleware(
 app.include_router(pvws.router) #turn this off if not connected to EPICS
 app.include_router(pvsim.router)
 app.include_router(queue_server.router)
+app.include_router(pyfai.router)
 
 
 @app.get("/")

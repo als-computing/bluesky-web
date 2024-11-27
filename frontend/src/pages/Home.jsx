@@ -14,8 +14,7 @@ export default function Home() {
  */
 
     const blankResponseData = [
-        {url: 'http://127.0.0.1:8000', response: ''}, 
-        {url: 'api/python', response: ''}
+        {url: 'http://127.0.0.1:8000/qvector', response: ''}
     ];
 
     //const wsUrl = 'ws://127.0.0.1:8000/ws'; //this works when we don't use the nginx port fowrarding
@@ -99,7 +98,7 @@ export default function Home() {
 
     useEffect(()=> {
         fetchData();
-        startWebSocket();
+        //startWebSocket();
     }, [])
 
 
