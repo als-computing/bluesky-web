@@ -21,7 +21,7 @@ import Sidebar from './components/Sidebar/Sidebar.jsx';
 
 function App() {
   const location = useLocation();
-  const compressRightSide = location.pathname.startsWith('/queueserver') || location.pathname.startsWith('/beamlines') || location.pathname.startsWith('/camera');
+  const compressRightSide = location.pathname.startsWith('/queueserver') || location.pathname.startsWith('/beamlines') || location.pathname.startsWith('/camera') || location.pathname.startsWith('/scattering');
 
 
   return (
