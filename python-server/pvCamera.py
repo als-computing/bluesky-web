@@ -158,6 +158,12 @@ def update_dimensions(settingSignals, buffer):
     }
     buffer.put_nowait((None, time.time(), tempDimensions))
 
+def format_array(rawImageArray, height, width, colorMode, dataType):
+    array_data = np.array(rawImageArray, dtype=dtype_map[dataType])
+    array_data = normalize_array_data(array_data, dataType)
+    array_data, mode = reshape_array(array_data, height, width, colorMode)
+    return array_data, mode
+
 # Main loop for streaming images
 
 async def handle_streaming(websocket, buffer):
@@ -173,11 +179,20 @@ async def handle_streaming(websocket, buffer):
             height, width, colorMode, dataType = currentSettings['y'], currentSettings['x'], currentSettings['colorMode'], currentSettings['dataType']
 
             try:
-                array_data = np.array(rawImageArray, dtype=dtype_map[dataType])
-                array_data = normalize_array_data(array_data, dataType)
-                array_data, mode = reshape_array(array_data, height, width, colorMode)
+                #array_data = np.array(rawImageArray, dtype=dtype_map[dataType])
+                #array_data = normalize_array_data(array_data, dataType)
+                #array_data, mode = reshape_array(array_data, height, width, colorMode)
+                #await send_image(array_data, websocket, mode)
 
-                await send_image(array_data, websocket, mode)
+                #change to make non blocking, PR#13
+                format_array_coroutine = asyncio.to_thread(format_array, rawImageArray, height, width, colorMode, dataType)
+                array_data, mode = await format_array_coroutine
+                
+                get_buffer_coroutine = asyncio.to_thread(send_image, array_data, websocket, mode)
+                buffered = await get_buffer_coroutine
+                await websocket.send_bytes(buffered.getvalue())
+                #End changes
+
             except Exception as e:
                 print(f'Skipping image due to error: {e}')
                 continue
@@ -216,7 +231,7 @@ def reshape_array(array_data, height, width, colorMode):
     
     return reshaped_data, mode
 
-async def send_image(array_data, websocket, mode):
+def send_image(array_data, websocket, mode):
     max_dimension = 2500 #maximum pixel width or height to be sent out. Increase if higher fidelity is needed
     try:
         if array_data.shape[0] > max_dimension or array_data.shape[1] > max_dimension:
@@ -227,6 +242,8 @@ async def send_image(array_data, websocket, mode):
 
         buffered = io.BytesIO()
         img.save(buffered, format="JPEG", quality=100)
-        await websocket.send_bytes(buffered.getvalue())
+        #put this send bytes call into the function
+        #await websocket.send_bytes(buffered.getvalue())
+        return buffered
     except Exception as e:
         print(f"Error sending image: {e}")
