@@ -7,7 +7,6 @@ export default function QSpaceMaskImage() {
 
     const parseEDF = (arrayBuffer) => {
         const textDecoder = new TextDecoder();
-        const dataView = new DataView(arrayBuffer);
 
         // Find header end (assumes "}\n" marks the end)
         let headerEndIndex = 0;
@@ -22,7 +21,6 @@ export default function QSpaceMaskImage() {
 
         const header = textDecoder.decode(new Uint8Array(arrayBuffer.slice(0, headerEndIndex)));
         const headerLines = header.split('\n');
-        console.log({headerLines})
         const headerData = {};
 
         // Parse header metadata
@@ -32,8 +30,6 @@ export default function QSpaceMaskImage() {
                 headerData[match[1]] = match[2].trim();
             }
         });
-
-        console.log({headerData})
 
         // Extract dimensions from header and ensure they are integers
         const width = parseInt(headerData['Dim_1'], 10);
@@ -60,7 +56,7 @@ export default function QSpaceMaskImage() {
                 const { width, height, imageData } = parseEDF(arrayBuffer);
 
                 // Log width and height for debugging
-                console.log(`Parsed dimensions: width=${width}, height=${height}`);
+                //console.log(`Parsed dimensions: width=${width}, height=${height}`);
 
                 // Render to canvas
                 const canvas = canvasRef.current;
