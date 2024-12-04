@@ -20,7 +20,7 @@ export default function FormContainer({inputs = {},  handleInputChange=()=>{}, l
         )
     } else {
         return (
-            <form className="flex-col space-y-2">
+            <form className="flex-col space-y-4 w-full max-w-96 overflow-auto h-fit pb-16">
                 {Object.keys(inputs).map((key) => 
                     <FormRow 
                         key={key}

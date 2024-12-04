@@ -31,7 +31,7 @@ function App() {
         <div className="md:hidden md:w-0 lg:block lg:w-1/6 h-full 3xl:w-36">
           <Sidebar />
         </div>
-        <div className={`md:w-full ${compressRightSide ? 'lg:w-5/6' : 'lg:w-4/6'} h-full 3xl:w-full `}>
+        <div className={`md:w-full ${compressRightSide ? 'lg:w-5/6' : 'lg:w-4/6'} h-[calc(100vh-6rem)] 3xl:w-full `}>
           <Routes>
             <Route path="/" element={<Home /> } />
             <Route path="/camera" element={<Camera />} />

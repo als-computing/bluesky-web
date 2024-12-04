@@ -87,7 +87,7 @@ export default function QSpaceMaskImage() {
     }, []);
 
     return (
-        <div className="w-fit h-full m-auto bg-white shadow-md flex justify-center items-center">
+        <div className="w-fit h-full m-auto bg-neutral-300 shadow-md flex justify-center items-center">
             {loading && <p>Loading image...</p>}
             {error && <p className="text-red-500">Error: {error}</p>}
             <canvas ref={canvasRef} className="max-w-full max-h-full"></canvas>
