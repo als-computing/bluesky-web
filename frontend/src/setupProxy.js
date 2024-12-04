@@ -38,6 +38,15 @@ module.exports = function(app) {
             ws: true, // Enables WebSocket support
         })
     );
+
+    app.use(
+        '/api/python',
+        createProxyMiddleware({
+            target: 'http://localhost:8000',
+            changeOrigin: true,
+            pathRewrite: {'^/api/python': ''}
+        })
+    );
 };
 
 // setupProxy.js
