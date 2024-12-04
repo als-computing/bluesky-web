@@ -38,7 +38,7 @@ async def test_websocket_without_epics_connection(client):
         # Expect an error response due to no EPICS mock
         response = websocket.receive_text()
         response_data = json.loads(response)
-        assert "error" in response_data
+        assert "error" in response_data #hint: if test fails, double check that there is no EPICS IOC for ADSimDetector running
         assert "Failed to connect" in response_data["error"]
 
         # Expect WebSocket to close
