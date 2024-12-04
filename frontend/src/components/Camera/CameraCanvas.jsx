@@ -2,16 +2,13 @@ import { useState, useRef } from 'react';
 import { phosphorIcons } from "../../assets/icons";
 import { getCameraUrl } from '../../utilities/connectionHelper';
 
+
 export default function CameraCanvas(
     {
-        imageArrayDataPV='13SIM1:image1:ArrayData', 
-        sizePVs={
-            startX_pv: "13SIM1:cam1:MinX",
-            startY_pv: "13SIM1:cam1:MinY",
-            sizeX_pv: "13SIM1:cam1:SizeX",
-            sizeY_pv: "13SIM1:cam1:SizeY"
-        }, 
-        canvasSize='medium'
+        imageArrayPV='', 
+        sizePVs={}, 
+        canvasSize='medium',
+        prefix=''
     }) 
     {
 
@@ -29,6 +26,78 @@ export default function CameraCanvas(
         large: 1024,
         automatic: 512
     };
+
+    const defaultImageSuffix = 'image1:ArrayData';
+    const defaultImagePV = '13SIM1:image1:ArrayData';
+    const defaultSizeSuffixes = {
+        startX: "cam1:MinX",
+        startY: "cam1:MinY",
+        sizeX: "cam1:SizeX",
+        sizeY: "cam1:SizeY",
+        colorMode: "cam1:ColorMode",
+        dataType: "cam1:DataType"
+    }
+    const defaultSizePVs={
+        startX: "13SIM1:cam1:MinX",
+        startY: "13SIM1:cam1:MinY",
+        sizeX: "13SIM1:cam1:SizeX",
+        sizeY: "13SIM1:cam1:SizeY",
+        colorMode: "13SIM1:cam1:ColorMode",
+        dataType: "13SIM1:cam1:DataType"
+    }
+
+    const getImageArrayPV = () => {
+        //Return imageArrayPV if it was specified
+        if (imageArrayPV.length > 0) {
+            return imageArrayPV;
+        } else {
+            //Return a concatenated PV based on the prefix (if provided) and a default Image suffix
+            if (prefix.length >0) {
+                let concatenatedPV = prefix + ':' + defaultImageSuffix;
+                return concatenatedPV;
+            } else {
+                //Return a default image PV when there are no inputs
+                return defaultImagePV;
+            }
+        }
+    };
+
+    const doesObjectStructureMatch = (obj1, obj2) => {
+        if (typeof obj1 !== "object" || typeof obj2 !== "object") return false;
+        if (Object.keys(obj1).length !== Object.keys(obj2).length) return false;
+        try {
+            for (const key in obj1) {
+                let val1 = obj1[key];
+                let val2 = obj2[key];
+                if (typeof val1 !== typeof val2) return false;
+                if (typeof val1 === 'string' && (val1.length < 1 || val2.length < 1)) return false;
+            }
+
+        } catch {
+            return false;
+        }
+        //all tests passed
+        return true;
+    }
+
+    const getSizePVs = () => {
+        //Return sizePVs if it was specified & contains all necessary keys matching the default
+        if (doesObjectStructureMatch(sizePVs, defaultSizePVs)) {
+            return sizePVs;
+        } else {
+            //Return object with concatenated values with user provided prefix and default suffixes
+            if (prefix.length > 0 ) {
+                var tempSizePVs = {}
+                for (const key in defaultSizeSuffixes) {
+                    let concatenatedPV = prefix + ':' + defaultSizeSuffixes[key];
+                    tempSizePVs[key] = concatenatedPV;
+                }
+            } else {
+                //Return default size PVs for ADSimDetector when no inputs provided
+                return defaultSizePVs;
+            }
+        }
+    }
 
     const startWebSocket = () => {
         const canvas = canvasRef.current;
@@ -51,13 +120,8 @@ export default function CameraCanvas(
             setSocketStatus('Open');
             frameCount.current = 0;
             startTime.current = new Date();
-            //send message to websocket containing the pvs for the image and pixel size
-            let wsMessage = {
-                imageArray_pv: imageArrayDataPV
-            }
-            for (const key in sizePVs) {
-                wsMessage[key]= sizePVs[key];
-            }
+            //send message to websocket containing the pvs for the image and pixel size            
+            let wsMessage = {imageArray_PV: getImageArrayPV, ...getSizePVs()}
             ws.current.send(JSON.stringify(wsMessage));
         }
     
@@ -156,8 +220,8 @@ export default function CameraCanvas(
             <div className={`${socketStatus === 'closed' ? '' : 'hidden'} absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center group`}>
                 <div className="flex justify-center items-center w-full h-full">
                     <div className="relative group-hover:cursor-pointer w-full max-w-xs h-32">
-                        <div className="group-hover:opacity-0 opacity-100 transition-opacity duration-700 flex content-center items-center flex-col absolute top-0 w-full h-full ">
-                            <p className="text-2xl font-bold text-slate-700">Websocket Disconnected</p>
+                        <div className="group-hover:opacity-0 opacity-100 transition-opacity duration-700 flex content-center items-center justify-center flex-col absolute top-0 w-full h-full ">
+                            <p className="text-2xl text-center font-bold text-slate-700">Websocket Disconnected</p>
                             <div className="w-24 aspect-square text-slate-700 m-auto">{phosphorIcons.plugs}</div>
                         </div>
 

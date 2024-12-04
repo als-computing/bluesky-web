@@ -2,8 +2,29 @@ import { useState, useRef, useEffect } from "react";
 import { closeWebSocket, getPVWSUrl } from "../../../utilities/connectionHelper";
 import dayjs from "dayjs";
 
-export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], enableControlPanel=true, enableSettings=true}) => {
-    //definitions
+/**
+ * Custom hook for generating Camera PV State variables and web socket connections.
+ * This function automatically concatenates a prefix into required settings PVs
+ * and a single control PV used to start/stop acquiring. Websockets are opened to connect these PVs, and a React
+ * state object is returned for the control PV and settings PVs which can be used to
+ * view live updates when rendered to the dom. The websockets handle live udpates to the React State objects.
+ *
+ * @param {string} prefix - Required PV prefix used for concatenating suffixes for settings. ex) '13SIM1'
+ * @param {Array} settings - Optional array of setting suffixes. Defaults to ADSimDetector
+ * @param {boolean} enableControlPanel - Optional boolean. True = connect acquire PV to web socket, False = do nothing
+ * @param {boolean} enableSettings - Optional boolean. True = connect settings PVs to web socket, False = do nothing
+ * 
+ * @returns {Object} An object containing state variables, WebSocket connections, and control functions for camera operations:
+ * - **cameraControlPV**: A React state object representing the control PV state, including properties like `value`, `lastUpdate`, `pv`, and `isConnected`.
+ * - **cameraSettingsPVs**: A React state object containing the settings PVs as keys, each with properties like `value`, `lastUpdate`, `pv`, and `isConnected`.
+ * - **connectionControl**: A React ref for the WebSocket connection managing the control PV.
+ * - **connectionSettings**: A React ref for the WebSocket connection managing the settings PVs.
+ * - **onSubmitControl**: Function to send a write request to the control PV WebSocket with a specified `pv` and `newValue`.
+ * - **onSubmitSettings**: Function to send a write request to the settings PVs WebSocket with a specified `pv` and `newValue`.
+ * - **startAcquire**: Function to start acquiring images by writing a `1` to the control PV.
+ * - **stopAcquire**: Function to stop acquiring images by writing a `0` to the control PV.
+ */
+export const useCamera = ({prefix='', settings=[], enableControlPanel=true, enableSettings=true}) => {
 
     const [ cameraControlPV, setCameraControlPV ] = useState({});
     const [ cameraSettingsPVs, setCameraSettingsPVs ] = useState({});
@@ -12,6 +33,7 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
     const connectionSettings = useRef(null);
 
     const wsUrl = getPVWSUrl();
+
 
     //helper function to return prefix with no whitespace or trailing ':'
     const sanitizeInputPrefix = (prefix) => {
@@ -35,7 +57,7 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
         return controlPV;
     };
 
-    const controlPVString = createControlPVString(settingsPrefix);
+    const controlPVString = createControlPVString(prefix);
 
     //creates object structure for state var
     const initializeControlPVState = (pv='') => {
@@ -85,12 +107,12 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
     };
 
     const subscribeControlPV = (connection) => {
-        var pv = createControlPVString(settingsPrefix);
+        var pv = createControlPVString(prefix);
         connection.current.send(JSON.stringify({type: "subscribe", pvs: [pv]}));
     };
 
     const subscribeSettingsPVs = (connection) => {
-        var pvArray = createSettingsPVArray(settings, settingsPrefix);
+        var pvArray = createSettingsPVArray(settings, prefix);
         connection.current.send(JSON.stringify({type: "subscribe", pvs: pvArray}));
     }
 
@@ -304,16 +326,16 @@ export const useCamera = ({imageArrayDataPV='', settingsPrefix='', settings=[], 
     };
 
     useEffect(() => {
-        if (enableControlPanel && settingsPrefix !== '') {
+        if (enableControlPanel && prefix !== '') {
             //create blank controlPV
-            initializeControlPVState(createControlPVString(settingsPrefix));
+            initializeControlPVState(createControlPVString(prefix));
             //create a websocket connection for acquire pv only
             connectWebSocket(connectionControl, wsUrl, subscribeControlPV, updateControlPV, 'Camera Control');
         }
     
-        if (enableSettings === true && settings.length !== 0 && settingsPrefix !== '') {
+        if (enableSettings === true && settings.length !== 0 && prefix !== '') {
             //create blank cameraSettingsPVs
-            var settingsPVArray = createSettingsPVArray(settings, settingsPrefix);
+            var settingsPVArray = createSettingsPVArray(settings, prefix);
             initializeCameraSettingsPVState(settingsPVArray);
             //create a websocket connection for all camera settings
             connectWebSocket(connectionSettings, wsUrl, subscribeSettingsPVs, updateSettingsPVs, 'Camera Settings');

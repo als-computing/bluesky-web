@@ -16,10 +16,25 @@ const adSimDetector = [
         prefix: 'cam1',
         inputs: [
             {
-                suffix: "DataType",
-                label: "Data Type",
-                type: type.enum,
-                enums: ["Int8", "UInt8","Int16", "UInt16"]
+                suffix:"AcquireTime",
+                label: "Exposure Time",
+                type: type.float,
+                min: 0.00001,
+                max: 10
+            },
+            {
+                suffix:"AcquirePeriod",
+                label: "Acquire Period",
+                type: type.float,
+                min: 0.01,
+                max: 10
+            },
+            {
+                suffix: "NumImages",
+                label: "Num Images",
+                type: type.integer,
+                min: 1,
+                max: 100
             },
             {
                 suffix: "ColorMode",
@@ -27,6 +42,91 @@ const adSimDetector = [
                 type: type.enum,
                 enums: ["Mono", "RGB1", "RGB2", "RGB3"]
             },
+            {
+                suffix: "GainRed",
+                label: "Gain Red",
+                type: type.float,
+                min: 0,
+                max: 100
+            },
+            {
+                suffix: "GainGreen",
+                label: "Gain Green",
+                type: type.float,
+                min: 0,
+                max: 100
+            },
+            {
+                suffix: "GainBlue",
+                label: "Gain Blue",
+                type: type.float,
+                min: 0,
+                max: 100
+            },
+            {
+                suffix: "DataType",
+                label: "Data Type",
+                type: type.enum,
+                enums: ["Int8", "UInt8","Int16", "UInt16"]
+            },
+        ],
+    },
+    {
+        title: "Size Settings",
+        icon: null,
+        prefix: 'cam1',
+        inputs: [
+            {
+                suffix: "MinX",
+                label: "start X",
+                type: type.integer,
+                min: 0,
+                max: 1024
+            },
+            {
+                suffix: "MinY",
+                label: "start Y",
+                type: type.integer,
+                min: 0,
+                max: 1024
+            },
+            {
+                suffix: "SizeX",
+                label: "Size X",
+                type: type.integer,
+                min: 1,
+                max: 1024
+            },
+            {
+                suffix: "SizeY",
+                label: "Size Y",
+                type: type.integer,
+                min: 1,
+                max: 1024
+            },
+        ]
+    },
+    {
+        title: "Plugins",
+        icon: null,
+        prefix: null,
+        inputs: [
+            {
+                suffix: "image1:EnableCallbacks",
+                label: "ND Array Port",
+                type: type.enum,
+                enums: ['Enable', 'Disable']
+            },
+        ]
+    }
+];
+
+const basler = [
+    {
+        title: "Acquisition Settings",
+        icon: null,
+        prefix: 'cam1',
+        inputs: [
             {
                 suffix:"AcquireTime",
                 label: "Exposure Time",
@@ -47,6 +147,39 @@ const adSimDetector = [
                 type: type.integer,
                 min: 1,
                 max: 100
+            },
+            {
+                suffix: "ColorMode",
+                label: "Color Mode",
+                type: type.enum,
+                enums: ["Mono", "RGB1", "RGB2", "RGB3"]
+            },
+            {
+                suffix: "GainRed",
+                label: "Gain Red",
+                type: type.float,
+                min: 0,
+                max: 100
+            },
+            {
+                suffix: "GainGreen",
+                label: "Gain Green",
+                type: type.float,
+                min: 0,
+                max: 100
+            },
+            {
+                suffix: "GainBlue",
+                label: "Gain Blue",
+                type: type.float,
+                min: 0,
+                max: 100
+            },
+            {
+                suffix: "DataType",
+                label: "Data Type",
+                type: type.enum,
+                enums: ["Int8", "UInt8","Int16", "UInt16"]
             },
         ],
     },
@@ -103,7 +236,8 @@ const adSimDetector = [
 
 // Add new camera IOCs to cameraDeviceData to be discoverable in the app
 const cameraDeviceData = {
-    ADSimDetector: adSimDetector
+    ADSimDetector: adSimDetector,
+    basler: basler
 }
 
 export { cameraDeviceData, type };

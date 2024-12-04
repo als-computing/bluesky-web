@@ -4,7 +4,7 @@ from fastapi import FastAPI, Response, status, Request, WebSocket, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-import pvws
+import pvCamera
 import pvsim
 import queue_server
 import pyfai
@@ -44,7 +44,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(pvws.router) #turn this off if not connected to EPICS
+app.include_router(pvCamera.router) #turn this off if not connected to EPICS
 app.include_router(pvsim.router)
 app.include_router(queue_server.router)
 app.include_router(pyfai.router)
