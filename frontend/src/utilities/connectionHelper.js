@@ -245,8 +245,7 @@ const getCameraUrl = () => {
     //ws.current = new WebSocket('ws://localhost/api/camera');
 
     const currentWebsiteIP = window.location.hostname;
-    const currentWebsitePort = window.location.port;
-    const pathname = "/pvws/pv";
+    const pathname = "/pvcamera";
     const port = ":8000";
     var wsUrl;
 

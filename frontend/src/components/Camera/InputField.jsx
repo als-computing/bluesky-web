@@ -4,7 +4,7 @@ import InputFloat from "./InputFloat";
 import InputInteger from "./InputInteger";
 import InputString from "./InputString";
 
-export default function InputField ({onSubmit=()=>{}, pv='', input={suffix: "Example", label: "Example", type: 'integer', min:'0', max:'5'}, cameraSettingsPVs={}, settingsPrefix=''}) {
+export default function InputField ({onSubmit=()=>{}, pv='', input={suffix: "Example", label: "Example", type: 'integer', min:'0', max:'5'}, cameraSettingsPVs={}}) {
     const exampleEnumInput = {
         suffix: "DataType",
         label: "Data Type",
@@ -49,7 +49,7 @@ export default function InputField ({onSubmit=()=>{}, pv='', input={suffix: "Exa
     return (
         <li className="flex">
             {renderInput()}
-            <p className={`${isPVConnected ? 'text-sky-800' : 'text-red-400'} ml-6`}>{isPVConnected ? ( 'text' in cameraSettingsPVs[pv] ? cameraSettingsPVs[pv].text : cameraSettingsPVs[pv].value) : `${pv} disconnected`}</p>
+            <p className={`${isPVConnected ? 'text-sky-800' : 'text-red-400'} ml-6 overflow-auto text-nowrap`}>{isPVConnected ? ( 'text' in cameraSettingsPVs[pv] ? cameraSettingsPVs[pv].text : cameraSettingsPVs[pv].value) : `${pv} disconnected`}</p>
         </li>
     )
 }
