@@ -9,11 +9,12 @@ export default function QSpaceContainer() {
     const qVectorUrl = 'http://127.0.0.1:8000/qvector';
     const {
         getPlotData,
-        plotData
+        plotData,
+        postPlotData
     } = useQSpace();
 
-    const handleSubmit = () => {
-        getPlotData();
+    const handleSubmit = (inputs) => {
+        postPlotData(inputs);
     };
 
 

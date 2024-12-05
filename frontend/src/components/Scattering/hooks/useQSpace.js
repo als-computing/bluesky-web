@@ -29,9 +29,37 @@ export const useQSpace = () => {
         }
     };
 
+    /**
+     * Post input data to PyFai endpoint, which will return plot Data
+     * 
+     *
+     * 
+     * @returns {boolean} Returns True on success, False on errors
+     */
+    const postPlotData = async (inputs) => {
+        console.log({inputs})
+        var postBody = {};
+        for (var key in inputs) {
+            postBody[key] = inputs[key].value;
+        }
+        console.log({postBody})
+        try {
+            const response = await axios.post(qVectorUrl,
+                postBody
+            );
+            setPlotData(response.data);
+            return true;
+        } catch (error) {
+            console.log('Error', error);
+            return false;
+        }
+    };
+    
+
     //return all functions and state variables
     return {
         getPlotData,
         plotData,
+        postPlotData
     }
 }
