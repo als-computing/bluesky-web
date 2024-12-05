@@ -37,15 +37,33 @@ export const useQSpace = () => {
      * @returns {boolean} Returns True on success, False on errors
      */
     const postPlotData = async (inputs) => {
-        console.log({inputs})
-        var postBody = {};
-        for (var key in inputs) {
-            postBody[key] = inputs[key].value;
+        //Create FormData object so we can include images
+        const formData = new FormData();
+
+        //Add form values from inputs table
+        for (let key in inputs) {
+            formData.append(key, inputs[key].value);
         }
-        console.log({postBody})
+
         try {
-            const response = await axios.post(qVectorUrl,
-                postBody
+            const dataFileResponse = await fetch('/images/saxs_ML_AgB_7000.0eV_0.5sec_12084.0mV.tif');
+            const maskFileResponse = await fetch('/images/saxs_mask_mrl.edf');
+
+            const dataFileBlob = await dataFileResponse.blob();
+            const maskFileBlob = await maskFileResponse.blob();
+
+            formData.append('dataFile', dataFileBlob, 'saxs_ML_AgB_7000.0eV_0.5sec_12084.0mV.tif');
+            formData.append('maskFile', maskFileBlob, 'saxs_mask_mrl.edf');
+        } catch (error) {
+            console.log('Unable to submit POST request, error with mask / image file: ' + error);
+            return false;
+        }
+        try {
+            const response = await axios.post(qVectorUrl, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
             );
             setPlotData(response.data);
             return true;

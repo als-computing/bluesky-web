@@ -11,12 +11,14 @@ import time
 import numpy as np
 import io
 import base64
+import shutil
 from PIL import Image
-from fastapi import APIRouter, Response, status, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, File, UploadFile, Form, Response, status, WebSocket, WebSocketDisconnect
 
 router = APIRouter()
 
 # Define the input schema using Pydantic
+#Note this does not work for files, so must use arguments when adding files
 class QVectorInput(BaseModel):
     detDistance: float = Field(..., description="Detector distance in meters")
     beamCenterX: int = Field(..., description="Beam center X coordinate in pixels")
@@ -27,20 +29,50 @@ class QVectorInput(BaseModel):
 
 
 @router.post("/qvector", status_code=200)
-def calculate_qvector(input_data: QVectorInput, response: Response):
+def calculate_qvector(
+    detDistance: float = Form(...),
+    beamCenterX: int = Form(...),
+    beamCenterY: int = Form(...),
+    energy: float = Form(...),
+    detType: str = Form(...),
+    numPoints: int = Form(...),
+    dataFile: UploadFile = File(...),
+    maskFile: UploadFile = File(...),
+    response: Response = Response()
+):
     try:
         # Parse input data
-        dist = input_data.detDistance
-        bc_x = input_data.beamCenterX
-        bc_y = input_data.beamCenterY
-        energy = input_data.energy
-        detector_type = input_data.detType
-        npt = input_data.numPoints
+        dist = detDistance
+        bc_x = beamCenterX
+        bc_y = beamCenterY
+        energy = energy
+        detector_type = detType
+        npt = numPoints
+        dataFile = dataFile
+        maskFile = maskFile
 
-        # File paths
-        data_folder = './data'
-        mask_path = os.path.join(data_folder, 'saxs_mask_mrl.edf')
-        image_path = os.path.join(data_folder, 'saxs_ML_AgB_7000.0eV_0.5sec_12084.0mV.tif')
+        # Example: Logging inputs and file paths
+        print("Detector Distance:", detDistance)
+        print("Beam Center X:", beamCenterX)
+        print("Beam Center Y:", beamCenterY)
+        print("Energy:", energy)
+        print("Detector Type:", detType)
+        print("Number of Points:", numPoints)
+
+        # File paths (hardcoded in the same repo)
+        #data_folder = './data'
+        #mask_path = os.path.join(data_folder, 'saxs_mask_mrl.edf')
+        #image_path = os.path.join(data_folder, 'saxs_ML_AgB_7000.0eV_0.5sec_12084.0mV.tif')
+
+        #Save uploaded files
+        image_path = f"./temp_{dataFile.filename}"
+        mask_path = f"./temp_{maskFile.filename}"
+
+        with open(image_path, "wb") as data_out:
+            shutil.copyfileobj(dataFile.file, data_out)
+
+        with open(mask_path, "wb") as mask_out:
+            shutil.copyfileobj(maskFile.file, mask_out)
 
         # Calculate derived parameters
         pixel_size = 0.000172  # Pixel size in meters (update based on your detector)
@@ -82,6 +114,10 @@ def calculate_qvector(input_data: QVectorInput, response: Response):
         qvector = im_reduced[0] / 10  # Convert to Å^-1
         intensity = im_reduced[1]
 
+        # Clean up temporary files
+        os.remove(image_path)
+        os.remove(mask_path)
+
         # Return the results
         data = {
             "qvector": qvector.tolist(),
@@ -90,6 +126,7 @@ def calculate_qvector(input_data: QVectorInput, response: Response):
         return data
 
     except Exception as e:
+        print(e)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"error": str(e)}
 
