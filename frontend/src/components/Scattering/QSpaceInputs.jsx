@@ -2,7 +2,7 @@ import { useState } from 'react';
 import FormContainer from "../library/FormContainer";
 import Button from "../library/Button";
 
-export default function QSpaceInputs({handleSubmit=()=>{}}) {
+export default function QSpaceInputs({handleSubmit=()=>{}, imageFile, maskFile}) {
     //to do: replace default Inputs with an API call to the Python backend to retrieve defaults
 
 
@@ -95,7 +95,7 @@ export default function QSpaceInputs({handleSubmit=()=>{}}) {
         <div className="w-full h-full bg-white shadow-md flex-col justify-center justify-items-center space-y-4 py-4">
             <h2 className="text-lg font-semibold text-sky-900">PyFai Inputs</h2>
             <FormContainer inputs={inputs} handleInputChange={handleInputChange}/>
-            <Button text='Submit' cb={()=>handleSubmit(inputs)}/>
+            <Button text='Submit' cb={()=>handleSubmit(inputs, imageFile, maskFile)}/>
         </div>
     )
 }

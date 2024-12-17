@@ -9,6 +9,14 @@ export const useQSpace = () => {
     };
     const qVectorUrl = 'http://127.0.0.1:8000/qvector';
     const [ plotData, setPlotData ] = useState(blankPlotData);
+    const [ imageFile, setImageFile ] = useState(null);
+    const [ maskFile, setMaskFile ] = useState(null);
+
+    const handleImageFileUpload = (file) => {
+        //process the file uploaded by user, then set it 
+        var processedFile;
+        setImageFile(processedFile);
+    }
 
     /**
      * Get current plot data from PyFai endpoint and set the result
@@ -36,7 +44,7 @@ export const useQSpace = () => {
      * 
      * @returns {boolean} Returns True on success, False on errors
      */
-    const postPlotData = async (inputs) => {
+    const postPlotData = async (inputs, imageFile, maskFile) => {
         //Create FormData object so we can include images
         const formData = new FormData();
 
@@ -46,13 +54,15 @@ export const useQSpace = () => {
         }
 
         try {
-            const dataFileResponse = await fetch('/images/saxs_ML_AgB_7000.0eV_0.5sec_12084.0mV.tif');
-            const maskFileResponse = await fetch('/images/saxs_mask_mrl.edf');
+            //const dataFileResponse = await fetch('/images/saxs_ML_AgB_7000.0eV_0.5sec_12084.0mV.tif');
+            //const maskFileResponse = await fetch('/images/saxs_mask_mrl.edf');
 
-            const dataFileBlob = await dataFileResponse.blob();
-            const maskFileBlob = await maskFileResponse.blob();
+            //const dataFileBlob = await dataFileResponse.blob();
+            //const maskFileBlob = await maskFileResponse.blob();
+            const imageFileBlob = await imageFile.blob();
+            const maskFileBlob = await maskFile.blob();
 
-            formData.append('dataFile', dataFileBlob, 'saxs_ML_AgB_7000.0eV_0.5sec_12084.0mV.tif');
+            formData.append('imageFile', imageFileBlob, 'saxs_ML_AgB_7000.0eV_0.5sec_12084.0mV.tif');
             formData.append('maskFile', maskFileBlob, 'saxs_mask_mrl.edf');
         } catch (error) {
             console.log('Unable to submit POST request, error with mask / image file: ' + error);

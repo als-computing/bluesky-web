@@ -36,7 +36,7 @@ def calculate_qvector(
     energy: float = Form(...),
     detType: str = Form(...),
     numPoints: int = Form(...),
-    dataFile: UploadFile = File(...),
+    imageFile: UploadFile = File(...),
     maskFile: UploadFile = File(...),
     response: Response = Response()
 ):
@@ -48,7 +48,7 @@ def calculate_qvector(
         energy = energy
         detector_type = detType
         npt = numPoints
-        dataFile = dataFile
+        imageFile = imageFile
         maskFile = maskFile
 
         # Example: Logging inputs and file paths
@@ -65,11 +65,11 @@ def calculate_qvector(
         #image_path = os.path.join(data_folder, 'saxs_ML_AgB_7000.0eV_0.5sec_12084.0mV.tif')
 
         #Save uploaded files
-        image_path = f"./temp_{dataFile.filename}"
+        image_path = f"./temp_{imageFile.filename}"
         mask_path = f"./temp_{maskFile.filename}"
 
         with open(image_path, "wb") as data_out:
-            shutil.copyfileobj(dataFile.file, data_out)
+            shutil.copyfileobj(imageFile.file, data_out)
 
         with open(mask_path, "wb") as mask_out:
             shutil.copyfileobj(maskFile.file, mask_out)
