@@ -7,3 +7,6 @@ COPY . /code
 # Install queue server and pyepics which provides EPICS channel access
 RUN pip install bluesky-queueserver
 RUN pip install pyepics
+RUN pip install happi
+RUN pip install httpx
+RUN pip install requests
