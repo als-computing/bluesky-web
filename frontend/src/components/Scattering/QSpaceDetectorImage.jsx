@@ -7,7 +7,10 @@ export default function QSpaceDetectorImage() {
     useEffect(() => {
         const fetchAndProcessTiff = async () => {
             try {
-                const tiff = await fromUrl('/images/saxs_ML_AgB_7000.0eV_0.5sec_12084.0mV.tif');
+                //const tiff = await fromUrl('/images/saxs_ML_AgB_7000.0eV_0.5sec_12084.0mV.tif');
+                const tiff = await fromUrl('/images/ML_exp08a_105Z_20CuAc_id681045_000025_SAXS.tif');
+
+                ///Users/seij/Repos/postman-demo/frontend/public/images/ML_exp08a_105Z_20CuAc_id681045_000025_SAXS.tif
                 //const arrayBuffer = await response.arrayBuffer();
                 //const tiff = await fromArrayBuffer(arrayBuffer);
                 const image = await tiff.getImage();
