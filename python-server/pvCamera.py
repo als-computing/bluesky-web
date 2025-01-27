@@ -97,7 +97,8 @@ async def initialize_settings(websocket):
             {'name': 'dataType', 'defaultPV': '13SIM1:cam1:DataType'}
         ]
 
-        imageArray_pv = message.get("imageArray_pv", "13SIM1:image1:ArrayData")
+        imageArray_pv = message.get("imageArray_PV", "13SIM1:image1:ArrayData")
+        print(imageArray_pv)
         if len(imageArray_pv) == 0:
             imageArray_pv = "13SIM1:image1:ArrayData"
         for item in settingsList:
