@@ -125,8 +125,10 @@ async def websocket_endpoint(websocket: WebSocket):
         low_limit = signal.low_limit
         high_limit = signal.high_limit
         if (low_limit is not None and value < low_limit) or (high_limit is not None and value > high_limit):
-            await websocket.send_json({"error": f"Value {value} is outside of limits for PV {pv_name}. Low limit: {low_limit}, High limit: {high_limit}"})
-            return
+            #area detector limits have a low limit === high limit by default.
+            if (low_limit != high_limit):
+                await websocket.send_json({"error": f"Value {value} is outside of limits for PV {pv_name}. Low limit: {low_limit}, High limit: {high_limit}"})
+                return
         
         try:
             signal.set(value).wait(timeout=timeout)
