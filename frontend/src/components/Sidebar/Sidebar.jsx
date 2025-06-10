@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { tailwindIcons as icons } from '../../assets/icons';
-
+import { phosphorIcons } from '../../assets/icons';
 export default function Sidebar() {
     const [activeLink, setActiveLink] = useState('/');
 
@@ -20,8 +20,9 @@ export default function Sidebar() {
         {text: 'Q Server', href: '/queueserver', icon: icons.queueList},
         {text: 'Devices', href: '/devices', icon: icons.rectangleGroup},
         {text: 'Camera', href: '/camera', icon: icons.videoCamera},
+        {text: 'Scattering', href: '/scattering', icon: <div className="w-6 aspect-square">{phosphorIcons.chartPolar}</div>},
         {text: 'BL 5.3.1', href: '/beamlines/bl531', icon: icons.userCircle},
-        {text: 'BL 6.0.1', href: '/beamlines/bl601', icon: icons.userCircle}
+        {text: 'BL 6.0.1', href: '/beamlines/bl601', icon: icons.userCircle},
     ]
     return (
         <div className="flex flex-col space-y-2 max-w-36">

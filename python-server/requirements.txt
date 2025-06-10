@@ -8,3 +8,5 @@ notebook
 Bluesky
 pyepics
 matplotlib
+pyfai
+python-multipart

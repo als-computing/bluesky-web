@@ -10,6 +10,7 @@ import QueueServerV0 from './pages/QueueServerV0.jsx';
 import BL601 from './pages/BL601.jsx';
 import BL531 from './pages/BL531.jsx';
 import ControllerInterface from './components/ControllerInterface/ControllerInterface.jsx';
+import Scattering from './pages/Scattering.jsx';
 
 import { autoDeviceList } from './data/device_names.js';
 
@@ -20,7 +21,7 @@ import Sidebar from './components/Sidebar/Sidebar.jsx';
 
 function App() {
   const location = useLocation();
-  const compressRightSide = location.pathname.startsWith('/queueserver') || location.pathname.startsWith('/beamlines') || location.pathname.startsWith('/camera');
+  const compressRightSide = location.pathname.startsWith('/queueserver') || location.pathname.startsWith('/beamlines') || location.pathname.startsWith('/camera') || location.pathname.startsWith('/scattering');
 
 
   return (
@@ -30,7 +31,7 @@ function App() {
         <div className="md:hidden md:w-0 lg:block lg:w-1/6 h-full 3xl:w-36">
           <Sidebar />
         </div>
-        <div className={`md:w-full ${compressRightSide ? 'lg:w-5/6' : 'lg:w-4/6'} h-full 3xl:w-full `}>
+        <div className={`md:w-full ${compressRightSide ? 'lg:w-5/6' : 'lg:w-4/6'} h-[calc(100vh-6rem)] 3xl:w-full `}>
           <Routes>
             <Route path="/" element={<Home /> } />
             <Route path="/camera" element={<Camera />} />
@@ -40,6 +41,7 @@ function App() {
             <Route path="/queueserver/v0" element={<QueueServerV0 />} />
             <Route path="/beamlines/BL601" element={<BL601 />} />
             <Route path="/beamlines/BL531" element={<BL531 />} />
+            <Route path="/scattering" element={<Scattering />} />
             <Route path="controller" element={<ControllerInterface defaultControllerList={['IOC:m1', 'IOC:m2', 'IOC:m3']}/>} />
           </Routes>      
         </div>

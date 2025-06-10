@@ -11,6 +11,7 @@ export default function CameraCanvas(
         prefix=''
     }) 
     {
+        console.log('render canvas')
 
     const canvasRef = useRef(null);
     const [fps, setFps] = useState(0);
@@ -120,8 +121,10 @@ export default function CameraCanvas(
             setSocketStatus('Open');
             frameCount.current = 0;
             startTime.current = new Date();
-            //send message to websocket containing the pvs for the image and pixel size            
-            let wsMessage = {imageArray_PV: getImageArrayPV, ...getSizePVs()}
+            //send message to websocket containing the pvs for the image and pixel size 
+            console.log('here')
+            console.log(getImageArrayPV())           
+            let wsMessage = {imageArray_PV: getImageArrayPV(), ...getSizePVs()}
             ws.current.send(JSON.stringify(wsMessage));
         }
     
