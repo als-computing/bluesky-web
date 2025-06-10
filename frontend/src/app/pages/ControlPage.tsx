@@ -6,7 +6,7 @@ import { deviceIcons } from '../../assets/icons';
 
 export default function BoltControl() {
     const wsUrl = useMemo(()=>'ws://localhost:8000/ophydSocket', []);
-    const deviceNameList = useMemo(()=>['DMC01:A', 'DMC01:D'], []);
+    const deviceNameList = useMemo(()=>['bl531_esp300:m101_pitch_mm', 'bl531_esp300:m101_bend_um'], []);
     const { devices, handleSetValueRequest, toggleDeviceLock, toggleExpand } = useOphydSocket(wsUrl, deviceNameList);
 
     return (
@@ -14,14 +14,14 @@ export default function BoltControl() {
 
             <div className="flex flex-col space-y-8 flex-shrink-0 h-full justify-start">
                 <DeviceControllerBox 
-                    device={devices['DMC01:A']} 
+                    device={devices['bl531_esp300:m101_pitch_mm']} 
                     handleSetValueRequest={handleSetValueRequest} 
                     handleLockClick={toggleDeviceLock} 
                     svgIcon={deviceIcons.stepperMotor}
                     className="shadow-xl"
                 />
                 <DeviceControllerBox 
-                    device={devices['DMC01:D']} 
+                    device={devices['bl531_esp300:m101_bend_um']} 
                     handleSetValueRequest={handleSetValueRequest} 
                     handleLockClick={toggleDeviceLock} 
                     svgIcon={deviceIcons.linearStage}
