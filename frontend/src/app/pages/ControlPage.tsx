@@ -6,34 +6,33 @@ import { deviceIcons } from '../../assets/icons';
 
 export default function BoltControl() {
     const P = "13SIM1"
-    const R1 = "cam1"
-    const R2 = "cam2"
+    const R = "cam1"
     const wsUrl = useMemo(() => 'ws://localhost:8000/ophydSocket', []);
-    const deviceNameList = useMemo(() => [`${P}:${R1}:PeakNumX`, `${P}:${R1}:PeakStepY`], []);
+    const deviceNameList = useMemo(() => [`${P}:${R}:PeakNumX`, `${P}:${R}:PeakStepY`], []);
     const { devices, handleSetValueRequest, toggleDeviceLock, toggleExpand } = useOphydSocket(wsUrl, deviceNameList);
     console.log(devices)
     return (
         <Bento className="h-full">
             <div className="flex flex-col justify-evenly h-full">
-                <div className="text-black flex justify-evenly w-full h-1/3 p-2">
+                <div className="text-black flex justify-evenly h-1/3 p-2">
                     <div className="bg-gray-100 w-full flex justify-center"><p>STRIPCHART</p></div>
                     <div className="bg-gray-100 w-full flex justify-center"><p>STRIPCHART</p></div>
                     <div className="bg-gray-100 w-full flex justify-center"><p>STRIPCHART</p></div>
                 </div>
-                <div className="flex text-black h-full h-2/3">
+                <div className="flex justify-between text-black h-full w-full h-2/3">
                     <div className="p-2">
                         <TableDeviceController devices={devices} handleSetValueRequest={handleSetValueRequest} toggleDeviceLock={toggleDeviceLock} toggleExpand={toggleExpand} />
                     </div>
                     <div className="flex flex-col p-2">
                         <DeviceControllerBox
-                            device={devices[`${P}:${R1}:PeakNumX`]} // dummy PV
+                            device={devices[`${P}:${R}:PeakNumX`]} // dummy PV
                             handleSetValueRequest={handleSetValueRequest}
                             handleLockClick={toggleDeviceLock}
                             svgIcon={deviceIcons.stepperMotor}
                             className="shadow-xl mb-2"
                         />
                         <DeviceControllerBox
-                            device={devices[`${P}:${R1}:PeakStepY`]} // dummy PV
+                            device={devices[`${P}:${R}:PeakStepY`]} // dummy PV
                             handleSetValueRequest={handleSetValueRequest}
                             handleLockClick={toggleDeviceLock}
                             svgIcon={deviceIcons.stepperMotor}
