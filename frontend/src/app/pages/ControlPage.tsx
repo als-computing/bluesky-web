@@ -1,14 +1,17 @@
 import { useMemo } from 'react';
 
-import { CameraContainer, DeviceControllerBox, Paper, Bento, useOphydSocket, TableDeviceController } from '@blueskyproject/finch'
+import { CameraContainer, DeviceControllerBox, Bento, useOphydSocket, TableDeviceController } from '@blueskyproject/finch'
 import { deviceIcons } from '../../assets/icons';
 
 
 export default function BoltControl() {
+    const P = "13SIM1"
+    const R1 = "cam1"
+    const R2 = "cam2"
     const wsUrl = useMemo(() => 'ws://localhost:8000/ophydSocket', []);
-    const deviceNameList = useMemo(() => ['13SIM1:m101_pitch_mm', '13SIM1:m101_bend_um'], []);
+    const deviceNameList = useMemo(() => [`${P}:${R1}:PeakNumX`, `${P}:${R1}:PeakStepY`], []);
     const { devices, handleSetValueRequest, toggleDeviceLock, toggleExpand } = useOphydSocket(wsUrl, deviceNameList);
-
+    console.log(devices)
     return (
         <Bento className="h-full">
             <div className="flex flex-col justify-evenly h-full">
@@ -23,14 +26,14 @@ export default function BoltControl() {
                     </div>
                     <div className="flex flex-col p-2">
                         <DeviceControllerBox
-                            device={devices['13SIM1:m101_pitch_mm']}
+                            device={devices[`${P}:${R1}:PeakNumX`]} // dummy PV
                             handleSetValueRequest={handleSetValueRequest}
                             handleLockClick={toggleDeviceLock}
                             svgIcon={deviceIcons.stepperMotor}
                             className="shadow-xl mb-2"
                         />
                         <DeviceControllerBox
-                            device={devices['13SIM1:m101_pitch_mm']}
+                            device={devices[`${P}:${R1}:PeakStepY`]} // dummy PV
                             handleSetValueRequest={handleSetValueRequest}
                             handleLockClick={toggleDeviceLock}
                             svgIcon={deviceIcons.stepperMotor}
