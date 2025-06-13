@@ -5,6 +5,7 @@ import numpy as np
 import io
 import base64
 from PIL import Image
+import os
 
 from ophyd import EpicsSignalRO
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
@@ -31,6 +32,7 @@ max_dimension = 2500 #maximum pixel width or height to be sent out. Increase if 
 
 router = APIRouter()
 
+print(os.environ.get("EPICS_CA_MAX_ARRAY_BYTES"))
 
 @router.websocket("/pvcamera")
 async def websocket_endpoint(websocket: WebSocket, num: int | None = None):
@@ -89,17 +91,18 @@ async def initialize_settings(websocket):
         data = await websocket.receive_text()
         message = json.loads(data)
         settingsList = [
-            {'name': 'startX', 'defaultPV': '13SIM1:cam1:MinX'},
-            {'name': 'startY', 'defaultPV': '13SIM1:cam1:MinY'},
-            {'name': 'sizeX', 'defaultPV': '13SIM1:cam1:SizeX'},
-            {'name': 'sizeY', 'defaultPV': '13SIM1:cam1:SizeY'},
-            {'name': 'colorMode', 'defaultPV': '13SIM1:cam1:ColorMode'},
-            {'name': 'dataType', 'defaultPV': '13SIM1:cam1:DataType'}
+            {'name': 'startX', 'defaultPV': 'BL531acA5427:cam1:MinX'},
+            {'name': 'startY', 'defaultPV': 'BL531acA5427:cam1:MinY'},
+            {'name': 'sizeX', 'defaultPV': 'BL531acA5427:cam1:SizeX'},
+            {'name': 'sizeY', 'defaultPV': 'BL531acA5427:cam1:SizeY'},
+            {'name': 'colorMode', 'defaultPV': 'BL531acA5427:cam1:ColorMode'},
+            {'name': 'dataType', 'defaultPV': 'BL531acA5427:cam1:DataType'}
         ]
-
-        imageArray_pv = message.get("imageArray_pv", "13SIM1:image1:ArrayData")
+        print(message)
+        imageArray_pv = message.get("imageArray_PV", "13SIM1:image1:ArrayData")
         if len(imageArray_pv) == 0:
             imageArray_pv = "13SIM1:image1:ArrayData"
+            print("Using Default")
         for item in settingsList:
             item['pv'] = message.get(item['name'], item['defaultPV'])
             if len(item['pv']) == 0:
@@ -183,11 +186,33 @@ async def handle_streaming(websocket, buffer):
         await websocket.close()
 
 def normalize_array_data(array_data, dataType):
-    if dataType not in ['UInt8', 'Int8']:
-        max_val = array_data.max() if array_data.max() > 0 else 1
-        array_data = (array_data / max_val * 255).astype(np.uint8)
-    return array_data
+    
+    # if dataType not in ['UInt8', 'Int8']:
+    max_val = array_data.max() if array_data.max() > 0 else 1
+    # array_data = (array_data / max_val * 255).astype(np.uint8)
+    array_data_log = log_normalize_to_255(array_data)
+    return array_data_log
 
+def log_normalize_to_255(data: np.ndarray) -> np.ndarray:
+
+    if np.any(data < 0):
+        raise ValueError("Input data must be non-negative for log normalization.")
+
+    # Avoid log(0) by shifting
+    data = data + 1.0
+
+    # Apply logarithm
+    log_data = np.log(data)
+
+    # Normalize to 0–255
+    log_min = np.min(log_data)
+    log_max = np.max(log_data)
+    if log_max == log_min:
+        normalized = np.zeros_like(log_data)
+    else:
+        normalized = (log_data - log_min) / (log_max - log_min) * 255
+
+    return normalized.astype(np.uint8)
 def reshape_array(array_data, height, width, colorMode):
     if colorMode == 'Mono':
         reshaped_data = array_data.reshape((height, width))
