@@ -1,0 +1,24 @@
+authentication:
+  single_user_api_key: ${TILED_SINGLE_USER_API_KEY}
+  allow_anonymous_access: true
+uvicorn:
+  host: 0.0.0.0
+  port: 8000
+allow_origins:
+  - http://192.168.10.155:5173
+  - http://192.168.10.150:5173 
+  - http://localhost:5173
+  - http://192.168.10.201:5173 
+  - http://192.168.10.123:5173 
+trees:
+  - path: /
+    tree: catalog
+    args:
+      uri: "sqlite:////home/bl531user/tiled_test/catalog.db"
+      writable_storage:
+        - '/home/bl531user/tiled_test/storage'
+        - 'sqlite:////home/bl531user/tiled_test/tabular.db'
+      readable_storage:
+        - "/home/bl531user/tiled_test/storage"
+      init_if_not_exists: true
+
