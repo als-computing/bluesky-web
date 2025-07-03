@@ -7,6 +7,7 @@ from pydantic import BaseModel
 import pvCamera
 import pvsim
 import queue_server
+import ophydSocket
 
 try:
     from ophyd.signal import EpicsSignal
@@ -32,6 +33,7 @@ origins = [
     "http://localhost",
     "http://localhost:8080",
     "http://localhost:3000",
+    "http://192.168.10.201",
     "*"
 ]
 
@@ -46,6 +48,7 @@ app.add_middleware(
 app.include_router(pvCamera.router) #turn this off if not connected to EPICS
 app.include_router(pvsim.router)
 app.include_router(queue_server.router)
+app.include_router(ophydSocket.router)
 
 
 @app.get("/")
