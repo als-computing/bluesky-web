@@ -16,6 +16,8 @@ startup_dir=path/queue-server-configuration/startup_sim
 """
 
 from bluesky import RunEngine
+from bluesky.callbacks.tiled_writer import TiledWriter
+from tiled.client import from_uri
 
 RE = RunEngine({})
 
@@ -34,6 +36,12 @@ bec.disable_plots()
 
 # Send all metadata/data captured to the BestEffortCallback.
 RE.subscribe(bec)
+
+
+tiled_client = from_uri("http://127.0.0.1:8000?api_key=830cddd39db2cf102e563364b5bd8a4eed428085d130f0569a84244357e09a89")
+tw = TiledWriter(tiled_client)
+RE.subscribe(tw)
+
 
 # flake8: noqa
 print(f"Loading file {__file__!r}")
