@@ -90,6 +90,7 @@ async def initialize_settings(websocket):
     try:
         data = await websocket.receive_text()
         message = json.loads(data)
+        
         settingsList = [
             {'name': 'startX', 'defaultPV': 'BL531acA5427:cam1:MinX'},
             {'name': 'startY', 'defaultPV': 'BL531acA5427:cam1:MinY'},
@@ -103,10 +104,19 @@ async def initialize_settings(websocket):
         if len(imageArray_pv) == 0:
             imageArray_pv = "13SIM1:image1:ArrayData"
             print("Using Default")
-        for item in settingsList:
-            item['pv'] = message.get(item['name'], item['defaultPV'])
-            if len(item['pv']) == 0:
-                item['pv'] = item['defaultPV']
+            for item in settingsList:
+                item['pv'] = message.get(item['name'], item['defaultPV'])
+                if len(item['pv']) == 0:
+                    item['pv'] = item['defaultPV']
+        else:
+            prefix = imageArray_pv.split(":")[0]
+            for item in settingsList:
+                suffix = ":" + item['defaultPV'].split(":")[1] + ":" + item['defaultPV'].split(":")[2]
+                print(prefix+suffix)
+                item['pv'] = message.get(item['name'], prefix+suffix)
+                if len(item['pv']) == 0:
+                    item['pv'] = item['defaultPV']
+        
         return settingsList, imageArray_pv
     except Exception as e:
         await websocket.send_text(json.dumps({'error': str(e)}))
