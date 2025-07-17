@@ -92,27 +92,29 @@ async def initialize_settings(websocket):
         message = json.loads(data)
         
         settingsList = [
-            {'name': 'startX', 'defaultPV': 'BL531acA5427:cam1:MinX'},
-            {'name': 'startY', 'defaultPV': 'BL531acA5427:cam1:MinY'},
-            {'name': 'sizeX', 'defaultPV': 'BL531acA5427:cam1:SizeX'},
-            {'name': 'sizeY', 'defaultPV': 'BL531acA5427:cam1:SizeY'},
-            {'name': 'colorMode', 'defaultPV': 'BL531acA5427:cam1:ColorMode'},
-            {'name': 'dataType', 'defaultPV': 'BL531acA5427:cam1:DataType'}
+            {'name': 'startX', 'defaultPV': '13SIM1:cam1:MinX'},
+            {'name': 'startY', 'defaultPV': '13SIM1:cam1:MinY'},
+            {'name': 'sizeX', 'defaultPV': '13SIM1:cam1:SizeX'},
+            {'name': 'sizeY', 'defaultPV': '13SIM1:cam1:SizeY'},
+            {'name': 'colorMode', 'defaultPV': '13SIM1:cam1:ColorMode'},
+            {'name': 'dataType', 'defaultPV': '13SIM1:cam1:DataType'}
         ]
-        print(message)
+        #print(message)
         imageArray_pv = message.get("imageArray_PV", "13SIM1:image1:ArrayData")
         if len(imageArray_pv) == 0:
             imageArray_pv = "13SIM1:image1:ArrayData"
-            print("Using Default")
+            print("Using Defaults for 13SIM1")
             for item in settingsList:
                 item['pv'] = message.get(item['name'], item['defaultPV'])
                 if len(item['pv']) == 0:
                     item['pv'] = item['defaultPV']
         else:
+            #If user provides additional value for startX, startY, etc. then subscribe to those
+            #Otherwise if user only provides the imageArray_PV, concatenate the P to default suffixes
             prefix = imageArray_pv.split(":")[0]
             for item in settingsList:
                 suffix = ":" + item['defaultPV'].split(":")[1] + ":" + item['defaultPV'].split(":")[2]
-                print(prefix+suffix)
+                #print(prefix+suffix)
                 item['pv'] = message.get(item['name'], prefix+suffix)
                 if len(item['pv']) == 0:
                     item['pv'] = item['defaultPV']
