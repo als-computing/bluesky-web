@@ -19,12 +19,24 @@ existing_devices:
     is_movable: false
     is_readable: true
     module: ophyd.sim
+  acquire_signal:
+    classname: EpicsSignal
+    is_flyable: false
+    is_movable: true
+    is_readable: true
+    module: ophyd.signal
   bool_sig:
     classname: Signal
     is_flyable: false
     is_movable: true
     is_readable: true
     module: ophyd.signal
+  camera:
+    classname: MyCamera
+    is_flyable: false
+    is_movable: false
+    is_readable: true
+    module: __main__
   custom_test_device:
     classname: Device
     is_flyable: false
@@ -524,35 +536,119 @@ existing_devices:
     is_movable: true
     is_readable: true
     module: ophyd.sim
-  motor:
-    classname: SynAxis
+  linear_stage:
+    classname: EpicsMotor
     components:
       acceleration:
-        classname: Signal
+        classname: EpicsSignal
         is_flyable: false
         is_movable: true
         is_readable: true
         module: ophyd.signal
-      readback:
-        classname: _ReadbackSignal
+      direction_of_travel:
+        classname: EpicsSignal
         is_flyable: false
         is_movable: true
         is_readable: true
-        module: ophyd.sim
-      setpoint:
-        classname: _SetpointSignal
+        module: ophyd.signal
+      high_limit_switch:
+        classname: EpicsSignalRO
         is_flyable: false
         is_movable: true
         is_readable: true
-        module: ophyd.sim
-      unused:
-        classname: Signal
+        module: ophyd.signal
+      high_limit_travel:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      home_forward:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      home_reverse:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      low_limit_switch:
+        classname: EpicsSignalRO
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      low_limit_travel:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      motor_done_move:
+        classname: EpicsSignalRO
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      motor_egu:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      motor_is_moving:
+        classname: EpicsSignalRO
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      motor_stop:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      offset_freeze_switch:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      set_use_switch:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      user_offset:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      user_offset_dir:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      user_readback:
+        classname: EpicsSignalRO
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      user_setpoint:
+        classname: EpicsSignal
         is_flyable: false
         is_movable: true
         is_readable: true
         module: ophyd.signal
       velocity:
-        classname: Signal
+        classname: EpicsSignal
         is_flyable: false
         is_movable: true
         is_readable: true
@@ -560,7 +656,128 @@ existing_devices:
     is_flyable: false
     is_movable: true
     is_readable: true
-    module: ophyd.sim
+    module: ophyd.epics_motor
+  motor:
+    classname: EpicsMotor
+    components:
+      acceleration:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      direction_of_travel:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      high_limit_switch:
+        classname: EpicsSignalRO
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      high_limit_travel:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      home_forward:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      home_reverse:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      low_limit_switch:
+        classname: EpicsSignalRO
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      low_limit_travel:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      motor_done_move:
+        classname: EpicsSignalRO
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      motor_egu:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      motor_is_moving:
+        classname: EpicsSignalRO
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      motor_stop:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      offset_freeze_switch:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      set_use_switch:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      user_offset:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      user_offset_dir:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      user_readback:
+        classname: EpicsSignalRO
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      user_setpoint:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      velocity:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+    is_flyable: false
+    is_movable: true
+    is_readable: true
+    module: ophyd.epics_motor
   motor1:
     classname: SynAxis
     components:
@@ -1050,6 +1267,127 @@ existing_devices:
     is_movable: true
     is_readable: true
     module: ophyd.sim
+  rotation_motor:
+    classname: EpicsMotor
+    components:
+      acceleration:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      direction_of_travel:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      high_limit_switch:
+        classname: EpicsSignalRO
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      high_limit_travel:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      home_forward:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      home_reverse:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      low_limit_switch:
+        classname: EpicsSignalRO
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      low_limit_travel:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      motor_done_move:
+        classname: EpicsSignalRO
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      motor_egu:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      motor_is_moving:
+        classname: EpicsSignalRO
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      motor_stop:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      offset_freeze_switch:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      set_use_switch:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      user_offset:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      user_offset_dir:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      user_readback:
+        classname: EpicsSignalRO
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      user_setpoint:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+      velocity:
+        classname: EpicsSignal
+        is_flyable: false
+        is_movable: true
+        is_readable: true
+        module: ophyd.signal
+    is_flyable: false
+    is_movable: true
+    is_readable: true
+    module: ophyd.epics_motor
   sig:
     classname: Signal
     is_flyable: false
@@ -1510,12 +1848,17 @@ existing_plans:
     module: bluesky.plans
     name: adaptive_scan
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - description: data field whose output is the focus of the adaptive tuning
+    - annotation:
+        type: str
+      description: data field whose output is the focus of the adaptive tuning
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -1525,45 +1868,61 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: motor
-    - description: starting position of motor
+    - annotation:
+        type: float
+      description: starting position of motor
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: start
-    - description: ending position of motor
+    - annotation:
+        type: float
+      description: ending position of motor
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: stop
-    - description: smallest step for fast-changing regions
+    - annotation:
+        type: float
+      description: smallest step for fast-changing regions
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: min_step
-    - description: largest step for slow-chaning regions
+    - annotation:
+        type: float
+      description: largest step for slow-chaning regions
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: max_step
-    - description: desired fractional change in detector signal between steps
+    - annotation:
+        type: float
+      description: desired fractional change in detector signal between steps
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: target_delta
-    - description: whether backward steps are allowed -- this is concern with some
+    - annotation:
+        type: bool
+      description: whether backward steps are allowed -- this is concern with some
         motors
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: backstep
-    - default: '0.8'
+    - annotation:
+        type: typing.Optional[float]
+      default: '0.8'
       description: threshold for going backward and rescanning a region, default is
         0.8
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: threshold
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -1576,12 +1935,17 @@ existing_plans:
     module: bluesky.plans
     name: fly
     parameters:
-    - description: objects that support the flyer interface
+    - annotation:
+        type: list[__FLYABLE__]
+      convert_device_names: true
+      description: objects that support the flyer interface
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: flyers
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -1594,7 +1958,10 @@ existing_plans:
     module: bluesky.plans
     name: grid_scan
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -1603,7 +1970,9 @@ existing_plans:
         name: VAR_POSITIONAL
         value: 2
       name: args
-    - default: None
+    - annotation:
+        type: typing.Union[collections.abc.Iterable, bool, NoneType]
+      default: None
       description: 'which axes should be snaked, either ``False`` (do not snake any
         axes),
 
@@ -1630,7 +1999,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -1642,15 +2013,23 @@ existing_plans:
     module: bluesky.plans
     name: inner_product_scan
     parameters:
-    - kind:
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - kind:
+    - annotation:
+        type: int
+      kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: num
-    - kind:
+    - annotation:
+        type: typing.Union[__MOVABLE__, typing.Any]
+      convert_device_names: true
+      kind:
         name: VAR_POSITIONAL
         value: 2
       name: args
@@ -1659,7 +2038,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       kind:
         name: KEYWORD_ONLY
         value: 3
@@ -1671,12 +2052,18 @@ existing_plans:
     module: bluesky.plans
     name: list_grid_scan
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - description: "patterned like (``motor1, position_list1,``\n                ``motor2,\
+    - annotation:
+        type: typing.Union[__MOVABLE__, typing.Any]
+      convert_device_names: true
+      description: "patterned like (``motor1, position_list1,``\n                ``motor2,\
         \ position_list2,``\n                ``motor3, position_list3,``\n       \
         \         ``...,``\n                ``motorN, position_listN``)\n\nThe first\
         \ motor is the \"slowest\", the outer loop. ``position_list``'s\nare lists\
@@ -1686,7 +2073,9 @@ existing_plans:
         name: VAR_POSITIONAL
         value: 2
       name: args
-    - default: 'False'
+    - annotation:
+        type: bool
+      default: 'False'
       description: 'which axes should be snaked, either ``False`` (do not snake any
         axes),
 
@@ -1713,7 +2102,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -1726,12 +2117,18 @@ existing_plans:
     module: bluesky.plans
     name: list_scan
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - description: "For one dimension, ``motor, [point1, point2, ....]``.\nIn general:\n\
+    - annotation:
+        type: tuple[typing.Union[__MOVABLE__, typing.Any], list[typing.Any]]
+      convert_device_names: true
+      description: "For one dimension, ``motor, [point1, point2, ....]``.\nIn general:\n\
         \n.. code-block:: python\n\n    motor1, [point1, point2, ...],\n    motor2,\
         \ [point1, point2, ...],\n    ...,\n    motorN, [point1, point2, ...]\n\n\
         Motors can be any 'settable' object (motor, temp controller, etc.)"
@@ -1749,7 +2146,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -1762,7 +2161,10 @@ existing_plans:
     module: bluesky.plans
     name: log_scan
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -1772,17 +2174,23 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: motor
-    - description: starting position of motor
+    - annotation:
+        type: float
+      description: starting position of motor
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: start
-    - description: ending position of motor
+    - annotation:
+        type: float
+      description: ending position of motor
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: stop
-    - description: number of steps
+    - annotation:
+        type: int
+      description: number of steps
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -1818,7 +2226,11 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: go_plan
-    - kind:
+    - annotation:
+        type: __READABLE__
+      convert_device_names: true
+      description: signal to be monitored
+      kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: monitor_sig
@@ -1832,13 +2244,17 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: inner_plan_func
-    - default: 'True'
+    - annotation:
+        type: bool
+      default: 'True'
       description: If True, add a pre data at beginning
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: take_pre_data
-    - default: None
+    - annotation:
+        type: typing.Optional[float]
+      default: None
       description: 'If not None, the maximum time the ramp can run.
 
 
@@ -1847,7 +2263,9 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: timeout
-    - default: None
+    - annotation:
+        type: typing.Optional[float]
+      default: None
       description: 'If not None, take data no faster than this.  If None, take
 
         data as fast as possible
@@ -1863,7 +2281,9 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: period
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -1875,60 +2295,84 @@ existing_plans:
     module: bluesky.plans
     name: rel_adaptive_scan
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - description: data field whose output is the focus of the adaptive tuning
+    - annotation:
+        type: str
+      description: data field whose output is the focus of the adaptive tuning
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: target_field
-    - description: any 'settable' object (motor, temp controller, etc.)
+    - annotation:
+        type: __MOVABLE__
+      convert_device_names: true
+      description: any 'settable' object (motor, temp controller, etc.)
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: motor
-    - description: starting position of motor
+    - annotation:
+        type: float
+      description: starting position of motor
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: start
-    - description: ending position of motor
+    - annotation:
+        type: float
+      description: ending position of motor
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: stop
-    - description: smallest step for fast-changing regions
+    - annotation:
+        type: float
+      description: smallest step for fast-changing regions
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: min_step
-    - description: largest step for slow-chaning regions
+    - annotation:
+        type: float
+      description: largest step for slow-chaning regions
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: max_step
-    - description: desired fractional change in detector signal between steps
+    - annotation:
+        type: float
+      description: desired fractional change in detector signal between steps
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: target_delta
-    - description: whether backward steps are allowed -- this is concern with some
+    - annotation:
+        type: bool
+      description: whether backward steps are allowed -- this is concern with some
         motors
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: backstep
-    - default: '0.8'
+    - annotation:
+        type: typing.Optional[float]
+      default: '0.8'
       description: threshold for going backward and rescanning a region, default is
         0.8
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: threshold
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -1941,16 +2385,24 @@ existing_plans:
     module: bluesky.plans
     name: rel_grid_scan
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - kind:
+    - annotation:
+        type: typing.Union[__MOVABLE__, typing.Any]
+      convert_device_names: true
+      kind:
         name: VAR_POSITIONAL
         value: 2
       name: args
-    - default: None
+    - annotation:
+        type: typing.Union[collections.abc.Iterable, bool, NoneType]
+      default: None
       description: 'which axes should be snaked, either ``False`` (do not snake any
         axes),
 
@@ -1977,7 +2429,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -1993,12 +2447,18 @@ existing_plans:
     module: bluesky.plans
     name: rel_list_grid_scan
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - description: "patterned like (``motor1, position_list1,``\n                ``motor2,\
+    - annotation:
+        type: typing.Union[__MOVABLE__, typing.Any]
+      convert_device_names: true
+      description: "patterned like (``motor1, position_list1,``\n                ``motor2,\
         \ position_list2,``\n                ``motor3, position_list3,``\n       \
         \         ``...,``\n                ``motorN, position_listN``)\n\nThe first\
         \ motor is the \"slowest\", the outer loop. ``position_list``'s\nare lists\
@@ -2008,7 +2468,9 @@ existing_plans:
         name: VAR_POSITIONAL
         value: 2
       name: args
-    - default: 'False'
+    - annotation:
+        type: bool
+      default: 'False'
       description: 'which axes should be snaked, either ``False`` (do not snake any
         axes),
 
@@ -2035,7 +2497,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -2048,12 +2512,18 @@ existing_plans:
     module: bluesky.plans
     name: rel_list_scan
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - description: "For one dimension, ``motor, [point1, point2, ....]``.\nIn general:\n\
+    - annotation:
+        type: typing.Union[__MOVABLE__, typing.Any]
+      convert_device_names: true
+      description: "For one dimension, ``motor, [point1, point2, ....]``.\nIn general:\n\
         \n.. code-block:: python\n\n    motor1, [point1, point2, ...],\n    motor2,\
         \ [point1, point2, ...],\n    ...,\n    motorN, [point1, point2, ...]\n\n\
         Motors can be any 'settable' object (motor, temp controller, etc.)\npoint1,\
@@ -2070,7 +2540,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -2083,27 +2555,39 @@ existing_plans:
     module: bluesky.plans
     name: rel_log_scan
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - description: any 'settable' object (motor, temp controller, etc.)
+    - annotation:
+        type: __MOVABLE__
+      convert_device_names: true
+      description: any 'settable' object (motor, temp controller, etc.)
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: motor
-    - description: starting position of motor
+    - annotation:
+        type: float
+      description: starting position of motor
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: start
-    - description: ending position of motor
+    - annotation:
+        type: float
+      description: ending position of motor
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: stop
-    - description: number of steps
+    - annotation:
+        type: int
+      description: number of steps
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -2116,7 +2600,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -2129,12 +2615,18 @@ existing_plans:
     module: bluesky.plans
     name: rel_scan
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - description: "For one dimension, ``motor, start, stop``.\nIn general:\n\n..\
+    - annotation:
+        type: typing.Union[__MOVABLE__, typing.Any]
+      convert_device_names: true
+      description: "For one dimension, ``motor, start, stop``.\nIn general:\n\n..\
         \ code-block:: python\n\n    motor1, start1, stop1,\n    motor2, start2, start2,\n\
         \    ...,\n    motorN, startN, stopN,\n\nMotors can be any 'settable' object\
         \ (motor, temp controller, etc.)"
@@ -2158,7 +2650,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -2171,41 +2665,60 @@ existing_plans:
     module: bluesky.plans
     name: rel_spiral
     parameters:
-    - kind:
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - description: any 'settable' object (motor, temp controller, etc.)
+    - annotation:
+        type: __MOVABLE__
+      convert_device_names: true
+      description: any 'settable' object (motor, temp controller, etc.)
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: x_motor
-    - description: any 'settable' object (motor, temp controller, etc.)
+    - annotation:
+        type: __MOVABLE__
+      convert_device_names: true
+      description: any 'settable' object (motor, temp controller, etc.)
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: y_motor
-    - description: x width of spiral
+    - annotation:
+        type: float
+      description: x width of spiral
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: x_range
-    - description: y width of spiral
+    - annotation:
+        type: float
+      description: y width of spiral
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: y_range
-    - description: Delta radius along the minor axis of the ellipse.
+    - annotation:
+        type: float
+      description: Delta radius along the minor axis of the ellipse.
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: dr
-    - description: Number of theta steps
+    - annotation:
+        type: float
+      description: Number of theta steps
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: nth
-    - default: None
+    - annotation:
+        type: typing.Optional[float]
+      default: None
       description: 'Delta radius along the major axis of the ellipse. If None, it
 
         defaults to dr.'
@@ -2213,7 +2726,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: dr_y
-    - default: '0.0'
+    - annotation:
+        type: float
+      default: '0.0'
       description: Tilt angle in radians, default 0.0
       kind:
         name: KEYWORD_ONLY
@@ -2229,7 +2744,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -2242,42 +2759,61 @@ existing_plans:
     module: bluesky.plans
     name: rel_spiral_fermat
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - description: any 'settable' object (motor, temp controller, etc.)
+    - annotation:
+        type: __MOVABLE__
+      convert_device_names: true
+      description: any 'settable' object (motor, temp controller, etc.)
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: x_motor
-    - description: any 'settable' object (motor, temp controller, etc.)
+    - annotation:
+        type: __MOVABLE__
+      convert_device_names: true
+      description: any 'settable' object (motor, temp controller, etc.)
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: y_motor
-    - description: x width of spiral
+    - annotation:
+        type: float
+      description: x width of spiral
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: x_range
-    - description: y width of spiral
+    - annotation:
+        type: float
+      description: y width of spiral
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: y_range
-    - description: delta radius
+    - annotation:
+        type: float
+      description: delta radius
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: dr
-    - description: radius gets divided by this
+    - annotation:
+        type: float
+      description: radius gets divided by this
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: factor
-    - default: None
+    - annotation:
+        type: typing.Optional[float]
+      default: None
       description: 'Delta radius along the major axis of the ellipse, if not specifed
 
         defaults to dr'
@@ -2285,7 +2821,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: dr_y
-    - default: '0.0'
+    - annotation:
+        type: typing.Optional[float]
+      default: '0.0'
       description: Tilt angle in radians, default 0.0
       kind:
         name: KEYWORD_ONLY
@@ -2301,7 +2839,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -2314,37 +2854,54 @@ existing_plans:
     module: bluesky.plans
     name: rel_spiral_square
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - description: any 'settable' object (motor, temp controller, etc.)
+    - annotation:
+        type: __MOVABLE__
+      convert_device_names: true
+      description: any 'settable' object (motor, temp controller, etc.)
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: x_motor
-    - description: any 'settable' object (motor, temp controller, etc.)
+    - annotation:
+        type: __MOVABLE__
+      convert_device_names: true
+      description: any 'settable' object (motor, temp controller, etc.)
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: y_motor
-    - description: x width of spiral
+    - annotation:
+        type: float
+      description: x width of spiral
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: x_range
-    - description: y width of spiral
+    - annotation:
+        type: float
+      description: y width of spiral
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: y_range
-    - description: number of x axis points
+    - annotation:
+        type: float
+      description: number of x axis points
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: x_num
-    - description: Number of y axis points.
+    - annotation:
+        type: float
+      description: Number of y axis points.
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -2359,7 +2916,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -2371,15 +2930,23 @@ existing_plans:
     module: bluesky.plans
     name: relative_inner_product_scan
     parameters:
-    - kind:
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - kind:
+    - annotation:
+        type: int
+      kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: num
-    - kind:
+    - annotation:
+        type: typing.Union[__MOVABLE__, typing.Any]
+      convert_device_names: true
+      kind:
         name: VAR_POSITIONAL
         value: 2
       name: args
@@ -2388,7 +2955,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       kind:
         name: KEYWORD_ONLY
         value: 3
@@ -2400,12 +2969,18 @@ existing_plans:
     module: bluesky.plans
     name: scan
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - description: "For one dimension, ``motor, start, stop``.\nIn general:\n\n..\
+    - annotation:
+        type: typing.Union[__MOVABLE__, typing.Any]
+      convert_device_names: true
+      description: "For one dimension, ``motor, start, stop``.\nIn general:\n\n..\
         \ code-block:: python\n\n    motor1, start1, stop1,\n    motor2, start2, stop2,\n\
         \    ...,\n    motorN, startN, stopN\n\nMotors can be any 'settable' object\
         \ (motor, temp controller, etc.)"
@@ -2413,7 +2988,9 @@ existing_plans:
         name: VAR_POSITIONAL
         value: 2
       name: args
-    - default: None
+    - annotation:
+        type: typing.Optional[int]
+      default: None
       description: number of points
       kind:
         name: KEYWORD_ONLY
@@ -2429,7 +3006,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -2442,7 +3021,10 @@ existing_plans:
     module: bluesky.plans
     name: scan_nd
     parameters:
-    - kind:
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
@@ -2461,7 +3043,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -2474,7 +3058,10 @@ existing_plans:
     module: bluesky.plans
     name: spiral
     parameters:
-    - kind:
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
@@ -2488,37 +3075,51 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: y_motor
-    - description: x center
+    - annotation:
+        type: float
+      description: x center
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: x_start
-    - description: y center
+    - annotation:
+        type: float
+      description: y center
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: y_start
-    - description: x width of spiral
+    - annotation:
+        type: float
+      description: x width of spiral
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: x_range
-    - description: y width of spiral
+    - annotation:
+        type: float
+      description: y width of spiral
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: y_range
-    - description: Delta radius along the minor axis of the ellipse.
+    - annotation:
+        type: float
+      description: Delta radius along the minor axis of the ellipse.
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: dr
-    - description: Number of theta steps
+    - annotation:
+        type: float
+      description: Number of theta steps
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: nth
-    - default: None
+    - annotation:
+        type: typing.Optional[float]
+      default: None
       description: 'Delta radius along the major axis of the ellipse. If None, defaults
         to
 
@@ -2527,7 +3128,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: dr_y
-    - default: '0.0'
+    - annotation:
+        type: typing.Optional[float]
+      default: '0.0'
       description: Tilt angle in radians, default 0.0
       kind:
         name: KEYWORD_ONLY
@@ -2543,7 +3146,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -2556,7 +3161,10 @@ existing_plans:
     module: bluesky.plans
     name: spiral_fermat
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -2571,37 +3179,51 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: y_motor
-    - description: x center
+    - annotation:
+        type: float
+      description: x center
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: x_start
-    - description: y center
+    - annotation:
+        type: float
+      description: y center
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: y_start
-    - description: x width of spiral
+    - annotation:
+        type: float
+      description: x width of spiral
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: x_range
-    - description: y width of spiral
+    - annotation:
+        type: float
+      description: y width of spiral
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: y_range
-    - description: delta radius
+    - annotation:
+        type: float
+      description: delta radius
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: dr
-    - description: radius gets divided by this
+    - annotation:
+        type: float
+      description: radius gets divided by this
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: factor
-    - default: None
+    - annotation:
+        type: typing.Optional[float]
+      default: None
       description: 'Delta radius along the major axis of the ellipse, if not specifed
 
         defaults to dr.'
@@ -2609,7 +3231,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: dr_y
-    - default: '0.0'
+    - annotation:
+        type: typing.Optional[float]
+      default: '0.0'
       description: Tilt angle in radians, default 0.0
       kind:
         name: KEYWORD_ONLY
@@ -2625,7 +3249,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -2638,7 +3264,10 @@ existing_plans:
     module: bluesky.plans
     name: spiral_square
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -2653,32 +3282,44 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: y_motor
-    - description: x center
+    - annotation:
+        type: float
+      description: x center
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: x_center
-    - description: y center
+    - annotation:
+        type: float
+      description: y center
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: y_center
-    - description: x width of spiral
+    - annotation:
+        type: float
+      description: x width of spiral
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: x_range
-    - description: y width of spiral
+    - annotation:
+        type: float
+      description: y width of spiral
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: y_range
-    - description: number of x axis points
+    - annotation:
+        type: float
+      description: number of x axis points
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: x_num
-    - description: Number of y axis points.
+    - annotation:
+        type: float
+      description: Number of y axis points.
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -2693,7 +3334,9 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -2706,12 +3349,17 @@ existing_plans:
     module: bluesky.plans
     name: tune_centroid
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - description: detector field whose output is to maximize
+    - annotation:
+        type: str
+      description: detector field whose output is to maximize
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -2721,28 +3369,38 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: motor
-    - description: start of range
+    - annotation:
+        type: float
+      description: start of range
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: start
-    - description: 'end of range, note: start < stop'
+    - annotation:
+        type: float
+      description: 'end of range, note: start < stop'
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: stop
-    - description: smallest step size to use.
+    - annotation:
+        type: float
+      description: smallest step size to use.
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: min_step
-    - default: '10'
+    - annotation:
+        type: int
+      default: '10'
       description: number of points with each traversal, default = 10
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: num
-    - default: '3.0'
+    - annotation:
+        type: float
+      default: '3.0'
       description: 'used in calculating new range after each pass
 
 
@@ -2751,13 +3409,17 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: step_factor
-    - default: 'False'
+    - annotation:
+        type: bool
+      default: 'False'
       description: if False (default), always scan from start to stop
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: snake
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -2770,11 +3432,16 @@ existing_plans:
     module: bluesky.plans
     name: tweak
     parameters:
-    - kind:
+    - annotation:
+        type: __READABLE__
+      convert_device_names: true
+      kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detector
-    - description: data field whose output is the focus of the adaptive tuning
+    - annotation:
+        type: str
+      description: data field whose output is the focus of the adaptive tuning
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -2783,12 +3450,16 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: motor
-    - description: initial suggestion for step size
+    - annotation:
+        type: float
+      description: initial suggestion for step size
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
       kind:
         name: KEYWORD_ONLY
@@ -2801,7 +3472,10 @@ existing_plans:
     module: bluesky.plans
     name: x2x_scan
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
@@ -2816,21 +3490,28 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: motor2
-    - description: 'The relative limits of the first motor.  The second motor
+    - annotation:
+        type: float
+      description: 'The relative limits of the first motor.  The second motor
 
         will move between ``start / 2`` and ``stop / 2``'
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: start
-    - description: 'The relative limits of the first motor.  The second motor
+    - annotation:
+        type: float
+      description: 'The relative limits of the first motor.  The second motor
 
         will move between ``start / 2`` and ``stop / 2``'
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: stop
-    - kind:
+    - annotation:
+        type: int
+      description: number of steps in the scan
+      kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: num
@@ -2844,8 +3525,68 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_step
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  acquire:
+    module: __main__
+    name: acquire
+    parameters:
+    - kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: angle
+    - kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: save_dir
+    properties:
+      is_generator: true
+  analyze_ply_quality:
+    module: __main__
+    name: analyze_ply_quality
+    parameters:
+    - default: '''default'''
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: image_dir
+    - default: None
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  camera_acquire:
+    description: Capture single image and store directly in Tiled using TiledWriter
+    module: __main__
+    name: camera_acquire
+    parameters:
+    - annotation:
+        type: typing.Any
+      convert_device_names: true
+      description: Required. Area Detector camera device
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: camera
+    - annotation:
+        type: typing.Any
+      convert_device_names: true
+      description: Required. Motor device to read
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: motor
+    - default: None
       kind:
         name: KEYWORD_ONLY
         value: 3
@@ -2857,12 +3598,17 @@ existing_plans:
     module: bluesky.plans
     name: count
     parameters:
-    - description: list of 'readable' objects
+    - annotation:
+        type: collections.abc.Sequence[__READABLE__]
+      convert_device_names: true
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
-    - default: '1'
+    - annotation:
+        type: typing.Optional[int]
+      default: '1'
       description: 'number of readings to take; default is 1
 
 
@@ -2871,7 +3617,9 @@ existing_plans:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: num
-    - default: None
+    - annotation:
+        type: typing.Union[float, collections.abc.Iterable[float]]
+      default: '0.0'
       description: Time delay in seconds between successive readings; default is 0.
       kind:
         name: POSITIONAL_OR_KEYWORD
@@ -2885,8 +3633,125 @@ existing_plans:
         name: KEYWORD_ONLY
         value: 3
       name: per_shot
-    - default: None
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
       description: metadata
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  get_angle:
+    description: Read motor angle and store in Tiled using TiledWriter
+    module: __main__
+    name: get_angle
+    parameters:
+    - annotation:
+        type: typing.Any
+      convert_device_names: true
+      description: Required. Motor device to read
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: motor
+    - default: None
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  move_motor:
+    description: Move motor to specified position
+    module: __main__
+    name: move_motor
+    parameters:
+    - annotation:
+        type: typing.Any
+      convert_device_names: true
+      description: Required. Inidividual motor that is moved to desired position
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: motor
+    - default: '0.0'
+      default_defined_in_decorator: true
+      description: Required. The position for the motor, uses the default units of
+        the motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '4000'
+      min: '-4000'
+      name: position
+      step: '20'
+    - default: None
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  reconstruct_object:
+    description: Perform reconstruction algorithm, on a given set of images
+    module: __main__
+    name: reconstruct_object
+    parameters:
+    - annotation:
+        type: str
+      default: '''default'''
+      description: Directory to save the images
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: image_dir
+    - default: None
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  rotation_scan:
+    description: Perform rotation scan with camera acquisition, for testing
+    module: __main__
+    name: rotation_scan
+    parameters:
+    - annotation:
+        type: str
+      default: '''0'''
+      description: Starting angle in degrees
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: start_angle
+    - annotation:
+        type: str
+      default: '''90'''
+      description: Ending angle in degrees
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: end_angle
+    - annotation:
+        type: str
+      default: '''10'''
+      description: Number of measurement points
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: num_points
+    - annotation:
+        type: str
+      default: '''default'''
+      description: Directory to save the images
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      name: save_dir
+    - default: None
       kind:
         name: KEYWORD_ONLY
         value: 3
@@ -2895,68 +3760,50 @@ existing_plans:
       is_generator: true
   scan:
     description: Scan over one multi-motor trajectory.
-    module: __main__
+    module: bluesky.plans
     name: scan
     parameters:
     - annotation:
-        type: typing.List[str]
+        type: collections.abc.Sequence[__READABLE__]
       convert_device_names: true
-      description: Required. List of detectors
+      description: list of 'readable' objects
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
       name: detectors
     - annotation:
-        type: typing.Any
+        type: typing.Union[__MOVABLE__, typing.Any]
       convert_device_names: true
-      description: Required. Inidividual motor that is moved between the start and
-        stop positions.
+      description: "For one dimension, ``motor, start, stop``.\nIn general:\n\n..\
+        \ code-block:: python\n\n    motor1, start1, stop1,\n    motor2, start2, stop2,\n\
+        \    ...,\n    motorN, startN, stopN\n\nMotors can be any 'settable' object\
+        \ (motor, temp controller, etc.)"
       kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      name: motor
+        name: VAR_POSITIONAL
+        value: 2
+      name: args
     - annotation:
-        type: float
-      default: '0.0'
-      default_defined_in_decorator: true
-      description: Required. The start position for the motor, uses the default units
-        of the motor
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      max: '4000'
-      min: '-4000'
-      name: start
-      step: '0.1'
-    - annotation:
-        type: float
-      default: '0.0'
-      default_defined_in_decorator: true
-      description: Required. The stop position for the motor, uses the default units
-        of the motor
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      max: '4000'
-      min: '-4000'
-      name: stop
-      step: '0.1'
-    - annotation:
-        type: int
-      default: '10'
-      default_defined_in_decorator: true
-      description: Required. The number of points that motor will stop at between
-        the start and stop.
-      kind:
-        name: POSITIONAL_OR_KEYWORD
-        value: 1
-      max: '200'
-      min: '0'
-      name: num
-      step: '1'
-    - annotation:
-        type: dict
+        type: typing.Optional[int]
       default: None
+      description: number of points
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: num
+    - default: None
+      description: 'hook for customizing action of inner loop (messages per step).
+
+        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+
+        for details.'
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: per_step
+    - annotation:
+        type: typing.Optional[dict[str, typing.Any]]
+      default: None
+      description: metadata
       kind:
         name: KEYWORD_ONLY
         value: 3

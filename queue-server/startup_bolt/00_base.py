@@ -16,8 +16,20 @@ startup_dir=path/queue-server-configuration/startup_sim
 """
 
 from bluesky import RunEngine
-
+import os
 RE = RunEngine({})
+
+from tiled.client import from_uri
+from bluesky.callbacks.tiled_writer import TiledWriter
+tiled_uri = os.getenv("TILED_URI", "http://localhost:8000")
+tiled_api_key = os.getenv("TILED_API_KEY", "ca6ae384c9f944e1465176b7e7274046b710dc7e2703dc33369f7c900d69bd64")
+
+tiled_client = from_uri(tiled_uri, api_key=tiled_api_key)
+
+# TiledWriter needs a specific container, not the root client
+tw = TiledWriter(tiled_client)
+RE.subscribe(tw)
+
 
 from databroker.v2 import temp
 db = temp()
