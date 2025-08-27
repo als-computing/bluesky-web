@@ -184,7 +184,7 @@ def camera_acquire(camera, motor, *, md=None):
     angle = f"{(angle_value*2.8125):.2f}"
     run_id = yield from bps.open_run(md=md)
     run_id = run_id + "_"
-    cmd = ["python", "/home/user/Repos/bluesky-web/queue-server/startup_bolt/take_measurement.py", angle, run_id]
+    cmd = ["python", "take_measurement.py", angle, run_id]
     #cmd = ["pwd"]
     result = subprocess.run(cmd, capture_output=True, text=True)
     print(result.stdout)
@@ -220,7 +220,7 @@ def camera_acquire(camera, motor, *, md=None):
 def rotation_scan(start_angle="0", end_angle="90", num_points="10", save_dir="default", *, md=None):
     import subprocess
     yield from bps.open_run(md=md)
-    cmd = ["python", "/home/user/Repos/bluesky-web/queue-server/startup_bolt/run_photogrammetry_scan.py", str(start_angle), str(end_angle), str(num_points), save_dir]
+    cmd = ["python", "run_photogrammetry_scan.py", str(start_angle), str(end_angle), str(num_points), save_dir]
     result = subprocess.run(cmd, capture_output=True, text=True)
     print(result.stdout)
     print(result.stderr)
@@ -242,7 +242,7 @@ def rotation_scan(start_angle="0", end_angle="90", num_points="10", save_dir="de
 def reconstruct_object(image_dir="default", *, md=None):
     import subprocess
     yield from bps.open_run(md=md)
-    cmd = ["python", "/home/user/Repos/bluesky-web/queue-server/startup_bolt/reconstruction.py", image_dir]
+    cmd = ["python", "reconstruction.py", image_dir]
     result = subprocess.run(cmd, capture_output=True, text=True)
     print(result.stdout)
     print(result.stderr)

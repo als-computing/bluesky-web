@@ -1,0 +1,275 @@
+def get_angle(motor, *, md=None):
+    from bluesky.plan_stubs import rd  # Import locally to hide from queue server
+    import os
+    import time
+    import numpy as np
+    from datetime import datetime
+    from tiled.client import from_uri
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+
+    # Read the motor position
+    angle = yield from rd(motor)
+    
+    # Save to Tiled as simple structured data (not DataFrame)
+    try:
+        tiled_uri = os.getenv("TILED_URI", "http://localhost:8000")
+        tiled_api_key = os.getenv("TILED_API_KEY", "9f0336b211425b2631f74685a3aee041e11da9617cdec4d7ee445f006c9b3954")
+        
+        if tiled_api_key:
+            tiled_client = from_uri(tiled_uri, api_key=tiled_api_key)
+            
+            # Create container for motor angles  
+            container_path = "motor_angle_log"
+            if container_path not in tiled_client:
+                tiled_client.create_container(container_path)
+            container = tiled_client[container_path]
+            
+            # Just store the angle value as a simple array
+            angle_array = np.array([float(angle)])
+            
+            # Use timestamp as unique key
+            unique_key = f"{motor.name}_{timestamp}"
+            
+            container.write_array(
+                angle_array,
+                metadata={
+                    "description": f"Motor angle reading from {motor.name}",
+                    "timestamp": timestamp,
+                    "motor_name": motor.name,
+                    "angle_value": float(angle),
+                    "datetime": datetime.now().isoformat(),
+                    **(md or {})
+                },
+                key=unique_key
+            )
+            print(f"✅ Angle {angle} stored with key: {unique_key}")
+            
+    except Exception as e:
+        print(f"⚠️ Failed to save to Tiled: {e}")
+    
+    return angle
+
+# Advanced camera acquisition with Area Detector and Tiled storage
+@parameter_annotation_decorator({
+    "description": "Acquire image using Area Detector and save to Tiled",
+    "parameters": {
+        "camera": {
+            "description": "Required. Area Detector camera device",
+            "annotation": "typing.Any",
+            "convert_device_names": True,
+        },
+        "save_dir": {
+            "description": "Directory path to save TIFF files",
+            "annotation": "str",
+            "default": "/tmp/camera_images",
+        },
+        "image_name": {
+            "description": "Base name for the image file",
+            "annotation": "str", 
+            "default": "scan_image",
+        }
+    }
+})
+def acquire_area_detector_image(camera, save_dir="/tmp/camera_images", image_name="scan_image", *, md=None):
+    import os
+    import numpy as np
+    from datetime import datetime
+    import time
+    from bluesky.plan_stubs import sleep
+    from bluesky.plans import count
+    from tiled.client import from_uri
+    from PIL import Image
+    import tifffile
+    
+    # Generate timestamp
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    
+    # Ensure save directory exists
+    os.makedirs(save_dir, exist_ok=True)
+    
+    try:
+        print("--- Staging Area Detector camera ---")
+        
+        # Configure file saving
+        camera.tiff.file_path.put(save_dir)
+        camera.tiff.file_template.put('%s%s_%d.tiff')
+        
+        # Get current file number and increment
+        current_number = camera.tiff.file_number.get()
+        current_number += 1
+        filename = f'{image_name}_{timestamp}'
+        
+        camera.tiff.file_name.put(filename)
+        camera.tiff.file_number.put(current_number)
+        
+        # Full file path
+        filepath = os.path.join(save_dir, f"{filename}_{current_number}.tiff")
+        
+        print(f"📸 Capturing single image → {filepath}")
+        
+        # Use Bluesky count for single image (general approach)
+        print("📸 Acquiring single image...")
+        
+        # Try using the image plugin instead of TIFF plugin
+        print("📸 Using image plugin for acquisition...")
+        uid = yield from count([camera.image], num=1)
+        
+        print(f"📸 Acquisition completed with UID: {uid}")
+        
+        # Debug: Check what files exist in the directory
+        print(f"🔍 Checking directory: {save_dir}")
+        if os.path.exists(save_dir):
+            files = os.listdir(save_dir)
+            print(f"📁 Files in directory: {files}")
+        else:
+            print(f"❌ Directory does not exist: {save_dir}")
+        
+        # Debug: Check camera's current file settings
+        print(f"📷 Camera file path: {camera.tiff.file_path.get()}")
+        print(f"📷 Camera file name: {camera.tiff.file_name.get()}")
+        print(f"📷 Camera file number: {camera.tiff.file_number.get()}")
+        print(f"📷 Camera file template: {camera.tiff.file_template.get()}")
+        
+        # Debug: Check TIFF plugin configuration
+        print(f"📷 TIFF plugin enabled: {camera.tiff.enable.get()}")
+        print(f"📷 TIFF auto save: {camera.tiff.auto_save.get()}")
+        print(f"📷 TIFF file write mode: {camera.tiff.file_write_mode.get()}")
+        print(f"📷 TIFF nd array port: {camera.tiff.nd_array_port.get()}")
+        print(f"📷 TIFF array counter: {camera.tiff.array_counter.get()}")
+        
+        # Debug: Check if we're using the right detector
+        print(f"📷 Available detectors: {list(camera.component_names)}")
+        print(f"📷 Camera stage_sigs: {camera.stage_sigs}")
+        
+        # Wait for file to appear
+        print("⏳ Waiting for TIFF file...")
+        max_wait = 10  # seconds
+        wait_time = 0
+        while not os.path.exists(filepath) and wait_time < max_wait:
+            yield from sleep(0.5)
+            wait_time += 0.5
+            
+        # Check if local file exists
+        if os.path.exists(filepath):
+            print(f"✓ TIFF saved locally at {filepath}")
+            local_file_exists = True
+        else:
+            print(f"❌ Local TIFF file not found: {filepath}")
+            local_file_exists = False
+            
+        # Alternative: Try to get image data directly from the UID
+        print(f"🔍 Attempting to get image data from UID: {uid}")
+        try:
+            from databroker import Broker
+            db = Broker.named('temp')  # Use temporary broker
+            
+            # Get the run data
+            run = db[uid]
+            print(f"📊 Run data retrieved: {run}")
+            
+            # Try to get image data
+            if hasattr(run, 'primary'):
+                data = run.primary.read()
+                print(f"📊 Primary data: {data}")
+                
+                # Check if we have image data
+                if 'camera_tiff_image' in data:
+                    image_data = data['camera_tiff_image']
+                    print(f"📸 Image data shape: {image_data.shape}")
+                    
+                    # Save this directly to Tiled
+                    print("📤 Uploading image data directly to Tiled...")
+                    try:
+                        tiled_uri = os.getenv("TILED_URI", "http://localhost:8000")
+                        tiled_api_key = os.getenv("TILED_API_KEY", "9f0336b211425b2631f74685a3aee041e11da9617cdec4d7ee445f006c9b3954")
+                        
+                        if tiled_api_key:
+                            tiled_client = from_uri(tiled_uri, api_key=tiled_api_key)
+                            
+                            # Create container
+                            container_path = "measurement_images"
+                            if container_path not in tiled_client:
+                                tiled_client.create_container(container_path)
+                            container = tiled_client[container_path]
+                            
+                            # Store image data directly
+                            tiled_key = f"{image_name}_{timestamp}_uid_{uid}"
+                            container.write_array(
+                                image_data.astype(np.float32),
+                                metadata={
+                                    "description": "Area Detector captured image (from UID)",
+                                    "timestamp": timestamp,
+                                    "uid": uid,
+                                    "camera_name": camera.name,
+                                    "local_file_exists": local_file_exists,
+                                    **(md or {})
+                                },
+                                key=tiled_key
+                            )
+                            print(f"✅ Image uploaded to Tiled with key: {tiled_key}")
+                            
+                    except Exception as e:
+                        print(f"⚠️ Failed to upload to Tiled: {e}")
+                else:
+                    print("❌ No image data found in run")
+                    
+        except Exception as e:
+            print(f"⚠️ Failed to get data from UID: {e}")
+            
+            # Convert to PNG for Tiled storage
+            png_path = filepath.replace(".tiff", ".png")
+            try:
+                # Load TIFF and convert to PNG
+                arr = tifffile.imread(filepath)
+                im = Image.fromarray(arr)
+                im.save(png_path, format="PNG")
+                print(f"✓ PNG created at {png_path}")
+                
+                # Save to Tiled
+                try:
+                    tiled_uri = os.getenv("TILED_URI", "http://localhost:8000")
+                    tiled_api_key = os.getenv("TILED_API_KEY", "9f0336b211425b2631f74685a3aee041e11da9617cdec4d7ee445f006c9b3954")
+                    
+                    if tiled_api_key:
+                        tiled_client = from_uri(tiled_uri, api_key=tiled_api_key)
+                        
+                        # Create container
+                        container_path = "measurement_images"
+                        if container_path not in tiled_client:
+                            tiled_client.create_container(container_path)
+                        container = tiled_client[container_path]
+                        
+                        # Load image array
+                        image_array = np.array(Image.open(png_path))
+                        
+                        # Store in Tiled
+                        tiled_key = f"{image_name}_{timestamp}"
+                        container.write_array(
+                            image_array.astype(np.float32),
+                            metadata={
+                                "description": "Area Detector captured image",
+                                "timestamp": timestamp,
+                                "filename": os.path.basename(filepath),
+                                "png_filename": os.path.basename(png_path),
+                                "camera_name": camera.name,
+                                **(md or {})
+                            },
+                            key=tiled_key
+                        )
+                        print(f"✅ Image stored in Tiled with key: {tiled_key}")
+                        
+                        # Clean up TIFF file to save space
+                        os.remove(filepath)
+                        print(f"✓ Cleaned up TIFF file")
+                        
+                except Exception as e:
+                    print(f"⚠️ Failed to save to Tiled: {e}")
+                    
+            except Exception as e:
+                print(f"⚠️ Failed to convert TIFF to PNG: {e}")
+        else:
+            print(f"❌ File not found after waiting: {filepath}")
+            
+    finally:
+        print("--- Unstaging Area Detector camera ---") 
+        #yield from unstage(camera)
