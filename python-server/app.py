@@ -7,12 +7,17 @@ from pydantic import BaseModel
 import pvCamera
 import pvsim
 import queue_server
+import pyfai
 import ophydSocket
 
 try:
     from ophyd.signal import EpicsSignal
     m7 = EpicsSignal("IOC:m7", name="m7") # initialize a known connection for testing
     device_dict = {"IOC:m7": m7} # initalize dictionary to hold all PVs
+    value = m7.get()
+    print(value)
+    print(m7.connected)
+    print("Connection to EPICS with IOC:m7 was initialized")
 except:
     print("Connection to EPICS with IOC:m7 was not initialized due to no connection found with EPICS")
     device_dict={}
@@ -48,7 +53,8 @@ app.add_middleware(
 app.include_router(pvCamera.router) #turn this off if not connected to EPICS
 app.include_router(pvsim.router)
 app.include_router(queue_server.router)
-app.include_router(ophydSocket.router)
+app.include_router(pyfai.router)
+app.include_router(ophydSocket.router) #turn this off if not connected to EPICS
 
 
 @app.get("/")
@@ -68,7 +74,9 @@ def list_devices( response: Response):
 
 @app.get("/devices/{prefix}/position", status_code=200) #make plural for resources, better to keep resource more clear for what it returns
 def read_device(prefix, response: Response):
+    print(prefix)
     if prefix in device_dict:
+        print('found the prefix in dict')
         device = device_dict.get(prefix)
         return device.read()
     else:
@@ -118,3 +126,4 @@ async def websocket_endpoint(websocket: WebSocket):
     while True:
         data = await websocket.receive_text()
         await websocket.send_text(f"Message text was: {data}")
+
