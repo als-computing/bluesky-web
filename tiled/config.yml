@@ -1,0 +1,20 @@
+authentication:
+  single_user_api_key: ${TILED_SINGLE_USER_API_KEY}
+  allow_anonymous_access: true
+uvicorn:
+  host: 0.0.0.0
+  port: 8001
+allow_origins:
+  - http://localhost
+trees:
+  - path: /
+    tree: catalog
+    args:
+      uri: "sqlite:////Users/seij/Repos/postman-demo/tiled/catalog.db"
+      writable_storage:
+        - "/Users/seij/Repos/postman-demo/tiled/data"               
+        - "sqlite:////Users/seij/Repos/postman-demo/tiled/tabular.db"       
+      readable_storage:
+        - "/Users/seij/Repos/postman-demo/tiled/data"
+      init_if_not_exists: true
+

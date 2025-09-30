@@ -12,6 +12,7 @@ python-server/test/__pycache__
 python-server/test/.pytest_cache
 python-server/.ipynb_checkpoints
 
+*.pyc
 
 # production
 frontend/build

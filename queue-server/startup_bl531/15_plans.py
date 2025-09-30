@@ -36,6 +36,87 @@ from bluesky.plans import (
     x2x_scan as _x2x_scan,
 )
 
+# 2D grid scan for spectroscopy
+@parameter_annotation_decorator({
+    "description": "Scan over a 2d grid to perform spectroscopy",
+    "parameters": {
+        "detectors": {
+            "description": "Required. List of detectors",
+            "annotation": "typing.List[str]",
+            "convert_device_names": True,
+          
+        },
+        "motor1": {
+            "description": "Required. First inidividual motor that is moved between the start and stop positions.",
+            "annotation": "typing.Any",
+            "convert_device_names": True,
+      
+        },
+        "motor1_start": {
+            "description": "Required. The start position for motor #1, uses the default units of the motor",
+            "default": 0.0,
+            "min": 0,
+            "max": 20,
+            "step": 0.1,
+         
+        },
+        "motor1_stop": {
+            "description": "Required. The stop position for motor #1, uses the default units of the motor",
+            "default": 20.0,
+            "min": 0,
+            "max": 20,
+            "step": 0.1,
+        
+        },
+        "motor1_num": {
+            "description": "Required. The number of points that motor #1 will stop at between the start and stop.",
+            "default": 10,
+            "min": 0,
+            "max": 30,
+            "step": 1,
+          
+        },
+        "motor2": {
+        "description": "Required. Second inidividual motor that is moved between the start and stop positions.",
+        "annotation": "typing.Any",
+        "convert_device_names": True,
+      
+        },
+        "motor2_start": {
+            "description": "Required. The start position for motor #2, uses the default units of the motor",
+            "default": 0.0,
+            "min": 0,
+            "max": 20,
+            "step": 0.1,
+         
+        },
+        "motor2_stop": {
+            "description": "Required. The stop position for motor #2, uses the default units of the motor",
+            "default": 20.0,
+            "min": 0,
+            "max": 20,
+            "step": 0.1,
+        
+        },
+        "motor2_num": {
+            "description": "Required. The number of points that motor #2 will stop at between the start and stop.",
+            "default": 10,
+            "min": 0,
+            "max": 30,
+            "step": 1,
+          
+        },
+        "snake_axes": {
+            "description": "Optional boolean. Should the motors follow a snake pattern when moving through the selected locations? Default=True",
+            "annotation": "bool",
+            "default": True,
+        },
+    }
+})
+def grid_scan(detectors, motor1, motor2, motor1_start:float=0.0, motor2_start:float=0.0, motor1_stop:float=20.0, motor2_stop:float=20.0, motor1_num:int=10, motor2_num:int=10, snake_axes:bool=True, *, md:dict=None):
+
+    yield from _grid_scan(detectors, motor1, motor1_start, motor1_stop, motor1_num, motor2, motor2_start, motor2_stop, motor2_num, snake_axes, md=md) 
+
 # 1D scan for endstation x, z or filters
 @parameter_annotation_decorator({
     "description": "Scan over one multi-motor trajectory.",
