@@ -5,15 +5,16 @@ services:
       - qnet
     ports:
      - "127.0.0.1:6379:6379"
-  pvws:
-    build: ./pvws/docker
+  ophyd-api:
+    build: ./ophyd-api
     environment:
       - EPICS_CA_ADDR_LIST=${EPICS_CA_ADDR_LIST}
       - EPICS_CA_AUTO_ADDR_LIST=NO
-      - PV_WRITE_SUPPORT=true
+      - ZMQ_HOST=localhost
+      - ZMQ_PORT=60625
     network_mode: "host"
-  python-server:
-    build: ./python-server
+  frontend-api:
+    build: ./frontend-api
     environment:
       - EPICS_CA_ADDR_LIST=${EPICS_CA_ADDR_LIST}
       - EPICS_CA_AUTO_ADDR_LIST=NO
