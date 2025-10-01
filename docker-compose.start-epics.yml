@@ -12,16 +12,17 @@ services:
       ../../bin/linux-x86_64/motorSim st.cmd"
     tty: true
     stdin_open: true
-  pvws:
-    build: ./pvws/docker
+  ophyd-api:
+    build: ./ophyd-api
     ports:
       - "8080:8080"
     networks:
       - epicsnet
     environment:
-      - PV_WRITE_SUPPORT=true
-  python-server:
-    build: ./python-server
+      - ZMQ_HOST=qserver
+      - ZMQ_PORT=60625
+  frontend-api:
+    build: ./frontend-api
     ports:
       - "8000:8000"
       - "8888:8888"
