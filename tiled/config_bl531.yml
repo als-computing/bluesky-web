@@ -10,6 +10,7 @@ allow_origins:
   - http://localhost:5173
   - http://192.168.10.201:5173 
   - http://192.168.10.123:5173 
+  - http://131.243.80.226:5173
 trees:
   - path: /
     tree: catalog
@@ -20,5 +21,6 @@ trees:
         - 'sqlite:////home/bl531user/tiled_test/tabular.db'
       readable_storage:
         - "/home/bl531user/tiled_test/storage"
+        - "/mnt/data531/20251022_test/pilatus/2025/10/22"
       init_if_not_exists: true
 
