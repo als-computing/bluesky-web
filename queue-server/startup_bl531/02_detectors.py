@@ -1,35 +1,36 @@
-# # Connect to Pilatus detector
-#Leave this commented out for now, there's some issue with the detector and we don't want this affecting anything
-# import ophyd
-# import os
-# import numpy as np
-# from ophyd import ADComponent
-# from ophyd import ImagePlugin
-# from ophyd import PilatusDetector
-# from ophyd import SingleTrigger
-# from ophyd.areadetector.filestore_mixins import FileStoreHDF5IterativeWrite
-# from ophyd.areadetector.plugins import HDF5Plugin_V34
-# from ophyd import EpicsSignalRO
+from ophyd import ADComponent
+from ophyd import ImagePlugin
+from ophyd import PilatusDetector
+from ophyd import SingleTrigger
+from ophyd.areadetector.filestore_mixins import FileStoreTIFFIterativeWrite
+from ophyd.areadetector.plugins import TIFFPlugin
+import os
 
-# # File path configuration
-# PILATUS_FILES_ROOT = "/mnt/data531"
-# BLUESKY_FILES_ROOT = "/mnt/data531"
-# TEST_IMAGE_DIR = "test/pilatus/%Y/%m/%d/"
+PILATUS_FILES_ROOT = "/mnt/data531"
+BLUESKY_FILES_ROOT = "/mnt/data531"
+TEST_IMAGE_DIR = "20251022_test/pilatus/%Y/%m/%d/"
 
-# # Custom HDF5 plugin with file store integration
-# class MyHDF5Plugin(FileStoreHDF5IterativeWrite, HDF5Plugin_V34):
-# 	pass
+class MyTIFFPlugin(FileStoreTIFFIterativeWrite, TIFFPlugin): ...
 
-# # Custom Pilatus detector class
-# class MyPilatusDetector(SingleTrigger, PilatusDetector):
-# 	"""Pilatus detector with HDF5 file writing capability"""
-# 	image = ADComponent(ImagePlugin, "image1:")
-# 	hdf1 = ADComponent(
-#     	MyHDF5Plugin,
-#     	"HDF1:",
-#     	write_path_template=os.path.join(PILATUS_FILES_ROOT, TEST_IMAGE_DIR),
-#     	read_path_template=os.path.join(BLUESKY_FILES_ROOT, TEST_IMAGE_DIR),
-# 	)
+class MyPilatusDetector(SingleTrigger, PilatusDetector):
+    """Pilatus detector"""
 
-# # Create detector instance
-# det = MyPilatusDetector("13PIL1:", name="det")
+    image = ADComponent(ImagePlugin, "image1:")
+    tiff = ADComponent(
+        MyTIFFPlugin,
+        "TIFF1:",
+        write_path_template=os.path.join(PILATUS_FILES_ROOT, TEST_IMAGE_DIR),
+        read_path_template=os.path.join(BLUESKY_FILES_ROOT, TEST_IMAGE_DIR),
+    )
+
+det = MyPilatusDetector("13PIL1:", name="det")
+#det.tiff.create_directory.put(-5)
+det.cam.stage_sigs["image_mode"] = "Single"
+det.cam.stage_sigs["num_images"] = 1
+det.cam.stage_sigs["acquire_time"] = 0.1
+det.cam.stage_sigs["acquire_period"] = 0.105
+#det.tiff.stage_sigs["lazy_open"] = 1
+#det.tiff.stage_sigs["compression"] = "LZ4"
+det.tiff.stage_sigs["file_template"] = "%s%s_%3.3d.tif"
+#del det.tiff.stage_sigs["capture"]
+#det.tiff.stage_sigs["capture"] = 1

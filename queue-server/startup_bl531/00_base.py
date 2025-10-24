@@ -47,6 +47,7 @@ if not api_key:
 
 # Initialize the Tiled server and client
 tiled_client = from_uri("http://127.0.0.1:8000", api_key=api_key)
+# tiled_client = from_uri("https://tiled.computing.als.lbl.gov/api/v1/metadata/beamlines/bl531/raw", api_key=api_key)
 tw = TiledWriter(tiled_client)
 RE.subscribe(tw)
 

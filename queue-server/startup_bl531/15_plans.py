@@ -113,7 +113,7 @@ from bluesky.plans import (
         },
     }
 })
-def grid_scan(detectors, motor1, motor2, motor1_start:float=0.0, motor2_start:float=0.0, motor1_stop:float=20.0, motor2_stop:float=20.0, motor1_num:int=10, motor2_num:int=10, snake_axes:bool=True, *, md:dict=None):
+def grid_scan(detectors, motor1, motor2, motor1_start:float=0.0, motor2_start:float=0.0, motor1_stop:float=20.0, motor2_stop:float=20.0, motor1_num:int=10, motor2_num:int=10, snake_axes:bool=False, *, md:dict=None):
 
     yield from _grid_scan(detectors, motor1, motor1_start, motor1_stop, motor1_num, motor2, motor2_start, motor2_stop, motor2_num, snake_axes, md=md) 
 
