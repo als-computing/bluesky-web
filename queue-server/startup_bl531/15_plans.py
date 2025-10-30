@@ -36,6 +36,10 @@ from bluesky.plans import (
     x2x_scan as _x2x_scan,
 )
 
+
+
+
+
 # 2D grid scan for spectroscopy
 @parameter_annotation_decorator({
     "description": "Scan over a 2d grid to perform spectroscopy",
@@ -162,6 +166,67 @@ def grid_scan(detectors, motor1, motor2, motor1_start:float=0.0, motor2_start:fl
 def scan(detectors, motor, start:float=0.0, stop:float=0.0, num:int=10, *, md:dict=None):
 
     yield from _scan(detectors, motor, start, stop, num,md=md) 
+
+
+
+# 1D scan for endstation x, z or filters
+@parameter_annotation_decorator({
+    "description": "Scan over one multi-motor trajectory.",
+    "parameters": {
+        "detectors": {
+            "description": "Required. List of detectors",
+            "annotation": "typing.List[str]",
+            "convert_device_names": True,
+          
+        },
+        "motor": {
+            "description": "Required. Inidividual motor that is moved between the start and stop positions.",
+            "annotation": "typing.Any",
+            "convert_device_names": True,
+      
+        },
+        "start": {
+            "description": "Required. The start position for the motor, uses the default units of the motor",
+            "default": 0.0,
+            "min": -5,
+            "max": 5,
+            "step": 0.01,
+         
+        },
+        "stop": {
+            "description": "Required. The stop position for the motor, uses the default units of the motor",
+            "default": 0.0,
+            "min": -5,
+            "max": 5,
+            "step": 0.01,
+        
+        },
+        "num": {
+            "description": "Required. The number of points that motor will stop at between the start and stop.",
+            "default": 10,
+            "min": 0,
+            "max": 200,
+            "step": 1,
+          
+        },
+    }
+})
+def rel_scan(detectors, motor, start:float=0.0, stop:float=0.0, num:int=10, *, md:dict=None):
+
+    yield from _rel_scan(detectors, motor, start, stop, num,md=md) 
+
+
+
+
+
+
+
+
+
+
+
+
+
 """ 
 # 1D scan for endstation x, z or filters
 @parameter_annotation_decorator({

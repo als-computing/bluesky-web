@@ -3,7 +3,6 @@
 
 from ophyd import EpicsMotor, Device, Signal, PVPositioner, EpicsSignal, EpicsSignalRO, Component as Cpt
 import ophyd
-ophyd.set_cl('caproto')
 
 class HexapodAxisTz(PVPositioner):
     # Target position
