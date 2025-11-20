@@ -140,16 +140,16 @@ def grid_scan(detectors, motor1, motor2, motor1_start:float=0.0, motor2_start:fl
         "start": {
             "description": "Required. The start position for the motor, uses the default units of the motor",
             "default": 0.0,
-            "min": -10000,
-            "max": 10000,
+            "min": -4000,
+            "max": 4000,
             "step": 0.1,
          
         },
         "stop": {
             "description": "Required. The stop position for the motor, uses the default units of the motor",
             "default": 0.0,
-            "min": -10000,
-            "max": 10000,
+            "min": -4000,
+            "max": 4000,
             "step": 0.1,
         
         },
@@ -157,7 +157,7 @@ def grid_scan(detectors, motor1, motor2, motor1_start:float=0.0, motor2_start:fl
             "description": "Required. The number of points that motor will stop at between the start and stop.",
             "default": 10,
             "min": 0,
-            "max": 401,
+            "max": 200,
             "step": 1,
           
         },

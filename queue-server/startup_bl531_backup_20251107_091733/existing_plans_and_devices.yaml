@@ -260,158 +260,8 @@ existing_devices:
     is_movable: true
     is_readable: true
     module: ophyd.epics_motor
-  gi_angle:
-    classname: GrazingIncidenceAngle
-    components:
-      grazing_angle:
-        classname: PseudoSingle
-        components:
-          readback:
-            classname: AttributeSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          setpoint:
-            classname: AttributeSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.pseudopos
-      hexapod_ry:
-        classname: HexapodAxisRy
-        components:
-          actuate:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          done:
-            classname: EpicsSignalRO
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          readback:
-            classname: EpicsSignalRO
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          setpoint:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: __main__
-    is_flyable: false
-    is_movable: true
-    is_readable: true
-    module: __main__
-  hexapod_motor_Rx:
-    classname: HexapodAxisRy
-    components:
-      actuate:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      done:
-        classname: EpicsSignalRO
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      readback:
-        classname: EpicsSignalRO
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      setpoint:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-    is_flyable: false
-    is_movable: true
-    is_readable: true
-    module: __main__
   hexapod_motor_Ry:
     classname: HexapodAxisRy
-    components:
-      actuate:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      done:
-        classname: EpicsSignalRO
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      readback:
-        classname: EpicsSignalRO
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      setpoint:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-    is_flyable: false
-    is_movable: true
-    is_readable: true
-    module: __main__
-  hexapod_motor_Rz:
-    classname: HexapodAxisRy
-    components:
-      actuate:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      done:
-        classname: EpicsSignalRO
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      readback:
-        classname: EpicsSignalRO
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-      setpoint:
-        classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-    is_flyable: false
-    is_movable: true
-    is_readable: true
-    module: __main__
-  hexapod_motor_Tx:
-    classname: HexapodAxisTy
     components:
       actuate:
         classname: EpicsSignal
@@ -495,159 +345,6 @@ existing_devices:
         module: ophyd.signal
       setpoint:
         classname: EpicsSignal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.signal
-    is_flyable: false
-    is_movable: true
-    is_readable: true
-    module: __main__
-  mono:
-    classname: MonoEnergy
-    components:
-      energy_eV:
-        classname: PseudoSingle
-        components:
-          readback:
-            classname: AttributeSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          setpoint:
-            classname: AttributeSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.pseudopos
-      mono_angle:
-        classname: EpicsMotor
-        components:
-          acceleration:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          direction_of_travel:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          high_limit_switch:
-            classname: EpicsSignalRO
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          high_limit_travel:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          home_forward:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          home_reverse:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          low_limit_switch:
-            classname: EpicsSignalRO
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          low_limit_travel:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          motor_done_move:
-            classname: EpicsSignalRO
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          motor_egu:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          motor_is_moving:
-            classname: EpicsSignalRO
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          motor_stop:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          offset_freeze_switch:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          set_use_switch:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          user_offset:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          user_offset_dir:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          user_readback:
-            classname: EpicsSignalRO
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          user_setpoint:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-          velocity:
-            classname: EpicsSignal
-            is_flyable: false
-            is_movable: true
-            is_readable: true
-            module: ophyd.signal
-        is_flyable: false
-        is_movable: true
-        is_readable: true
-        module: ophyd.epics_motor
-      offset:
-        classname: AttributeSignal
         is_flyable: false
         is_movable: true
         is_readable: true
@@ -2899,8 +2596,8 @@ existing_plans:
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
-      max: '10000'
-      min: '-10000'
+      max: '4000'
+      min: '-4000'
       name: start
       step: '0.1'
     - annotation:
@@ -2912,8 +2609,8 @@ existing_plans:
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
-      max: '10000'
-      min: '-10000'
+      max: '4000'
+      min: '-4000'
       name: stop
       step: '0.1'
     - annotation:
@@ -2925,7 +2622,7 @@ existing_plans:
       kind:
         name: POSITIONAL_OR_KEYWORD
         value: 1
-      max: '401'
+      max: '200'
       min: '0'
       name: num
       step: '1'

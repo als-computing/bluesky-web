@@ -256,8 +256,7 @@ def automatic_gisaxs_alignment(
     """
     attempts = 0
     aligned = False
-    # move beamstop y = 18.2mm into beam position, hard code for current usage, probably will have history in the future
-    yield from bps.mv(diode_y_mm, 18.2)
+
     while attempts < max_attempts:
         # Height alignment
         yield from gisaxs_height_scan(rang=height_range, point=height_points, md=md)
@@ -272,17 +271,10 @@ def automatic_gisaxs_alignment(
         attempts += 1
         if aligned:
             print("GISAXS alignment successful.")
-            gi_angle.set_reference_angle(optimal_angle)
-            yield from bps.mv(diode_y_mm, 0)
+            yield from bps.mv(hexapod_motor_Ry, optimal_angle + GISAXS_angle)
             break
         else:
             print(f"GISAXS alignment not successful (attempt {attempts}/{max_attempts}), retrying...")
 
     if not aligned:
         print("GISAXS alignment finished without meeting residual threshold.")
-        # Raise exception - this will set exit_status to "failed"
-        raise RuntimeError(
-            f"GISAXS alignment failed after {max_attempts} attempts. "
-            f"Threshold {threshold} not met. "
-            f"Last angle: {optimal_angle:.4f}°"
-        )
