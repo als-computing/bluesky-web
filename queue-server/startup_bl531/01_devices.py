@@ -435,6 +435,67 @@ class GrazingIncidenceAngle(PseudoPositioner):
         print(f"Reference angle updated: {old_ref:.4f}° → {new_ref_angle:.4f}°")
         print(f"Current grazing angle: {self.grazing_angle.position:.4f}°")
 
+# ============================================================================
+# Shutter device
+# ============================================================================
+
+
+class Shutter(Device):
+    """
+    Shutter controlled by LabJack analog output.
+    5V = closed, 0V = open
+    No readback available.
+    """
+    # The actual PV that controls the shutter
+    _control = Cpt(EpicsSignal, 'AO0', kind='config')
+    
+    # A simulated readback that tracks the last set value
+    # since there's no real RBV
+    state = Cpt(Signal, value='Unknown', kind='hinted')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set initial state as unknown
+        self.state.put('Unknown')
+    
+    def open(self):
+        """Open the shutter (0V)"""
+        self._control.put(0)
+        self.state.put('Open')
+        print(f"{self.name}: Shutter opened (0V)")
+    
+    def close(self):
+        """Close the shutter (5V)"""
+        self._control.put(5)
+        self.state.put('Closed')
+        print(f"{self.name}: Shutter closed (5V)")
+    
+    def set(self, value):
+        """
+        Set shutter state.
+        Accepts: 'open', 'Open', 0, 'close', 'Closed', 5
+        """
+        if value in ['open', 'Open', 0]:
+            self.open()
+        elif value in ['close', 'Closed', 5]:
+            self.close()
+        else:
+            raise ValueError(f"Invalid shutter command: {value}. Use 'open', 'close', 0, or 5")
+        
+        # Return a status object for bluesky compatibility
+        from ophyd.status import Status
+        st = Status()
+        st.set_finished()
+        return st
+    
+    def read(self):
+        """Read the simulated state"""
+        return self.state.read()
+    
+    def describe(self):
+        """Describe the simulated state"""
+        return self.state.describe()
+
 
 # ============================================================================
 # Device Instantiation
@@ -464,3 +525,4 @@ mono_angle_deg = EpicsMotor('bl531_xps1:mono_angle_deg', name="mono_angle_deg")
 # Monochromator - energy pseudo positioner (preferred for most use)
 mono = MonoEnergy('', name='mono')  # Empty prefix since motor has full PV
 
+shutter_status = Shutter('bl531:LJT4:1:', name='shutter')
