@@ -141,9 +141,10 @@ E_EV = 6.2415e18            # Elementary charge (1/eV to J conversion)
 # Silicon crystal parameters
 SI_M = 5.43e-10             # Si lattice constant (m)
 A_SI111_M = SI_M / np.sqrt(3)  # Si(1,1,1) d-spacing (m)
-
+# 19.2567degree at copper edge 8980.3eV
+# H_M2KGPS * C_MPS * E_EV/(energies_kev*1000)/(2*A_SI111_M)
 # Calibration
-DEFAULT_MONO_OFFSET_DEG = 6.715425475998675  # Default calibration offset
+DEFAULT_MONO_OFFSET_DEG = 19.2567 - H_M2KGPS * C_MPS * E_EV/(8980.3)/(2*A_SI111_M) * 180/np.pi  # Default calibration offset
 
 
 # ============================================================================
