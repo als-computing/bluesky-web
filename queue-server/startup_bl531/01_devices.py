@@ -523,6 +523,9 @@ diode_y_mm = EpicsMotor('bl531_xps2:beamstop_y_mm', name='diode_y_mm')
 mono_angle_deg = EpicsMotor('bl531_xps1:mono_angle_deg', name="mono_angle_deg")
 
 # Monochromator - energy pseudo positioner (preferred for most use)
-mono = MonoEnergy('', name='mono')  # Empty prefix since motor has full PV
+mono_energy = MonoEnergy('', name='mono_energy')  # Empty prefix since motor has full PV
 
 shutter_status = Shutter('bl531:LJT4:1:', name='shutter')
+
+# sampleJack
+sampleJack = EpicsMotor('bl531_xps1:es_height_mm', name='sampleJack')
