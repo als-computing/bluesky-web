@@ -144,7 +144,7 @@ A_SI111_M = SI_M / np.sqrt(3)  # Si(1,1,1) d-spacing (m)
 # 19.2567degree at copper edge 8980.3eV
 # H_M2KGPS * C_MPS * E_EV/(energies_kev*1000)/(2*A_SI111_M)
 # Calibration
-DEFAULT_MONO_OFFSET_DEG = 19.2567 - H_M2KGPS * C_MPS * E_EV/(8980.3)/(2*A_SI111_M) * 180/np.pi  # Default calibration offset
+DEFAULT_MONO_OFFSET_DEG = 19.2525 - np.arcsin(H_M2KGPS * C_MPS * E_EV/(8978.8)/(2*A_SI111_M)) * 180/np.pi  # Default calibration offset
 
 
 # ============================================================================
@@ -506,12 +506,12 @@ class Shutter(Device):
 diode = ophyd.EpicsSignal('bl201-beamstop:current', name='diode')
 
 # Hexapod motors (direct access - for advanced use)
-hexapod_motor_Rz = HexapodAxisRy(name='hexapod_motor_Rz')
+hexapod_motor_Rz = HexapodAxisRz(name='hexapod_motor_Rz')
 hexapod_motor_Ry = HexapodAxisRy(name='hexapod_motor_Ry')
-hexapod_motor_Rx = HexapodAxisRy(name='hexapod_motor_Rx')
+hexapod_motor_Rx = HexapodAxisRx(name='hexapod_motor_Rx')
 hexapod_motor_Tz = HexapodAxisTz(name='hexapod_motor_Tz')
 hexapod_motor_Ty = HexapodAxisTy(name='hexapod_motor_Ty')
-hexapod_motor_Tx = HexapodAxisTy(name='hexapod_motor_Tx')
+hexapod_motor_Tx = HexapodAxisTx(name='hexapod_motor_Tx')
 
 # Grazing incidence angle pseudo positioner (preferred for GISAXS)
 gi_angle = GrazingIncidenceAngle('', name='gi_angle', ref_angle=0.0)
@@ -530,3 +530,10 @@ shutter_status = Shutter('bl531:LJT4:1:', name='shutter')
 
 # sampleJack
 sampleJack = EpicsMotor('bl531_xps1:es_height_mm', name='sampleJack')
+
+
+# ============================================================================
+# Supplemental Data ('baseline' stream) captured on every plan
+# ============================================================================
+if sd:
+    sd.baseline = [diode, mono_energy] #for now just adding these two. add more as needed.

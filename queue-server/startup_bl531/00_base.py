@@ -46,7 +46,7 @@ if not api_key:
     raise ValueError("TILED_SINGLE_USER_API_KEY environment variable is not set.")
 
 # Initialize the Tiled server and client
-tiled_client = from_uri("http://127.0.0.1:8000", api_key=api_key)
+tiled_client = from_uri("http://192.168.10.155:8000", api_key=api_key)
 # tiled_client = from_uri("https://tiled.computing.als.lbl.gov/api/v1/metadata/beamlines/bl531/raw", api_key=api_key)
 tw = TiledWriter(tiled_client, batch_size=1)
 RE.subscribe(tw)
@@ -58,7 +58,10 @@ bec.disable_plots()
 # Send all metadata/data captured to the BestEffortCallback.
 RE.subscribe(bec)
 
-
+# add 'baseline' stream with start/stop position of ophyd devices passed into 'sd'
+from bluesky.preprocessors import SupplementalData
+sd = SupplementalData()
+RE.preprocessors.append(sd)
 
 
 
