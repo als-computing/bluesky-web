@@ -622,9 +622,5 @@ except:
 # ============================================================================
 # Supplemental Data ('baseline' stream) captured on every plan
 # ============================================================================
-try:
-    sd.baseline = [diode, mono_energy] #for now just adding these two. add more as needed.
-except NameError:
-    pass  # sd not defined yet
 if sd:
     sd.baseline = [diode, mono_energy, sdd, sampleJack, gi_angle, hexapod_motor_Tx, hexapod_motor_Ty, hexapod_motor_Tz, hexapod_motor_Rx, hexapod_motor_Ry, hexapod_motor_Rz] #for now just adding these two. add more as needed.
