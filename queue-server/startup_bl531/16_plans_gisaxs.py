@@ -4,7 +4,7 @@ from scipy.special import erf
 
 import bluesky.plan_stubs as bps
 from bluesky.plans import rel_scan as _rel_scan
-
+from bluesky.plans import rel_grid_scan as _rel_grid_scan
 # If your environment already injects this decorator, you can leave the import.
 # Otherwise, this import is the standard location used by QServer.
 from bluesky_queueserver.manager.annotation_decorator import parameter_annotation_decorator
@@ -257,7 +257,7 @@ def automatic_gisaxs_alignment(
     attempts = 0
     aligned = False
     # move beamstop y = 18.2mm into beam position, hard code for current usage, probably will have history in the future
-    yield from bps.mv(diode_y_mm, 18.2)
+    yield from bps.mv(diode_y_mm, 3.35)
     while attempts < max_attempts:
         # Height alignment
         yield from gisaxs_height_scan(rang=height_range, point=height_points, md=md)
@@ -286,3 +286,72 @@ def automatic_gisaxs_alignment(
             f"Threshold {threshold} not met. "
             f"Last angle: {optimal_angle:.4f}°"
         )
+    
+from tiled.client import from_uri
+tiled_client = from_uri("http://192.168.10.155:8000")
+
+@parameter_annotation_decorator({
+    "description": "Automatic diode alignment routine",
+    "parameters": {
+        "x_range": {
+            "description": "Optional. Range for the x scan (±mm).",
+            "default": 0.5, "min": 0.1, "max": 5, "step": 0.1,
+        },
+        "x_points": {
+            "description": "Optional. Number of points for the x scan.",
+            "default": 5, "min": 3, "max": 21, "step": 1,
+        },
+        "y_range": {
+            "description": "Optional. Range for the y scan (±mm).",
+            "default": 0.5, "min": 0.1, "max": 5, "step": 0.1,
+        },
+        "y_points": {
+            "description": "Optional. Number of points for the y scan.",
+            "default": 5, "min": 3, "max": 21, "step": 1,
+        },
+    }
+})
+def automatic_diode_alignment(
+    x_range: float = 0.5,
+    x_points: int = 5,
+    y_range: float = 0.5,
+    y_points: int = 5,
+    *,
+    md: dict | None = None,
+):
+    """
+    Automatic diode alignment routine.
+    Steps:
+      1) 2D grid scan of diode_x_mm and diode_y_mm
+      2) Move to position with minimum diode current
+      * higher flux means lower diode reading
+    """
+    
+    # Prepare metadata for the diode alignment scan
+    _md = {
+        'plan_name': 'automatic_diode_alignment',
+        'scan_type': '2D_grid_scan',
+        'purpose': 'diode_beam_alignment',
+        'motors': ['diode_x_mm', 'diode_y_mm'],
+        'detector': 'diode',
+        'scan_parameters': {
+            'x_range_mm': x_range,
+            'x_points': x_points,
+            'y_range_mm': y_range, 
+            'y_points': y_points,
+        }
+    }
+    yield from _rel_grid_scan([diode], diode_x_mm, -x_range, x_range, x_points, diode_y_mm, -y_range, y_range, y_points, snake_axes=False, md=_md)
+    uid = tiled_client.keys().last()
+    db = tiled_client[uid]['primary']
+    diode_uA = db.base['internal']['diode'].read()
+    diode_x_mm_rbv = db.base['internal']['diode_x_mm'].read()
+    diode_y_mm_rbv = db.base['internal']['diode_y_mm'].read()
+    max_index = np.argmin(diode_uA)
+    x_pos = diode_x_mm_rbv[max_index]
+    y_pos = diode_y_mm_rbv[max_index]
+    print(f"Moving diode to optimal position: x={x_pos} mm, y={y_pos} mm")
+    yield from bps.mv(diode_x_mm, x_pos)
+    yield from bps.mv(diode_y_mm, y_pos)
+
+    

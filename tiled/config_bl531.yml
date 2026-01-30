@@ -11,16 +11,36 @@ allow_origins:
   - http://192.168.10.201:5173 
   - http://192.168.10.123:5173 
   - http://131.243.80.226:5173
+  - http://192.168.10.100:5173
+  - http://192.168.10.156:8080
+  - http://192.168.10.156:4001
+# trees:
+#   - path: /
+#     tree: catalog
+#     args:
+#       uri: "sqlite:////home/bl531user/tiled_test/catalog.db"
+#       writable_storage:
+#         - '/home/bl531user/tiled_test/storage'
+#         - 'sqlite:////home/bl531user/tiled_test/tabular.db'
+#         - "/mnt"
+#       readable_storage:
+#         - "/home/bl531user/tiled_test/storage"
+#         - "/mnt"
+#       init_if_not_exists: true
+
 trees:
   - path: /
     tree: catalog
     args:
-      uri: "sqlite:////home/bl531user/tiled_test/catalog.db"
+      uri: "sqlite:////mnt/data531/tiled/catalog.db"
       writable_storage:
-        - '/home/bl531user/tiled_test/storage'
-        - 'sqlite:////home/bl531user/tiled_test/tabular.db'
+        - '/mnt/data531/tiled/storage'
+        - 'sqlite:////mnt/data531/tiled/tabular.db'
+        - "/mnt"
       readable_storage:
-        - "/home/bl531user/tiled_test/storage"
-        - "/mnt/data531/20251022_test/pilatus/2025/10/22"
+        - "/mnt/data531/tiled/storage"
+        - "/mnt"
       init_if_not_exists: true
 
+streaming_cache:
+  uri: redis://localhost:6379

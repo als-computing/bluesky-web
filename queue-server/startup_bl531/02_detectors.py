@@ -48,7 +48,7 @@ try:
     basler_camera = BaslerDetector('BL531acA5427:', name='basler_camera')
     basler_camera.cam.stage_sigs["image_mode"] = "Single"
     basler_camera.cam.stage_sigs["num_images"] = 1
-    basler_camera.cam.stage_sigs["acquire_time"] = 1
+    basler_camera.cam.stage_sigs["acquire_time"] = 0.1
     basler_camera.cam.stage_sigs["acquire_period"] = 0.105
     basler_camera.tiff.stage_sigs["file_template"] = "/%s%s_%3.3d.tif"
 
@@ -114,7 +114,7 @@ try:
     det = MyPilatusDetector("13PIL1:", name="det")
     det.cam.stage_sigs["image_mode"] = "Single"
     det.cam.stage_sigs["num_images"] = 1
-    det.cam.stage_sigs["acquire_time"] = 1
+    #det.cam.stage_sigs["acquire_time"] = 0.1
     det.cam.stage_sigs["acquire_period"] = 0.105
     det.tiff.stage_sigs["file_template"] = "/%s%s_%3.3d.tif"
 
@@ -127,3 +127,5 @@ try:
     
 except:
     print("Error instantiating connection to Pilatus detector. Is the EPICS IOC on?")
+
+

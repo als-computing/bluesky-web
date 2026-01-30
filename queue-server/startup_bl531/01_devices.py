@@ -503,37 +503,63 @@ class Shutter(Device):
 # ============================================================================
 
 # Detectors
-diode = ophyd.EpicsSignal('bl201-beamstop:current', name='diode')
+try:
+    diode = ophyd.EpicsSignal('bl201-beamstop:current', name='diode')
+except:
+    print("error instantiating connection to diode current. Is the EPICS IOC on?")
 
 # Hexapod motors (direct access - for advanced use)
-hexapod_motor_Rz = HexapodAxisRz(name='hexapod_motor_Rz')
-hexapod_motor_Ry = HexapodAxisRy(name='hexapod_motor_Ry')
-hexapod_motor_Rx = HexapodAxisRx(name='hexapod_motor_Rx')
-hexapod_motor_Tz = HexapodAxisTz(name='hexapod_motor_Tz')
-hexapod_motor_Ty = HexapodAxisTy(name='hexapod_motor_Ty')
-hexapod_motor_Tx = HexapodAxisTx(name='hexapod_motor_Tx')
+try:
+    hexapod_motor_Rz = HexapodAxisRz(name='hexapod_motor_Rz')
+    hexapod_motor_Ry = HexapodAxisRy(name='hexapod_motor_Ry')
+    hexapod_motor_Rx = HexapodAxisRx(name='hexapod_motor_Rx')
+    hexapod_motor_Tz = HexapodAxisTz(name='hexapod_motor_Tz')
+    hexapod_motor_Ty = HexapodAxisTy(name='hexapod_motor_Ty')
+    hexapod_motor_Tx = HexapodAxisTx(name='hexapod_motor_Tx')
+except:
+    print("error instantiating connection to hexapod motors. Is the EPICS IOC on?")
 
 # Grazing incidence angle pseudo positioner (preferred for GISAXS)
-gi_angle = GrazingIncidenceAngle('', name='gi_angle', ref_angle=0.0)
+try:
+    gi_angle = GrazingIncidenceAngle('', name='gi_angle', ref_angle=0.0)
+except:
+    print("error instantiating connection to grazing incidence angle. Is the EPICS IOC on?")
 
 # Diode positioning motors
-diode_x_mm = EpicsMotor('bl531_xps2:beamstop_x_mm', name='diode_x_mm')
-diode_y_mm = EpicsMotor('bl531_xps2:beamstop_y_mm', name='diode_y_mm')
+try:
+    diode_x_mm = EpicsMotor('bl531_xps2:beamstop_x_mm', name='diode_x_mm')
+    diode_y_mm = EpicsMotor('bl531_xps2:beamstop_y_mm', name='diode_y_mm')
+except:
+    print("error instantiating connection to diode motors. Is the EPICS IOC on?")
 
 # Monochromator - angle motor (direct access - for advanced use)
-mono_angle_deg = EpicsMotor('bl531_xps1:mono_angle_deg', name="mono_angle_deg")
+try:
+    mono_angle_deg = EpicsMotor('bl531_xps1:mono_angle_deg', name="mono_angle_deg")
+except:
+    print("error instantiating connection to mono angle motor. Is the EPICS IOC on?")
 
 # Monochromator - energy pseudo positioner (preferred for most use)
-mono_energy = MonoEnergy('', name='mono_energy')  # Empty prefix since motor has full PV
+try:
+    mono_energy = MonoEnergy('', name='mono_energy')  # Empty prefix since motor has full PV
+except:
+    print("error instantiating connection to mono energy. Is the EPICS IOC on?")
 
-shutter_status = Shutter('bl531:LJT4:1:', name='shutter')
+try:
+    shutter_status = Shutter('bl531:LJT4:1:', name='shutter')
+except:
+    print("error instantiating connection to shutter. Is the EPICS IOC on?")
 
 # sampleJack
-sampleJack = EpicsMotor('bl531_xps1:es_height_mm', name='sampleJack')
+try:
+    sampleJack = EpicsMotor('bl531_xps1:es_height_mm', name='sampleJack')
+except:
+    print("error instantiating connection to sample jack motor. Is the EPICS IOC on?")
 
 
 # ============================================================================
 # Supplemental Data ('baseline' stream) captured on every plan
 # ============================================================================
-if sd:
+try:
     sd.baseline = [diode, mono_energy] #for now just adding these two. add more as needed.
+except NameError:
+    pass  # sd not defined yet

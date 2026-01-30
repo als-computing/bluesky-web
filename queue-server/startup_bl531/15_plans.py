@@ -141,7 +141,7 @@ def grid_scan(detectors, motor1, motor2, motor1_start:float=0.0, motor2_start:fl
             "description": "Required. The start position for the motor, uses the default units of the motor",
             "default": 0.0,
             "min": -10000,
-            "max": 10000,
+            "max": 12000,
             "step": 0.1,
          
         },
@@ -149,7 +149,7 @@ def grid_scan(detectors, motor1, motor2, motor1_start:float=0.0, motor2_start:fl
             "description": "Required. The stop position for the motor, uses the default units of the motor",
             "default": 0.0,
             "min": -10000,
-            "max": 10000,
+            "max": 12000,
             "step": 0.1,
         
         },
@@ -164,6 +164,98 @@ def grid_scan(detectors, motor1, motor2, motor1_start:float=0.0, motor2_start:fl
     }
 })
 def scan(detectors, motor, start:float=0.0, stop:float=0.0, num:int=10, *, md:dict=None):
+
+    yield from _scan(detectors, motor, start, stop, num,md=md) 
+
+# 1D energy scan
+@parameter_annotation_decorator({
+    "description": "Scan over one multi-motor trajectory.",
+    "parameters": {
+        "detectors": {
+            "description": "Required. List of detectors",
+            "annotation": "typing.List[str]",
+            "convert_device_names": True,
+          
+        },
+        "motor": {
+            "description": "Required. Inidividual motor that is moved between the start and stop positions.",
+            "annotation": "typing.Any",
+            "convert_device_names": True,
+      
+        },
+        "start": {
+            "description": "Required. The start position for the motor, uses the default units of the motor",
+            "default": 0.0,
+            "min": -10000,
+            "max": 12000,
+            "step": 0.1,
+         
+        },
+        "stop": {
+            "description": "Required. The stop position for the motor, uses the default units of the motor",
+            "default": 0.0,
+            "min": -10000,
+            "max": 12000,
+            "step": 0.1,
+        
+        },
+        "num": {
+            "description": "Required. The number of points that motor will stop at between the start and stop.",
+            "default": 10,
+            "min": 0,
+            "max": 401,
+            "step": 1,
+          
+        },
+    }
+})
+def energy_scan(detectors, motor, start:float=0.0, stop:float=0.0, num:int=10, *, md:dict=None):
+
+    yield from _scan(detectors, motor, start, stop, num,md=md) 
+
+# 1D angle scan
+@parameter_annotation_decorator({
+    "description": "Scan over one multi-motor trajectory.",
+    "parameters": {
+        "detectors": {
+            "description": "Required. List of detectors",
+            "annotation": "typing.List[str]",
+            "convert_device_names": True,
+          
+        },
+        "motor": {
+            "description": "Required. Inidividual motor that is moved between the start and stop positions.",
+            "annotation": "typing.Any",
+            "convert_device_names": True,
+      
+        },
+        "start": {
+            "description": "Required. The start position for the motor, uses the default units of the motor",
+            "default": 0.0,
+            "min": -10000,
+            "max": 12000,
+            "step": 0.1,
+         
+        },
+        "stop": {
+            "description": "Required. The stop position for the motor, uses the default units of the motor",
+            "default": 0.0,
+            "min": -10000,
+            "max": 12000,
+            "step": 0.1,
+        
+        },
+        "num": {
+            "description": "Required. The number of points that motor will stop at between the start and stop.",
+            "default": 10,
+            "min": 0,
+            "max": 401,
+            "step": 1,
+          
+        },
+    }
+})
+def angle_scan(detectors, motor, start:float=0.0, stop:float=0.0, num:int=10, *, md:dict=None):
 
     yield from _scan(detectors, motor, start, stop, num,md=md) 
 
