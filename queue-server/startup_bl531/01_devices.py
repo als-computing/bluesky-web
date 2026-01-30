@@ -144,7 +144,9 @@ A_SI111_M = SI_M / np.sqrt(3)  # Si(1,1,1) d-spacing (m)
 # 19.2567degree at copper edge 8980.3eV
 # H_M2KGPS * C_MPS * E_EV/(energies_kev*1000)/(2*A_SI111_M)
 # Calibration
-DEFAULT_MONO_OFFSET_DEG = 19.2525 - np.arcsin(H_M2KGPS * C_MPS * E_EV/(8978.8)/(2*A_SI111_M)) * 180/np.pi  # Default calibration offset
+# 19.2525
+# 19.223 Dec 4, 2025
+DEFAULT_MONO_OFFSET_DEG = 19.16745 - np.arcsin(H_M2KGPS * C_MPS * E_EV/(8978.8)/(2*A_SI111_M)) * 180/np.pi  # Default calibration offset
 
 
 # ============================================================================
@@ -499,6 +501,67 @@ class Shutter(Device):
 
 
 # ============================================================================
+# Sample-Detector Distance Pseudo Positioner
+# ============================================================================
+
+class SampleDetectorDistance(Device):
+    """
+    Pseudo positioner for sample-detector distance.
+    
+    This is a simple settable/readable signal that stores the distance
+    between the sample and detector. Useful for metadata and calibration.
+    
+    Usage:
+        >>> sdd.distance.put(150.0)  # Set distance to 150 mm
+        >>> sdd.distance.get()       # Read current distance
+        150.0
+        >>> sdd.set(200.0)           # Alternative: set via Device interface
+    """
+    
+    # Main signal for distance
+    distance = Cpt(Signal, value=1500.0, kind='hinted')
+    
+    def __init__(self, *args, initial_distance=1500.0, **kwargs):
+        """
+        Initialize sample-detector distance.
+        
+        Args:
+            initial_distance: Initial distance value in mm (default: 1500.0)
+        """
+        super().__init__(*args, **kwargs)
+        self.distance.put(initial_distance)
+    
+    def set(self, value):
+        """
+        Set the sample-detector distance.
+        
+        Args:
+            value: Distance in mm
+            
+        Returns:
+            Status object for bluesky compatibility
+        """
+        self.distance.put(value)
+        print(f"{self.name}: Sample-detector distance set to {value:.2f} mm")
+        
+        from ophyd.status import Status
+        st = Status()
+        st.set_finished()
+        return st
+    
+    def get(self):
+        """Get the current sample-detector distance."""
+        return self.distance.get()
+    
+    def read(self):
+        """Read the distance (for bluesky)."""
+        return self.distance.read()
+    
+    def describe(self):
+        """Describe the distance signal (for bluesky)."""
+        return self.distance.describe()
+
+# ============================================================================
 # Device Instantiation
 # ============================================================================
 
@@ -530,10 +593,11 @@ shutter_status = Shutter('bl531:LJT4:1:', name='shutter')
 
 # sampleJack
 sampleJack = EpicsMotor('bl531_xps1:es_height_mm', name='sampleJack')
+sdd = SampleDetectorDistance(name='SampleDetectorDistance', initial_distance=1500.0)
 
 
 # ============================================================================
 # Supplemental Data ('baseline' stream) captured on every plan
 # ============================================================================
 if sd:
-    sd.baseline = [diode, mono_energy] #for now just adding these two. add more as needed.
+    sd.baseline = [diode, mono_energy, sdd, sampleJack, gi_angle, hexapod_motor_Tx, hexapod_motor_Ty, hexapod_motor_Tz, hexapod_motor_Rx, hexapod_motor_Ry, hexapod_motor_Rz] #for now just adding these two. add more as needed.

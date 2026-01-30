@@ -215,6 +215,99 @@ def rel_scan(detectors, motor, start:float=0.0, stop:float=0.0, num:int=10, *, m
 
     yield from _rel_scan(detectors, motor, start, stop, num,md=md) 
 
+# MonoEnergy scan - optimized for angle resolution
+@parameter_annotation_decorator({
+    "description": "Energy scan for monochromator (optimized to avoid duplicate angle positions)",
+    "parameters": {
+        "detectors": {
+            "description": "Required. List of detectors",
+            "annotation": "typing.List[str]",
+            "convert_device_names": True,
+        },
+        "mono": {
+            "description": "Required. MonoEnergy pseudo positioner",
+            "annotation": "typing.Any",
+            "convert_device_names": True,
+        },
+        "start_eV": {
+            "description": "Required. Start energy in eV",
+            "default": 7000.0,
+            "min": 2400,
+            "max": 12000,
+            "step": 0.1,
+        },
+        "stop_eV": {
+            "description": "Required. Stop energy in eV",
+            "default": 7050.0,
+            "min": 2400,
+            "max": 12000,
+            "step": 0.1,
+        },
+        "num": {
+            "description": "Required. Requested number of points (will be adjusted to match 0.001° resolution)",
+            "default": 120,
+            "min": 2,
+            "max": 10000,
+            "step": 1,
+        },
+    }
+})
+def energy_scan(detectors, mono, start_eV: float = 7000.0, stop_eV: float = 7050.0, num: int = 120, *, md: dict = None):
+    """
+    Scan monochromator energy with automatic optimization for angle resolution.
+    
+    Converts energy range to angle range and adjusts the number of points
+    to ensure scan steps are multiples of 0.001° (the mono resolution).
+    This avoids wasting time on duplicate positions.
+    
+    Args:
+        detectors: List of detectors
+        mono: MonoEnergy instance
+        start_eV: Start energy in eV
+        stop_eV: Stop energy in eV
+        num: Requested number of points
+        md: Optional metadata dictionary
+    
+    Example:
+        RE(energy_scan([diode], mono, 7000, 7050, 120))
+    """
+    angle_resolution = 0.001  # degrees
+    
+    # Convert energy to angle
+    start_angle = mono.forward(mono.PseudoPosition(energy_eV=start_eV)).mono_angle
+    stop_angle = mono.forward(mono.PseudoPosition(energy_eV=stop_eV)).mono_angle
+    
+    # Calculate actual angle range
+    angle_range = abs(stop_angle - start_angle)
+    
+    # Calculate requested step size
+    requested_step = angle_range / (num - 1) if num > 1 else angle_range
+    
+    # Round step size to nearest multiple of resolution (at least 1x)
+    step_multiple = max(1, round(requested_step / angle_resolution))
+    actual_step = step_multiple * angle_resolution
+    
+    # Calculate actual number of points
+    actual_num = int(angle_range / actual_step) + 1
+    
+    # Report scan parameters
+    print(f"\n{'='*60}")
+    print(f"MonoEnergy Scan")
+    print(f"{'='*60}")
+    print(f"Energy range:    {start_eV:.1f} → {stop_eV:.1f} eV")
+    print(f"Angle range:     {start_angle:.4f} → {stop_angle:.4f}°")
+    print(f"Requested:       {num} points (step = {requested_step:.6f}°)")
+    print(f"Optimized:       {actual_num} points (step = {actual_step:.4f}° = {step_multiple}x{angle_resolution}°)")
+    
+    if actual_num != num:
+        print(f"Adjustment:      Avoiding {num - actual_num} duplicate positions")
+    else:
+        print(f"Status:          Already optimal!")
+    
+    print(f"{'='*60}\n")
+    
+    # Execute the scan on the real motor (angle)
+    yield from _scan(detectors, mono.mono_angle, start_angle, stop_angle, actual_num, md=md)
 
 
 
