@@ -622,5 +622,8 @@ except:
 # ============================================================================
 # Supplemental Data ('baseline' stream) captured on every plan
 # ============================================================================
-if sd:
-    sd.baseline = [diode, mono_energy, sdd, sampleJack, gi_angle, hexapod_motor_Tx, hexapod_motor_Ty, hexapod_motor_Tz, hexapod_motor_Rx, hexapod_motor_Ry, hexapod_motor_Rz] #for now just adding these two. add more as needed.
+try:
+    if sd:
+        sd.baseline = [diode, mono_energy, sampleJack, gi_angle, hexapod_motor_Tx, hexapod_motor_Ty, hexapod_motor_Tz, hexapod_motor_Rx, hexapod_motor_Ry, hexapod_motor_Rz] #for now just adding these two. add more as needed.
+except:
+    print("sd not defined yet, skipping baseline setup for run engine")
