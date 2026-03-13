@@ -569,20 +569,22 @@ class SampleDetectorDistance(Device):
 class MercuryDetector:
     """Simple Bluesky-compatible Mercury detector for XANES with channel threshold."""
     
-    def __init__(self, prefix='dxpMercury:', name='mercury', threshold_channel=250):
+    def __init__(self, prefix='dxpMercury:', name='mercury', threshold_channel=500, upper_channel=800):
         self.prefix = prefix
         self.mca_prefix = prefix + 'mca1'
         self.name = name
         self.parent = None
         self._last_spectrum = None
         self.threshold_channel = threshold_channel
+        self.upper_channel = upper_channel
         
         # Set to Live Time mode once
         caput(self.prefix + 'PresetMode', 1, wait=True)
     
-    def set_threshold(self, channel):
+    def set_threshold(self, channel, upper_channel=None):
         """Set the channel threshold for integration."""
         self.threshold_channel = channel
+        self.upper_channel = min(channel + 300, 2048)  # Example: set upper channel 300 above threshold, max 2048
     
     def set_acquisition_time(self, time_seconds):
         """Set the acquisition time."""
@@ -678,8 +680,7 @@ except:
     print("error instantiating connection to diode current. Is the EPICS IOC on?")
 
 # Fluorescent detector (Mercury with channel threshold)
-mercury = MercuryDetector('dxpMercury:', name='mercury', threshold_channel=250)
-mercury.set_acquisition_time(1.0)  # Set default acquisition time to 1 second
+mercury = MercuryDetector('dxpMercury:', name='mercury', threshold_channel=500, upper_channel=800)
 
 # Hexapod motors (direct access - for advanced use)
 try:
