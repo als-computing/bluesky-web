@@ -209,7 +209,7 @@ def scan(detectors, motor, start:float=0.0, stop:float=0.0, num:int=10, *, md:di
         },
     }
 })
-def energy_scan(detectors, motor, start:float=0.0, stop:float=0.0, num:int=10, *, md:dict=None):
+def energy_scan_ui(detectors, motor, start:float=0.0, stop:float=0.0, num:int=10, *, md:dict=None):
 
     yield from _scan(detectors, motor, start, stop, num,md=md) 
 

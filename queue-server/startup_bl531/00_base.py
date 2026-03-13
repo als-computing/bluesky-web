@@ -20,6 +20,7 @@ startup_dir=path/queue-server-configuration/startup
     
 # The queue server must include the "keep_re" parameter which prevents the RE in this startup script from being overwritten
 
+import re
 from bluesky import RunEngine
 
 RE = RunEngine({})
@@ -41,9 +42,40 @@ from tiled.server import SimpleTiledServer
 from tiled.client import from_uri
 #load the api key from env var
 import os
+
 api_key = os.getenv("TILED_SINGLE_USER_API_KEY")
 if not api_key:
     raise ValueError("TILED_SINGLE_USER_API_KEY environment variable is not set.")
+
+central_tiled_api_key = os.getenv("CENTRAL_API_KEY")
+central_tiled_client = from_uri("https://tiled.computing.als.lbl.gov/api/v1/metadata/beamlines/bl531/raw", api_key=central_tiled_api_key)
+LOCAL_PATH_PREFIX = "mnt/data531"
+#CENTRAL_PATH_PREFIX = "/global/beegfs/beamline_staging/bl531data/User_Data"
+CENTRAL_PATH_PREFIX = "/global/beegfs/beamlines/bl531/raw"
+
+def patch_ride_filenames(doc: dict):
+    """
+    a TiledWriter will be sending documents to the central Tiled server.
+    For resource documents, we want to patch resource_path;
+    Add CENTRAL_PATH_PREFIX in place of LOCAL_PATH_PREFIX as the root key
+    Strip LOCAL_PATH_PREFIX from the beginning of resource_path, if it exists
+    :param doc_name: Description
+    :type doc_name: str
+    :param doc: Description
+    :type doc: dict
+    """    
+    resource_path = doc.get("resource_path", "")
+    if resource_path.startswith(LOCAL_PATH_PREFIX):
+        # Strip LOCAL_PATH_PREFIX and prepend CENTRAL_PATH_PREFIX
+        relative_path = resource_path[len(LOCAL_PATH_PREFIX):].lstrip("/")
+        new_resource_path = os.path.join(CENTRAL_PATH_PREFIX, relative_path)
+        doc["resource_path"] = new_resource_path
+        #print(f"Patched resource_path: {resource_path} -> {new_resource_path}")
+    return doc
+
+central_tiled_writer = TiledWriter(central_tiled_client, batch_size=1, patches={"resource": patch_ride_filenames})
+# uncomment this to connect to central tiled server
+RE.subscribe(central_tiled_writer)
 
 # Initialize the Tiled server and client
 tiled_client = from_uri("http://192.168.10.155:8000", api_key=api_key)

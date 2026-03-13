@@ -256,8 +256,8 @@ def automatic_gisaxs_alignment(
     """
     attempts = 0
     aligned = False
-    # move beamstop y = 18.2mm into beam position, hard code for current usage, probably will have history in the future
-    yield from bps.mv(diode_y_mm, 3.35)
+    # move beamstop y = 6m into beam position, hard code for current usage, probably will have history in the future
+    yield from bps.mv(diode_y_mm, 6)
     while attempts < max_attempts:
         # Height alignment
         yield from gisaxs_height_scan(rang=height_range, point=height_points, md=md)

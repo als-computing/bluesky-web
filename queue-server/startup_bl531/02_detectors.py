@@ -61,7 +61,7 @@ except:
 
 
 ################# Pilatus Camera Device ################
-TEST_IMAGE_DIR = "20251113_test/%Y/%m/%d"
+TEST_IMAGE_DIR = "scans/%Y/%m/%d"
 
 class PilatusTIFFPlugin(FileStoreTIFFIterativeWrite, TIFFPlugin):
     def __init__(self, *args, root_str="/nsls2/data/smi/proposals", md=None, **kwargs):
@@ -94,15 +94,30 @@ class PilatusTIFFPlugin(FileStoreTIFFIterativeWrite, TIFFPlugin):
 
         return ret
 
-class MyPilatusDetector(SingleTrigger, PilatusDetector):
+PILATUS_300K_IMAGE_DIR = "scans/%Y/%m/%d/pilatus300k"
+PILATUS_1M_IMAGE_DIR = "scans/%Y/%m/%d/pilatus1M"
+
+
+class My300kPilatusDetector(SingleTrigger, PilatusDetector):
     """Pilatus detector"""
 
     image = ADComponent(ImagePlugin, "image1:")
     tiff = ADComponent(
         PilatusTIFFPlugin,
         "TIFF1:",
-        write_path_template=os.path.join(PILATUS_FILES_ROOT, TEST_IMAGE_DIR),
-        read_path_template=os.path.join(BLUESKY_FILES_ROOT, TEST_IMAGE_DIR),
+        write_path_template=os.path.join(PILATUS_FILES_ROOT, PILATUS_300K_IMAGE_DIR),
+        read_path_template=os.path.join(BLUESKY_FILES_ROOT, PILATUS_300K_IMAGE_DIR),
+    )
+
+class My1MPilatusDetector(SingleTrigger, PilatusDetector):
+    """Pilatus detector"""
+
+    image = ADComponent(ImagePlugin, "image1:")
+    tiff = ADComponent(
+        PilatusTIFFPlugin,
+        "TIFF1:",
+        write_path_template=os.path.join(PILATUS_FILES_ROOT, PILATUS_1M_IMAGE_DIR),
+        read_path_template=os.path.join(BLUESKY_FILES_ROOT, PILATUS_1M_IMAGE_DIR),
     )
 
 # didn't work, failed at bluesky plan
@@ -111,7 +126,7 @@ class MyPilatusDetector(SingleTrigger, PilatusDetector):
     #     od['dtype_str'] = '<i4'
     #     return od
 try:
-    det = MyPilatusDetector("13PIL1:", name="det")
+    det = My1MPilatusDetector("13PIL1:", name="det")
     det.cam.stage_sigs["image_mode"] = "Single"
     det.cam.stage_sigs["num_images"] = 1
     #det.cam.stage_sigs["acquire_time"] = 0.1
@@ -130,12 +145,13 @@ except:
     print("Error instantiating connection to Pilatus detector. Is the EPICS IOC on?")
 
 try:
-    det300k = MyPilatusDetector("pilatus300k:", name="det")
+    det300k = My300kPilatusDetector("pilatus300k:", name="det")
     det300k.cam.stage_sigs["image_mode"] = "Single"
     det300k.cam.stage_sigs["num_images"] = 1
     #det.cam.stage_sigs["acquire_time"] = 0.1
     det300k.cam.stage_sigs["acquire_period"] = 0.105
     det300k.tiff.stage_sigs["file_template"] = "/%s%s_%3.3d.tif"
+
 
 
     #try to make sure that the file writing part is in read attributes and picked up by tiled writer

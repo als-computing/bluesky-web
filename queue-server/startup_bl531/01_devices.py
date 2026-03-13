@@ -679,6 +679,7 @@ except:
 
 # Fluorescent detector (Mercury with channel threshold)
 mercury = MercuryDetector('dxpMercury:', name='mercury', threshold_channel=250)
+mercury.set_acquisition_time(1.0)  # Set default acquisition time to 1 second
 
 # Hexapod motors (direct access - for advanced use)
 try:
