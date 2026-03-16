@@ -126,18 +126,18 @@ class My1MPilatusDetector(SingleTrigger, PilatusDetector):
     #     od['dtype_str'] = '<i4'
     #     return od
 try:
-    det = My1MPilatusDetector("13PIL1:", name="det1M")
-    det.cam.stage_sigs["image_mode"] = "Single"
-    det.cam.stage_sigs["num_images"] = 1
-    #det.cam.stage_sigs["acquire_time"] = 0.1
-    #det.cam.stage_sigs["acquire_time"] = 0.1
-    det.cam.stage_sigs["acquire_period"] = 0.105
-    det.tiff.stage_sigs["file_template"] = "/%s%s_%3.3d.tif"
+    det1M = My1MPilatusDetector("13PIL1:", name="det1M")
+    det1M.cam.stage_sigs["image_mode"] = "Single"
+    det1M.cam.stage_sigs["num_images"] = 1
+    #det1M.cam.stage_sigs["acquire_time"] = 0.1
+    #det1M.cam.stage_sigs["acquire_time"] = 0.1
+    det1M.cam.stage_sigs["acquire_period"] = 0.105
+    det1M.tiff.stage_sigs["file_template"] = "/%s%s_%3.3d.tif"
 
 
     #try to make sure that the file writing part is in read attributes and picked up by tiled writer
-    det.read_attrs = ['tiff']
-    det.tiff.read_attrs = []
+    det1M.read_attrs = ['tiff']
+    det1M.tiff.read_attrs = []
 
     #manually add attribute for the dtype so it can be recognized by tiled
     
@@ -163,22 +163,5 @@ try:
 except:
     print("Error instantiating connection to Pilatus detector. Is the EPICS IOC on?")
 
-try:
-    det300k = MyPilatusDetector("pilatus300k:", name="det")
-    det300k.cam.stage_sigs["image_mode"] = "Single"
-    det300k.cam.stage_sigs["num_images"] = 1
-    #det.cam.stage_sigs["acquire_time"] = 0.1
-    det300k.cam.stage_sigs["acquire_period"] = 0.105
-    det300k.tiff.stage_sigs["file_template"] = "/%s%s_%3.3d.tif"
-
-
-    #try to make sure that the file writing part is in read attributes and picked up by tiled writer
-    det300k.read_attrs = ['tiff']
-    det300k.tiff.read_attrs = []
-
-    #manually add attribute for the dtype so it can be recognized by tiled
-    
-except:
-    print("Error instantiating connection to Pilatus detector. Is the EPICS IOC on?")
 
 
