@@ -126,7 +126,7 @@ class My1MPilatusDetector(SingleTrigger, PilatusDetector):
     #     od['dtype_str'] = '<i4'
     #     return od
 try:
-    det = My1MPilatusDetector("13PIL1:", name="det")
+    det = My1MPilatusDetector("13PIL1:", name="det1M")
     det.cam.stage_sigs["image_mode"] = "Single"
     det.cam.stage_sigs["num_images"] = 1
     #det.cam.stage_sigs["acquire_time"] = 0.1
@@ -145,7 +145,7 @@ except:
     print("Error instantiating connection to Pilatus detector. Is the EPICS IOC on?")
 
 try:
-    det300k = My300kPilatusDetector("pilatus300k:", name="det")
+    det300k = My300kPilatusDetector("pilatus300k:", name="det300k")
     det300k.cam.stage_sigs["image_mode"] = "Single"
     det300k.cam.stage_sigs["num_images"] = 1
     #det.cam.stage_sigs["acquire_time"] = 0.1
