@@ -6,7 +6,7 @@ existing_devices:
     is_movable: false
     is_readable: true
     module: __main__
-  det:
+  det1M:
     classname: My1MPilatusDetector
     is_flyable: false
     is_movable: false

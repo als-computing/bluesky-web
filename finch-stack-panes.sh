@@ -62,10 +62,10 @@ main() {
   build_window
 
   # Pane 0: FRONTEND (5173)
-  send_cmd 0 "cd /home/bl531user/Repos/finch && npm run dev -- --host=0.0.0.0"
+  send_cmd 0 "cd /home/bl531user/Repos/bl531-finch && npm run dev -- --host=0.0.0.0"
 
   # Pane 1: OPHYD API (8001)
-  send_cmd 1 "source '$CONDA_SH' && conda activate bluesky && cd /home/bl531user/Repos/bluesky-web/ophyd-api && python server/server.py --startup-dir /home/bl531user/Repos/bluesky-web/queue-server/startup_bl531/01_devices.py"
+  send_cmd 1 "source '$CONDA_SH' && conda activate test_ophyd_websocket && cd /home/bl531user/MoreRepos/ophyd-websocket && python src/ophyd_websocket/server.py --startup-dir /home/bl531user/Repos/bluesky-web/queue-server/startup_bl531/01_devices.py"
 
   # Pane 2: FRONTEND API (8002)
   send_cmd 2 "source '$CONDA_SH' && conda activate frontend-api && python /home/bl531user/Repos/bluesky-web/frontend-api/main.py"
@@ -77,7 +77,7 @@ main() {
   send_cmd 4 "source '$CONDA_SH' && conda activate bluesky && start-re-manager --zmq-publish-console ON --startup-dir /home/bl531user/Repos/bluesky-web/queue-server/startup_bl531 --keep-re"
 
   # Pane 5: TILED (8000)
-  send_cmd 5 "source '$CONDA_SH' && conda activate tiled2 && tiled serve config /home/bl531user/Repos/bluesky-web/tiled/config_bl531.yml"
+  send_cmd 5 "source '$CONDA_SH' && conda activate tiled-recovery && tiled serve config /home/bl531user/Repos/bluesky-web/tiled/config_bl531.yml"
 
   set_titles_and_borders
 
