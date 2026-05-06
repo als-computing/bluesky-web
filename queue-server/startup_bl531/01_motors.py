@@ -566,108 +566,7 @@ class SampleDetectorDistance(Device):
         """Describe the distance signal (for bluesky)."""
         return self.distance.describe()
 
-class MercuryDetector:
-    """Simple Bluesky-compatible Mercury detector for XANES with channel threshold."""
-    
-    def __init__(self, prefix='dxpMercury:', name='mercury', threshold_channel=500, upper_channel=800):
-        self.prefix = prefix
-        self.mca_prefix = prefix + 'mca1'
-        self.name = name
-        self.parent = None
-        self._last_spectrum = None
-        self.threshold_channel = threshold_channel
-        self.upper_channel = upper_channel
-        
-        # Set to Live Time mode once
-        caput(self.prefix + 'PresetMode', 1, wait=True)
-    
-    def set_threshold(self, channel, upper_channel=None):
-        """Set the channel threshold for integration."""
-        self.threshold_channel = channel
-        self.upper_channel = min(channel + 300, 2048)  # Example: set upper channel 300 above threshold, max 2048
-    
-    def set_acquisition_time(self, time_seconds):
-        """Set the acquisition time."""
-        caput(self.mca_prefix + '.PRTM', time_seconds, wait=True)
-    
-    def trigger(self):
-        """Start acquisition (Bluesky interface)."""
-        status = DeviceStatus(self)
-        
-        caput(self.prefix + 'EraseAll', 1, wait=True)
-        caput(self.prefix + 'StartAll', 1, wait=True)
-        
-        def check_done():
-            while caget(self.prefix + 'Acquiring') == 1:
-                time.sleep(0.1)
-            status.set_finished()
-    
-        threading.Thread(target=check_done, daemon=True).start()
-        return status
-    
-    def read(self):
-        """Read data - integrates from threshold_channel to end."""
-        spectrum = caget(self.mca_prefix + '.VAL')
-        num_channels = int(caget(self.mca_prefix + '.NUSE'))
-        self._last_spectrum = spectrum[:num_channels]
-        
-        # Integrate from threshold_channel to the end
-        integrated_counts = float(np.sum(self._last_spectrum[self.threshold_channel:]))
-        total_counts = float(np.sum(self._last_spectrum))
-        
-        timestamp = time.time()
-        
-        return {
-            f'{self.name}_counts': {
-                'value': integrated_counts,
-                'timestamp': timestamp
-            },
-            f'{self.name}_total_counts': {
-                'value': total_counts,
-                'timestamp': timestamp
-            }
-        }
-    
-    def describe(self):
-        """Describe data format."""
-        return {
-            f'{self.name}_counts': {
-                'source': f'PV:{self.mca_prefix}',
-                'dtype': 'number',
-                'shape': [],
-                'units': 'counts'
-            },
-            f'{self.name}_total_counts': {
-                'source': f'PV:{self.mca_prefix}',
-                'dtype': 'number',
-                'shape': [],
-                'units': 'counts'
-            }
-        }
-    
-    def read_configuration(self):
-        """Read configuration."""
-        return {
-            f'{self.name}_threshold_channel': {
-                'value': self.threshold_channel,
-                'timestamp': time.time()
-            }
-        }
-    
-    def describe_configuration(self):
-        """Describe configuration."""
-        return {
-            f'{self.name}_threshold_channel': {
-                'source': 'internal',
-                'dtype': 'number',
-                'shape': [],
-                'units': 'channel'
-            }
-        }
-    
-    def get_spectrum(self):
-        """Get the last acquired spectrum."""
-        return self._last_spectrum
+
 
 # ============================================================================
 # Device Instantiation
@@ -679,8 +578,6 @@ try:
 except:
     print("error instantiating connection to diode current. Is the EPICS IOC on?")
 
-# Fluorescent detector (Mercury with channel threshold)
-mercury = MercuryDetector('dxpMercury:', name='mercury', threshold_channel=500, upper_channel=800)
 
 # Hexapod motors (direct access - for advanced use)
 try:
