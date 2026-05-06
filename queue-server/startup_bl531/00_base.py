@@ -48,7 +48,7 @@ if not api_key:
     raise ValueError("TILED_SINGLE_USER_API_KEY environment variable is not set.")
 
 central_tiled_api_key = os.getenv("CENTRAL_API_KEY")
-central_tiled_client = from_uri("https://tiled.computing.als.lbl.gov/api/v1/metadata/beamlines/bl531/raw", api_key=central_tiled_api_key)
+#central_tiled_client = from_uri("https://tiled.computing.als.lbl.gov/api/v1/metadata/beamlines/bl531/raw", api_key=central_tiled_api_key)
 LOCAL_PATH_PREFIX = "mnt/data531"
 #CENTRAL_PATH_PREFIX = "/global/beegfs/beamline_staging/bl531data/User_Data"
 CENTRAL_PATH_PREFIX = "/global/beegfs/beamlines/bl531/raw"
@@ -73,9 +73,27 @@ def patch_ride_filenames(doc: dict):
         #print(f"Patched resource_path: {resource_path} -> {new_resource_path}")
     return doc
 
-central_tiled_writer = TiledWriter(central_tiled_client, batch_size=1, patches={"resource": patch_ride_filenames})
+def add_to_start(doc: dict):
+    """
+    a TiledWriter will be sending documents to the central Tiled server.
+    For the start document, we want to add an "access_blob" field that contains metadata about the beamline.
+    :param doc_name: Description
+    :type doc_name: str
+    :param doc: Description
+    :type doc: dict
+    """    
+    doc["access_blob"] = {"tags": ["bl531"]}
+    return doc
+#we want to put in some arbitrary json into the start document, we want to add afield into the start doc
+# { access_blob: { "tags": [bl531]}}
+# if this is in root of doc going into tiled the access control will be limited by beamline scientists at 531
+# we also need a tag for the proposal number that has to get in here. for now we can have a UI input that allows a propsal to be set by a user in finch.
+
+# if user changes the proposal number in UI, we need to send command to qserver to reload our python files, which will recreate the RE, the tiled writer, and the patch function.
+
+#central_tiled_writer = TiledWriter(central_tiled_client, batch_size=1, patches={"resource": patch_ride_filenames, "start": add_to_start})
 # uncomment this to connect to central tiled server
-RE.subscribe(central_tiled_writer)
+#RE.subscribe(central_tiled_writer)
 
 # Initialize the Tiled server and client
 tiled_client = from_uri("http://192.168.10.155:8000", api_key=api_key)
@@ -154,4 +172,4 @@ def ad_tiled_debug_printer(name, doc):
         print(f"=== RUN STOP (exit_status={status}) ===")
 
 # Turn this on when you want to see document stream output related to Area Detectors        
-#RE.subscribe(ad_tiled_debug_printer)
+RE.subscribe(ad_tiled_debug_printer)
