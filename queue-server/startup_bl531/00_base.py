@@ -62,7 +62,7 @@ def add_to_start(doc: dict):
     # we also need a tag for the proposal number that has to get in here. for now we can have a UI input that allows a propsal to be set by a user in finch.
 
     # if user changes the proposal number in UI, we need to send command to qserver to reload our python files, which will recreate the RE, the tiled writer, and the patch function.
-    doc["access_blob"] = {"tags": ["bl531"]}
+    doc["access_blob"] = {"tags": ["5.3.1"]}
     return doc
 
 def ad_tiled_debug_printer(name, doc):
@@ -146,8 +146,11 @@ api_key = os.getenv("CENTRAL_API_KEY")
 if not api_key:
     raise ValueError("CENTRAL_API_KEY environment variable is not set.")
 #central_tiled_client = from_uri("https://tiled.computing.als.lbl.gov/api/v1/metadata/beamlines/bl531/raw", api_key=central_tiled_api_key)
-#central_tiled_writer = TiledWriter(central_tiled_client, batch_size=1, patches={"resource": patch_ride_filenames, "start": add_to_start})
+#central_tiled_writer = TiledWriter(central_tiled_client, batch_size=1, patches={"resource": patch_ride_filenames})
 #RE.subscribe(central_tiled_writer)
+
+# Add metadata to all entries
+#RE.md['tiled_access_tags'] = ["5.3.1"]  # This will be included in the 'start' document for access control in Tiled
 
 
 # Optional: Debug area detector docs

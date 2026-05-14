@@ -148,11 +148,13 @@ SI_M = 5.43e-10             # Si lattice constant (m)
 A_SI111_M = SI_M / np.sqrt(3)  # Si(1,1,1) d-spacing (m)
 # 19.2567degree at copper edge 8980.3eV
 # H_M2KGPS * C_MPS * E_EV/(energies_kev*1000)/(2*A_SI111_M)
+
 # Calibration
 # 19.2525
 # 19.223 Dec 4, 2025
-DEFAULT_MONO_OFFSET_DEG = 19.16745 - np.arcsin(H_M2KGPS * C_MPS * E_EV/(8978.8)/(2*A_SI111_M)) * 180/np.pi  # Default calibration offset
-
+# 19.16745 - May 14, 2026
+# 19.157569
+DEFAULT_MONO_OFFSET_DEG = 19.157569 - np.arcsin(H_M2KGPS * C_MPS * E_EV/(8978.8)/(2*A_SI111_M)) * 180/np.pi  # Default calibration offset
 
 # ============================================================================
 # Hexapod Motor Classes
@@ -626,12 +628,20 @@ try:
 except:
     print("error instantiating connection to sample jack motor. Is the EPICS IOC on?")
 
+# dummy ophyd object to store angle offset (deg)
+mono_angle_offset = Signal(name="mono_angle_offset", value=0.0)
+
+
+# write value
+mono_angle_offset.put(DEFAULT_MONO_OFFSET_DEG)
+
+
 
 # ============================================================================
 # Supplemental Data ('baseline' stream) captured on every plan
 # ============================================================================
 try:
     if sd:
-        sd.baseline = [diode, mono_energy, sampleJack, gi_angle, hexapod_motor_Tx, hexapod_motor_Ty, hexapod_motor_Tz, hexapod_motor_Rx, hexapod_motor_Ry, hexapod_motor_Rz] #for now just adding these two. add more as needed.
+        sd.baseline = [mono_angle_offset, diode, mono_energy, sampleJack, gi_angle, hexapod_motor_Tx, hexapod_motor_Ty, hexapod_motor_Tz, hexapod_motor_Rx, hexapod_motor_Ry, hexapod_motor_Rz] #for now just adding these two. add more as needed.
 except:
     print("sd not defined yet, skipping baseline setup for run engine")
