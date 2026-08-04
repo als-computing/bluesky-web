@@ -1,0 +1,133 @@
+# Fully simulated BL 5.3.1 beamline.
+#
+#   docker compose -f docker-compose.sim.yml up --build
+#
+# The caproto IOC serves the exact PV names queue-server/startup_bl531 uses, so
+# the whole stack runs without the real beamline. Every backend and frontend
+# port is published to the host; the IOC deliberately is not -- Channel Access
+# stays inside the compose network, so this never collides with EPICS services
+# on the host and never reaches the real beamline.
+#
+# See caproto-server/README.md for the PV list and what is not simulated
+# (area detectors).
+
+x-epics-client: &epics-client
+  # Unicast CA search straight at the IOC by service name. AUTO_ADDR_LIST must
+  # be NO: CA name resolution is a broadcast, and broadcasts do not cross a
+  # Docker bridge on macOS.
+  EPICS_CA_ADDR_LIST: caproto
+  EPICS_CA_AUTO_ADDR_LIST: "NO"
+
+services:
+  caproto:
+    build: ./caproto-server
+    networks: [simnet]
+    # No `ports:` -- see the header comment. This is intentional.
+    environment:
+      EPICS_CAS_INTF_ADDR_LIST: 0.0.0.0
+
+  redis:
+    image: redis:7.4-rc2-alpine
+    networks: [simnet]
+    ports:
+      - "6379:6379"
+
+  tiled:
+    image: ghcr.io/bluesky/tiled:latest
+    networks: [simnet]
+    # The image runs as uid 999, but Docker creates named volumes owned by
+    # root, so the catalog sqlite cannot be created. Running as root is the
+    # simplest fix for a dev stack and matches the other containers, which
+    # write to /mnt/data531 as root too.
+    user: "0:0"
+    ports:
+      - "8000:8000"
+    environment:
+      TILED_SINGLE_USER_API_KEY: bl531simdevkey
+    command: ["tiled", "serve", "config", "/deploy/config_sim.yml"]
+    volumes:
+      - ./tiled/config_sim.yml:/deploy/config_sim.yml:ro
+      - data531:/mnt/data531
+      - tiled_db:/tiled_db
+
+  qserver:
+    build: ./queue-server
+    networks: [simnet]
+    depends_on: [redis, caproto, tiled]
+    environment:
+      <<: *epics-client
+      # Dummy keys: 00_base.py raises if either is unset. Hardcoded rather than
+      # interpolated so the sim stack never picks up the host's real key.
+      TILED_SINGLE_USER_API_KEY: bl531simdevkey
+      CENTRAL_API_KEY: bl531simdevkey
+      TILED_URI: http://tiled:8000
+    volumes:
+      - data531:/mnt/data531
+    # ZMQ (60615 control, 60625 info) is only consumed inside the network.
+    command:
+      - start-re-manager
+      - --zmq-publish-console
+      - "ON"
+      - --redis-addr
+      - redis:6379
+      - --startup-dir
+      - /code/startup_bl531_sim
+      - --keep-re
+
+  qserver-api:
+    build: ./queue-server-api
+    networks: [simnet]
+    depends_on: [qserver]
+    ports:
+      - "60610:60610"
+    environment:
+      QSERVER_ZMQ_CONTROL_ADDRESS: tcp://qserver:60615
+      QSERVER_ZMQ_INFO_ADDRESS: tcp://qserver:60625
+      QSERVER_HTTP_SERVER_ALLOW_ORIGINS: "*"
+      QSERVER_HTTP_SERVER_SINGLE_USER_API_KEY: test
+    command: ["uvicorn", "--host", "0.0.0.0", "--port", "60610", "bluesky_httpserver.server:app"]
+
+  ophyd-api:
+    build: ./ophyd-api
+    networks: [simnet]
+    depends_on: [caproto]
+    ports:
+      - "8001:8001"
+    environment:
+      <<: *epics-client
+      ZMQ_HOST: qserver
+      ZMQ_PORT: "60625"
+    volumes:
+      # Same device definitions the queue server runs, so the two agree.
+      - ./queue-server/startup_bl531_sim:/startup:ro
+
+  frontend-api:
+    build: ./frontend-api
+    networks: [simnet]
+    ports:
+      - "8002:8002"
+    environment:
+      <<: *epics-client
+      ZMQ_HOST: qserver
+      ZMQ_PORT: "60625"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    networks: [simnet]
+    depends_on: [qserver-api]
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      # Keep the image's Linux-built modules; do not let the host's shadow them.
+      - /app/node_modules
+
+networks:
+  simnet:
+    driver: bridge
+
+volumes:
+  data531:
+  tiled_db:

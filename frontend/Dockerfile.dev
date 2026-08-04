@@ -1,0 +1,16 @@
+# Vite dev server with hot reload. docker-compose.sim.yml bind-mounts ./frontend
+# over /app so edits on the host are picked up live, with an anonymous volume on
+# /app/node_modules so the host's macOS-built modules do not shadow these.
+FROM node:22-slim
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+
+EXPOSE 5173
+
+# --host binds 0.0.0.0 so the published port reaches the dev server.
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

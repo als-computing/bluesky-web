@@ -66,6 +66,30 @@ Navigate to port 8081 in a web browser to view the application.
 http://localhost:8081/
 
 \
+<mark>Run the fully simulated BL 5.3.1 beamline</mark>
+```
+#Bluesky-Web/
+docker-compose -f docker-compose.sim.yml up -d --build
+```
+This runs every service against [`caproto-server/`](caproto-server/README.md), a
+pure-Python IOC that serves the exact PV names `queue-server/startup_bl531`
+uses, so the whole stack works with no beamline and no EPICS installation. It
+builds natively on Apple Silicon — no `linux/amd64` emulation. The queue server
+runs `startup_bl531_sim`, a copy of the real startup files that points Tiled at
+the in-compose service and drops the area detectors (not simulated).
+
+The frontend is a Vite dev server on 5173 with the source bind-mounted, so
+frontend changes hot-reload against the simulated beamline. Tiled is on 8000,
+ophyd-websocket on 8001, frontend-api on 8002, the queue server API on 60610.
+The IOC is deliberately **not** port-mapped: Channel Access stays inside the
+compose network, so it never collides with EPICS on the host.
+
+Open the run engine environment before queueing plans:
+```
+curl -X POST -H "Authorization: ApiKey test" http://localhost:60610/api/environment/open
+```
+
+\
 <mark>Stop Application</mark>
 ```
 #Bluesky-Web/
