@@ -18,48 +18,39 @@ allow_origins:
   - http://131.243.191.238:5173
   - http://localhost:8050
   - http://127.0.0.1:8050
-# trees:
-#   - path: /
-#     tree: catalog
-#     args:
-#       uri: "sqlite:////home/bl531user/tiled_test/catalog.db"
-#       writable_storage:
-#         - '/home/bl531user/tiled_test/storage'
-#         - 'sqlite:////home/bl531user/tiled_test/tabular.db'
-#         - "/mnt"
-#       readable_storage:
-#         - "/home/bl531user/tiled_test/storage"
-#         - "/mnt"
-#       init_if_not_exists: true
+  - http://131.243.153.165:5173
+  - http://131.243.153.165:5174
+  - http://tiled-test:5173
+  - http://tiled-test:5174
 
-# none of this is working, upgradfed tiled and no longer work
 trees:
   - path: /
     tree: catalog
     args:
-      uri: "sqlite:////mnt/data531/tiled/catalog.db"
+      uri: "sqlite:////home/bl531user/tiled_test/catalog.db"
       writable_storage:
-        - '/mnt/data531/tiled/storage'
+        - 'sqlite:////home/bl531user/tiled_test/tabular.db'
+        - '/home/bl531user/tiled_test/storage'
         - 'sqlite:////mnt/data531/tiled/tabular.db'
-        - "/mnt"
       readable_storage:
-        - "/mnt/data531/tiled/storage"
-        - "/mnt"
+        - "/mnt/data531/tiled/tabular.db"
+        - "/mnt/data531/scans"
+        - "/mnt/data531/20251113_test"
+        - "/home/bl531user/tiled"
       init_if_not_exists: true
+  # - path: /
+  #   tree: catalog
+  #   args:
+  #     uri: "sqlite:////mnt/data531/tiled/catalog.db"
+  #     writable_storage:
+  #       - '/mnt/data531/tiled/storage'
+  #       - 'sqlite:////mnt/data531/tiled/tabular.db'
+  #       - "/mnt"
+  #     readable_storage:
+  #       - "/mnt/data531/tiled/storage"
+  #       - "/mnt"
+  #     init_if_not_exists: true
 
-# trees:
-#   - path: /
-#     tree: catalog
-#     args:
-#       uri: "sqlite:////mnt/data531/tiled/catalog2.db"
-#       writable_storage:
-#         - '/mnt/data531/tiled/storage'
-#         - 'sqlite:////mnt/data531/tiled/tabular2.db'
-#         - "/mnt"
-#       readable_storage:
-#         - "/mnt/data531/tiled/storage"
-#         - "/mnt"
-#       init_if_not_exists: true
 
 streaming_cache:
   uri: redis://localhost:6379
