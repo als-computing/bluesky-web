@@ -2,6 +2,10 @@
 print(f"Loading file {__file__!r}")
 
 from typing import Any, Dict, List, Optional
+import uuid;
+from bluesky.plans import (
+    scan as _scan
+)
 
 
 from bluesky_queueserver.manager.annotation_decorator import parameter_annotation_decorator
@@ -83,3 +87,107 @@ def xas_scan(mono: any = "mono_energy", roi_low: float = 1800, roi_high: float =
     
     # Execute the scan on the real motor (angle)
     yield from energy_scan([amptek_fluo, mono_energy], mono, start_eV, stop_eV, num, md=md)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 1D scan for endstation x, z or filters
+@parameter_annotation_decorator({
+   "description": "Scan over one multi-motor trajectory.",
+   "parameters": {
+       "start_Z": {
+           "description": "Optional. The start position for the Z motor (vertical), uses the default units of the motor",
+           "default": 0.0,
+           "min": -4000,
+           "max": 4000,
+           "step": 0.1,
+       },
+       "stop_Z": {
+           "description": "Optional. The stop position for the Z motor (vertical), uses the default units of the motor",
+           "default": 10,
+           "min": -4000,
+           "max": 4000,
+           "step": 0.1,
+       },
+       "start_Y": {
+           "description": "Optional. The start position for the Y motor (horizontal), uses the default units of the motor",
+           "default": 0.0,
+           "min": -4000,
+           "max": 4000,
+           "step": 0.1,
+       
+       },
+       "stop_Y": {
+           "description": "Optional. The stop position for the Y motor (horizontal), uses the default units of the motor",
+           "default": 10,
+           "min": -4000,
+           "max": 4000,
+           "step": 0.1,
+      
+       },
+       "num_Z": {
+           "description": "Optional. The number of points that motor will stop at between the Z (vertical) start and stop.",
+           "default": 10,
+           "min": 0,
+           "max": 200,
+           "step": 1,
+       },
+       "num_Y": {
+           "description": "Optional. The number of points that motor will stop at between the Y (horizontal) start and stop.",
+           "default": 10,
+           "min": 0,
+           "max": 200,
+           "step": 1,
+       }
+   }
+})
+def xas_alignment(start_Z:float=-1, stop_Z:float=-5, start_Y:float=-10, stop_Y:float=-12, num_Z:int=21, num_Y:int=21, *, md:dict=None):
+   md = md or {}
+   sequence_uid = str(uuid.uuid4())
+
+
+   base_md = md or {}
+   base_md.update({
+       "plan_name": "xas_alignment",
+       "alignment_sequence_uid": sequence_uid,
+       "alignment_sequence_total": 2,
+   })
+   z_uid = yield from _scan(
+       [amptek_fluo],
+       hexapod_motor_Tz,
+       start_Z,
+       stop_Z,
+       num_Z,
+       md={
+           **base_md,
+           "exact_plan_name": "alignment_scan_z",
+           "alignment_sequence_number": 1,
+           "alignment_role": "z_scan",
+       },
+   )
+   yield from _scan(
+       [amptek_fluo],
+       hexapod_motor_Ty,
+       start_Y,
+       stop_Y,
+       num_Y,
+       md={
+           **base_md,
+           "exact_plan_name": "alignment_scan_y",
+           "alignment_sequence_number": 2,
+           "alignment_role": "y_scan",
+           "previous_scans": [z_uid],
+       },
+   )
