@@ -42,8 +42,16 @@ class _MCABase(PVGroup):
     def _acquisition_done(self):
         return self._acquire_until is not None and time.monotonic() >= self._acquire_until
 
-    def _make_spectrum(self, live_time):
-        return beam.mca_spectrum(self._beamline.mono_angle_deg, live_time)
+    async def _publish_spectrum(self, live_time):
+        """Generate a spectrum and publish it on both .VAL and the bare name.
+
+        EPICS resolves a fieldless PV name to .VAL, so a real MCA record answers
+        to `mcaTest:mca1` as well as `mcaTest:mca1.VAL`. caproto serves only what
+        is in the pvdb, so both channels are explicit here.
+        """
+        data = beam.mca_spectrum(self._beamline.mono_angle_deg, live_time)
+        await self.spectrum.write(data)
+        await self.spectrum_bare.write(data)
 
 
 class SimAmptekMCA(_MCABase):
@@ -59,6 +67,9 @@ class SimAmptekMCA(_MCABase):
     spectrum = pvproperty(value=[0] * beam.MCA_CHANNELS, name='.VAL',
                           max_length=beam.MCA_CHANNELS, read_only=True,
                           doc='MCA spectrum')
+    spectrum_bare = pvproperty(value=[0] * beam.MCA_CHANNELS, name='',
+                               max_length=beam.MCA_CHANNELS, read_only=True,
+                               doc='MCA spectrum -- alias for .VAL')
     erase_start = pvproperty(value=0, name='EraseStart',
                              doc='Write 1 to erase and start acquiring')
 
@@ -72,7 +83,7 @@ class SimAmptekMCA(_MCABase):
     async def acqg(self, instance, async_lib):
         if self.acqg.value == 0 or not self._acquisition_done():
             return
-        await self.spectrum.write(self._make_spectrum(self.prtm.value))
+        await self._publish_spectrum(self.prtm.value)
         self._acquire_until = None
         await self.acqg.write(0)
 
@@ -96,6 +107,9 @@ class SimMercuryDXP(_MCABase):
     spectrum = pvproperty(value=[0] * beam.MCA_CHANNELS, name='mca1.VAL',
                           max_length=beam.MCA_CHANNELS, read_only=True,
                           doc='MCA spectrum')
+    spectrum_bare = pvproperty(value=[0] * beam.MCA_CHANNELS, name='mca1',
+                               max_length=beam.MCA_CHANNELS, read_only=True,
+                               doc='MCA spectrum -- alias for mca1.VAL')
     nuse = pvproperty(value=beam.MCA_CHANNELS, name='mca1.NUSE',
                       doc='Number of channels in use')
 
@@ -103,6 +117,7 @@ class SimMercuryDXP(_MCABase):
     async def erase_all(self, instance, value):
         if value:
             await self.spectrum.write([0] * beam.MCA_CHANNELS)
+            await self.spectrum_bare.write([0] * beam.MCA_CHANNELS)
         return 0
 
     @start_all.putter
@@ -115,6 +130,6 @@ class SimMercuryDXP(_MCABase):
     async def acquiring(self, instance, async_lib):
         if self.acquiring.value == 0 or not self._acquisition_done():
             return
-        await self.spectrum.write(self._make_spectrum(self.prtm.value))
+        await self._publish_spectrum(self.prtm.value)
         self._acquire_until = None
         await self.acquiring.write(0)

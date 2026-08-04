@@ -33,6 +33,11 @@ class SimMotorRecord(PVGroup):
     """
 
     # --- position -----------------------------------------------------------
+    # EPICS resolves a fieldless PV name to .VAL, so `caput bl531_xps2:beamstop_x_mm 5`
+    # moves a real motor record. caproto serves only what is in the pvdb, so the
+    # bare record name has to be an explicit channel kept in step with .VAL.
+    bare = pvproperty(value=0.0, name='', precision=4,
+                      doc='Desired position -- alias for .VAL')
     val = pvproperty(value=0.0, name='.VAL', precision=4,
                      doc='Desired position (user units)')
     rbv = pvproperty(value=0.0, name='.RBV', precision=4, read_only=True,
@@ -81,16 +86,21 @@ class SimMotorRecord(PVGroup):
         # Where the motion loop is driving .RBV. Kept separate from .VAL so a
         # .STOP leaves .VAL alone, the way a real motor record does.
         self._target = start
+        # Set while copying a setpoint between the bare name and .VAL, so the
+        # mirrored write does not start a second move.
+        self._mirroring = False
 
     @val.startup
     async def val(self, instance, async_lib):
         """Apply the per-instance configuration once the server is up."""
         self.async_lib = async_lib
         # EpicsMotor.user_setpoint is declared with limits=True, so it reads the
-        # control limits off the .VAL channel.
-        await self.val.write_metadata(
-            upper_ctrl_limit=self._high, lower_ctrl_limit=self._low,
-        )
+        # control limits off the .VAL channel. Publish them on the bare name too,
+        # so a UI that talks to the record by name sees the same limits.
+        for channel in (self.val, self.bare):
+            await channel.write_metadata(
+                upper_ctrl_limit=self._high, lower_ctrl_limit=self._low,
+            )
         await self.val.write(self._start)
         await self.rbv.write(self._start)
         await self.hlm.write(self._high)
@@ -100,8 +110,28 @@ class SimMotorRecord(PVGroup):
 
     @val.putter
     async def val(self, instance, value):
-        """Begin a move to ``value``, clamped to the travel limits."""
+        return await self._setpoint_put(self.bare, value)
+
+    @bare.putter
+    async def bare(self, instance, value):
+        return await self._setpoint_put(self.val, value)
+
+    async def _setpoint_put(self, alias, value):
+        """Begin a move to ``value``, clamped to the travel limits.
+
+        Handles a write to either .VAL or the bare record name, keeping the two
+        in step. An internal ``write()`` runs the other channel's putter, hence
+        the guard -- without it the two would bounce a move back and forth.
+        """
+        if self._mirroring:
+            return value        # already clamped by the originating put
         target = max(self._low, min(self._high, float(value)))
+        self._mirroring = True
+        try:
+            await alias.write(target)
+        finally:
+            self._mirroring = False
+
         self._target = target
         # Always toggle .DMOV, even for a zero-length move. A real motor record
         # does, and ophyd's MoveStatus needs to see not-done before done -- a

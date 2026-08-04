@@ -17,6 +17,10 @@ x-epics-client: &epics-client
   # Docker bridge on macOS.
   EPICS_CA_ADDR_LIST: caproto
   EPICS_CA_AUTO_ADDR_LIST: "NO"
+  # Area detector frames are far past the historical 16 kB default (a 512x512
+  # UInt8 frame is 262 144 bytes). EPICS 7's libca negotiates this itself, but
+  # a too-small limit is the classic silent failure for CA image transport.
+  EPICS_CA_MAX_ARRAY_BYTES: "16777216"
 
 services:
   caproto:
@@ -29,8 +33,8 @@ services:
   redis:
     image: redis:7.4-rc2-alpine
     networks: [simnet]
-    ports:
-      - "6379:6379"
+    # Deliberately not published: this is an unauthenticated database, and only
+    # qserver talks to it, as redis:6379 inside the network.
 
   tiled:
     image: ghcr.io/bluesky/tiled:latest
@@ -111,18 +115,18 @@ services:
       ZMQ_HOST: qserver
       ZMQ_PORT: "60625"
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.dev
-    networks: [simnet]
-    depends_on: [qserver-api]
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      # Keep the image's Linux-built modules; do not let the host's shadow them.
-      - /app/node_modules
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile.dev
+  #   networks: [simnet]
+  #   depends_on: [qserver-api]
+  #   ports:
+  #     - "5173:5173"
+  #   volumes:
+  #     - ./frontend:/app
+  #     # Keep the image's Linux-built modules; do not let the host's shadow them.
+  #     - /app/node_modules
 
 networks:
   simnet:

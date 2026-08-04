@@ -17,13 +17,23 @@ import logging
 
 from caproto.server import run
 
+import area_detector
 import beam
+from area_detector import SIM_DETECTOR_PREFIX, SimAreaDetector
 from detectors import SimAmptekMCA, SimMercuryDXP
 from hexapod import SimHexapod
 from misc import SimDiode, SimShutter
 from motor_record import SimMotorRecord
 
 log = logging.getLogger('bl531_ioc')
+
+# How fast the mono should sweep energy, and where that rate is quoted. The
+# angle-to-energy relation is nonlinear (see beam.deg_per_ev), so a constant
+# .VELO only pins the energy rate at one point: this gives 1000 eV in 5 s near
+# the Cu K edge, and is proportionally slower further down in energy.
+MONO_EV_PER_SECOND = 1000.0 / 5.0
+MONO_REFERENCE_EV = 9000.0
+MONO_VELOCITY_DEG_S = beam.deg_per_ev(MONO_REFERENCE_EV) * MONO_EV_PER_SECOND
 
 # Motor records, keyed by the PV name the startup files use.
 #
@@ -33,7 +43,7 @@ log = logging.getLogger('bl531_ioc')
 MOTORS = {
     'bl531_xps1:mono_angle_deg': dict(
         start=19.157569,  # Cu K edge, matching DEFAULT_MONO_OFFSET_DEG
-        limits=(15.0, 63.0), velocity=8.0, egu='deg',
+        limits=(15.0, 63.0), velocity=MONO_VELOCITY_DEG_S, egu='deg',
     ),
     'bl531_xps1:es_height_mm': dict(
         start=0.0, limits=(-50.0, 50.0), velocity=5.0, egu='mm',
@@ -87,6 +97,7 @@ def build_pvdb():
         SimShutter(prefix='bl531:LJT4:1:'),
         SimAmptekMCA(prefix='mcaTest:mca1', beamline=beamline),
         SimMercuryDXP(prefix='dxpMercury:', beamline=beamline),
+        SimAreaDetector(prefix=SIM_DETECTOR_PREFIX, beamline=beamline),
     ]
 
     pvdb = {}
@@ -124,6 +135,12 @@ def main():
         log.info('  %s', name)
     log.info('MCA calibration: %d channels at %.2f eV/channel',
              beam.MCA_CHANNELS, beam.MCA_EV_PER_CHANNEL)
+    log.info('Mono velocity: %.4f deg/s (%.0f eV/s at %.0f eV)',
+             MONO_VELOCITY_DEG_S, MONO_EV_PER_SECOND, MONO_REFERENCE_EV)
+    log.info('Area detector: prefix %s, %dx%d UInt8, free-running '
+             '(stop with: caput %scam1:Acquire 0)',
+             SIM_DETECTOR_PREFIX, area_detector.DEFAULT_SIZE,
+             area_detector.DEFAULT_SIZE, SIM_DETECTOR_PREFIX)
 
     run(pvdb, interfaces=args.interfaces, log_pv_names=False)
 

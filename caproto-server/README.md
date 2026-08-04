@@ -21,6 +21,7 @@ Silicon.
 | `shutter_status` | `bl531:LJT4:1:AO0` |
 | `amptek_fluo` | `mcaTest:mca1.{PRTM,ACQG,VAL}` + `mcaTest:mca1EraseStart` |
 | `mercury` | `dxpMercury:{PresetMode,EraseAll,StartAll,Acquiring}` + `dxpMercury:mca1.{PRTM,VAL,NUSE}` |
+| area detector (Finch Camera) | `13SIM1:cam1:*` + `13SIM1:image1:*` — see below |
 
 `python bl531_ioc.py --list-pvs` prints the authoritative list.
 
@@ -33,16 +34,36 @@ Every field `ophyd.EpicsMotor` connects to is served:
 .MOVN .DMOV .TDIR .HLM .LLM .HLS .LLS .STOP .HOMF .HOMR
 ```
 
+plus the **bare record name** with no field at all. EPICS resolves a fieldless
+PV to `.VAL`, so `caput bl531_xps2:beamstop_x_mm 5` moves a real motor record;
+caproto serves only what is in the pvdb, so the bare name is an explicit channel
+kept in step with `.VAL` in both directions. Writing either one starts the same
+move, and both publish the travel limits. This is the name a UI will typically
+use to set a position.
+
 Motion is constant-velocity at `.VELO` (no acceleration ramp — `.ACCL` is served
 but not honoured), stepped at 20 Hz. `.RBV` moves toward `.VAL`; `.DMOV` goes
-0 → 1 on every put to `.VAL`, **including a zero-length move**, because ophyd's
+0 → 1 on every put, **including a zero-length move**, because ophyd's
 `MoveStatus` must observe not-done before done or a scan that revisits a
 position hangs. `.STOP` halts in place. `.VAL` publishes control limits, which
 is what `EpicsMotor.user_setpoint` (declared `limits=True`) reads.
 
+An out-of-limits write is **rejected**, not clamped — the put fails with
+`CannotExceedLimits` and the motor does not move, matching a real record.
+
 The mono angle limits are `[15, 63]` degrees, chosen to span the 2400–12000 eV
 range `MonoEnergy` allows for Si(111). Narrower limits make `energy_scan` fail a
 limits check before it ever moves.
+
+Its `.VELO` is derived rather than hardcoded, from `MONO_EV_PER_SECOND` in
+`bl531_ioc.py` — currently **1000 eV in 5 s** near the Cu K edge (0.287 deg/s).
+Change that constant to retune; the IOC logs the resulting velocity at startup.
+
+Because the angle-to-energy relation is nonlinear, a constant `.VELO` only pins
+the *energy* rate at one point. 1000 eV spans 1.4 degrees at 9 keV but 16.7 at
+3 keV, so the same 1000 eV step takes about 42 s down there. That is how a real
+mono behaves. If you would rather have a constant eV/s across the whole range,
+the motor would need to vary `.VELO` with position — say the word.
 
 ### Hexapod
 
@@ -51,6 +72,17 @@ record: six independent setpoint/readback pairs sharing one "GO" button
 (`MOVE_PTP`) and one done flag (`s_hexa:InPosition_RBV`). A put of 1 to
 `MOVE_PTP` drops the done flag to 0 *before* acknowledging the put, ramps all
 six readbacks, then sets it back to 1.
+
+Writing a `MOVE_PTP:<axis>` setpoint alone does **not** move anything — you
+must then press GO by writing 1 to `MOVE_PTP`. That is how the real controller
+works and how `PVPositioner` drives it.
+
+`MOVE_PTP` latches at the written value instead of self-clearing to 0. caproto
+runs the put handler on every write whether or not the value changed, so a
+repeat press still moves; latching additionally keeps clients that verify the
+readback after writing working. `ophyd.EpicsSignal.set()` is one such client —
+it waits for readback == setpoint, so a self-clearing actuate would report
+failure on every move even though the move ran.
 
 ### Fluorescent detectors
 
@@ -64,6 +96,74 @@ the previous spectrum.
 
 Preset times are capped at 0.3 s (`MAX_SIM_ACQUIRE_S` in `detectors.py`) so a
 100-point energy scan does not take two minutes.
+
+### Area detector (`area_detector.py`)
+
+Feeds Finch's Camera component, which renders frames served by ophyd-websocket's
+[`camera-socket`](https://github.com/bluesky/ophyd-websocket/blob/main/src/ophyd_websocket/routers/camera_socket.py)
+router. Shaped like ADSimDetector, at the prefix that router defaults to.
+
+**To rename the detector, change one line** at the top of `area_detector.py`:
+
+```python
+SIM_DETECTOR_PREFIX = '13SIM1:'
+```
+
+Nothing else hardcodes the name. The socket derives the `cam1:` PVs from
+whatever array PV it is given (`image_array_pv.split(":")[0]`), so a client
+pointed at `MYDET:image1:ArrayData` picks up `MYDET:cam1:*` automatically.
+
+| PV | Type | Default |
+|---|---|---|
+| `cam1:MinX` `cam1:MinY` | int | 0 |
+| `cam1:SizeX` `cam1:SizeY` | int | 512 |
+| `cam1:ColorMode` | enum `Mono, RGB1, RGB2, RGB3` | `Mono` |
+| `cam1:DataType` | enum `Int8 … Float64` | `UInt8` |
+| `cam1:BinX` `cam1:BinY` | int | 1 |
+| `cam1:Acquire` | enum `Done, Acquire` | `Acquire` |
+| `cam1:AcquireTime` `cam1:AcquirePeriod` | float | 0.1 / 0.2 s |
+| `cam1:ImageMode` | enum `Single, Multiple, Continuous` | `Continuous` |
+| `cam1:NumImages` `cam1:ArrayCounter` | int | 1 / 0 |
+| `cam1:*_RBV`, `ArraySize{X,Y,}_RBV`, `DetectorState_RBV`, `NumImagesCounter_RBV` | ro | — |
+| `image1:ArrayData` | UInt8 waveform | the image |
+| `image1:{ArrayCounter,NDimensions,ArraySize0,ArraySize1,ArraySize2}_RBV`, `image1:EnableCallbacks` | — | — |
+
+It **free-runs on startup** (Continuous, 5 fps) so a viewer shows frames with no
+setup. Stop and control it with:
+
+```bash
+caput 13SIM1:cam1:Acquire 0            # stop
+caput 13SIM1:cam1:AcquirePeriod 0.05   # 20 fps
+caput 13SIM1:cam1:ImageMode Single     # one frame per Acquire=1
+caput 13SIM1:cam1:AcquireTime 0.5      # longer exposure: brighter, less noise
+```
+
+The image is a SAXS-like pattern from `beam.scattering_frame()`, wired to the
+same beamline model as the diode and the MCAs, so it reacts to motion:
+
+- **Debye–Scherrer rings** whose radius tracks the wavelength — raising the mono
+  energy pulls them inward. Measured against the running IOC: rings at 90/153/216 px
+  at 9 keV move to 66/114/162 px at 12 keV, a 0.75 ratio matching 9/12 keV to
+  within 3%.
+- **A beamstop shadow** that follows `diode_x_mm` / `diode_y_mm`; move it aside and
+  the saturated direct beam appears.
+- Poisson noise scaled by `AcquireTime`.
+
+Three deliberate limitations, all forced by the consumer or by caproto:
+
+- **`MinX`/`MinY` shrink the frame** rather than acting as an ROI origin. The
+  router computes its dimensions as `size - start`, so real AreaDetector semantics
+  (emit `SizeX` columns regardless of `MinX`) would desync the array from the width
+  it expects and its `reshape` would throw. The sim emits exactly
+  `(SizeX-MinX) × (SizeY-MinY)` elements so the two always agree.
+- **`DataType` changes interpretation, not the wire type.** caproto fixes a
+  channel's dtype at class-definition time, so `ArrayData` is always UInt8. The
+  consumer casts, values survive, the image still renders.
+- **`BinX`/`BinY` are inert.** The router reads them but its dimension maths divides
+  by a hardcoded `1`, so applying binning would desync the array length.
+
+`MAX_DIM = 1024` caps the frame size (the channel is preallocated for
+1024×1024 RGB); larger requests are clamped.
 
 ### Beamline model
 
@@ -84,11 +184,17 @@ None of it is quantitatively meaningful.
 
 ## What is **not** simulated
 
-Area detectors. `BL531acA5427:` (Basler), `13PIL1:` and `pilatus300k:` (Pilatus)
-are out of scope — a faithful AreaDetector simulation also has to write real
-TIFFs to a shared volume or ophyd's `FileStore` staging fails. The sim startup
-directory `queue-server/startup_bl531_sim` therefore omits
-`02_area_detectors.py`.
+**The beamline's own area detectors.** `BL531acA5427:` (Basler), `13PIL1:` and
+`pilatus300k:` (Pilatus) are out of scope — a faithful simulation of those also
+has to write real TIFFs to a shared volume or ophyd's `FileStore` staging fails.
+The sim startup directory `queue-server/startup_bl531_sim` therefore omits
+`02_area_detectors.py`. The `13SIM1:` detector above is a *different* thing: it
+feeds the Camera component over Channel Access and writes no files.
+
+**The `13SIM1:` detector as a bluesky device.** Its PV set is deliberately not
+the full CamBase/NDPluginBase surface, so ophyd's `AreaDetector` class cannot
+connect to it and it is not usable as a detector in a plan. It is for the Camera
+component's live view only.
 
 ## Running it
 
@@ -170,6 +276,20 @@ shadowing.
 
 Devices that need to react to the machine state (the diode, the MCAs) receive a
 `Beamline` object rather than reaching into each other's groups.
+
+## Known bugs in ophyd-websocket (not this IOC)
+
+Both make a *successful* operation look like a failure from the UI:
+
+- `PUT /api/v1/devices` with a `timeout` returns
+  `'OphydDeviceInstruction' object has no attribute 'value'`. The device really
+  did move — `core_api.py` builds the success response from `instruction.value`,
+  but the model field is `set_value`. Omit `timeout` and it returns success.
+- `PUT /api/v1/pvs` calls `pv.set(...).wait(timeout=1)`. If that raises — an
+  out-of-limits value, or a move longer than one second — the `EpicsSignal` is
+  left with an in-flight set, and every later write to that PV fails with
+  `Another set() call is still in progress`. Restarting the ophyd-api container
+  clears it.
 
 ## Known gap in the frontend
 

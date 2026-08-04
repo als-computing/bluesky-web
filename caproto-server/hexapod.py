@@ -53,15 +53,23 @@ class SimHexapod(PVGroup):
 
     @actuate.putter
     async def actuate(self, instance, value):
-        """Start moving every axis toward its setpoint."""
+        """Start moving every axis toward its setpoint.
+
+        The written value latches rather than self-clearing to 0. caproto runs
+        this putter on every write regardless of whether the value changed, so
+        motion still triggers on a repeat press -- and latching keeps clients
+        that verify the readback after writing happy. `ophyd.EpicsSignal.set()`
+        is one: it waits for readback == setpoint, so a self-clearing actuate
+        reports failure on every move even though the move ran. PVPositioner
+        uses `.put()` and does not care either way.
+        """
         if not value:
-            return 0
+            return value
         # Drop the done flag unconditionally -- even for a zero-length move, and
         # before this put is acknowledged. PVPositioner has to observe not-done
         # before done, or the move status either fires instantly or never.
         await self.in_position.write(0)
-        # The real controller self-clears the button.
-        return 0
+        return value
 
     @in_position.scan(period=UPDATE_PERIOD, use_scan_field=False)
     async def in_position(self, instance, async_lib):
