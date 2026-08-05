@@ -115,7 +115,7 @@ services:
       ZMQ_HOST: qserver
       ZMQ_PORT: "60625"
 
-  # frontend:
+  # frontend: #Just run this directly for development
   #   build:
   #     context: ./frontend
   #     dockerfile: Dockerfile.dev
@@ -124,9 +124,14 @@ services:
   #   ports:
   #     - "5173:5173"
   #   volumes:
-  #     - ./frontend:/app
-  #     # Keep the image's Linux-built modules; do not let the host's shadow them.
-  #     - /app/node_modules
+  #     # Mount only the source, not the whole directory. node_modules then always
+  #     # comes from the image, so it cannot go stale: the previous anonymous
+  #     # volume was seeded once at container creation and thereafter shadowed
+  #     # every rebuild, which is how the image ended up serving dependencies from
+  #     # whenever that volume was first made. Dependency changes need `up --build`.
+  #     - ./frontend/src:/app/src
+  #     - ./frontend/public:/app/public
+  #     - ./frontend/index.html:/app/index.html
 
 networks:
   simnet:

@@ -19,10 +19,9 @@ All of the services needed to run a web-based beamline controls / data acquisiti
 A docker-compose file is used to run the required services together. For full functionality, the host computer should be running an EPICS IOC or connected to one through the local network. If an existing EPICS IOC is not running, then use the script that starts EPICS.
 
 ## 1. Clone the Repository
-Clone this repository with the --recurse-submodules flag.
 
 ```
-git clone --recurse-submodules https://github.com/als-computing/bluesky-web.git
+git clone https://github.com/als-computing/bluesky-web.git
 cd Bluesky-Web
 ```
 
@@ -46,9 +45,7 @@ When using docker bridge network, broadcast UDP messages will not be sent outsid
 
 
 ## 3. Run Application
-Two different scripts are provided that will start the application in docker containers. The first script starts the main services (frontend, python server, PV Web Socket). The second script will start the same services and also run a container with EPICS. 
 
-If you already have EPICS running and want to access your own IOCs, use the first script. Otherwise the second script can be used to start a "default" EPICS environment that still works with the application.
 
 <mark>Run Web Application Only (does not include an EPICS service)</mark> 
 ```
@@ -269,7 +266,7 @@ That means we can only do unicast (directed) UDP to EPICS servers from the bridg
 ```mermaid
 graph LR
     subgraph "Docker Bridge Network"
-        A[PVWS Container<br/>172.17.0.2]
+        A[ EPICS CLIENT Container<br/>172.17.0.2]
         A -.->|"'caget camera'<br/>UDP Broadcast to 192.168.1.255 <br/> ❌ blocked"| E[Bridge Boundary <br/> ❌ Blocks .255]
     end
     
@@ -291,7 +288,7 @@ graph LR
 ```mermaid
 graph LR
     subgraph "Docker Bridge Network"
-        A[PVWS Container<br/>172.17.0.2]
+        A[EPICS CLIENT  Container<br/>172.17.0.2]
     end
     
     subgraph "Host Network"
@@ -314,7 +311,7 @@ graph LR
 ```mermaid
 graph LR
     subgraph "Docker Host Network"
-        A[PVWS Container<br/>172.17.0.2]
+        A[EPICS CLIENT  Container<br/>172.17.0.2]
     end
     
     subgraph "Host Network"

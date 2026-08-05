@@ -13,4 +13,9 @@ COPY . .
 EXPOSE 5173
 
 # --host binds 0.0.0.0 so the published port reaches the dev server.
+#
+# Dependencies come from `npm ci` above and nowhere else -- deliberately no
+# `npm install` at startup. /app is bind-mounted from the host, so a runtime
+# install would rewrite the host's package-lock.json, and it competes for memory
+# with Vite's dep pre-bundling. Change a dependency, then `up --build`.
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
