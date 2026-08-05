@@ -49,12 +49,6 @@ existing_devices:
     is_movable: false
     is_readable: true
     module: __main__
-  basler_camera:
-    classname: BaslerDetector
-    is_flyable: false
-    is_movable: false
-    is_readable: true
-    module: __main__
   det1M:
     classname: My1MPilatusDetector
     is_flyable: false
@@ -685,6 +679,12 @@ existing_devices:
     is_movable: true
     is_readable: true
     module: ophyd.epics_motor
+  mono_angle_offset:
+    classname: Signal
+    is_flyable: false
+    is_movable: true
+    is_readable: true
+    module: ophyd.signal
   mono_energy:
     classname: MonoEnergy
     components:
@@ -3399,6 +3399,98 @@ existing_plans:
       max: '401'
       min: '0'
       name: num
+      step: '1'
+    - annotation:
+        type: dict
+      default: None
+      kind:
+        name: KEYWORD_ONLY
+        value: 3
+      name: md
+    properties:
+      is_generator: true
+  xas_alignment:
+    description: Scan over one multi-motor trajectory.
+    module: __main__
+    name: xas_alignment
+    parameters:
+    - annotation:
+        type: float
+      default: '0.0'
+      default_defined_in_decorator: true
+      description: Optional. The start position for the Z motor (vertical), uses the
+        default units of the motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '4000'
+      min: '-4000'
+      name: start_Z
+      step: '0.1'
+    - annotation:
+        type: float
+      default: '10'
+      default_defined_in_decorator: true
+      description: Optional. The stop position for the Z motor (vertical), uses the
+        default units of the motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '4000'
+      min: '-4000'
+      name: stop_Z
+      step: '0.1'
+    - annotation:
+        type: float
+      default: '0.0'
+      default_defined_in_decorator: true
+      description: Optional. The start position for the Y motor (horizontal), uses
+        the default units of the motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '4000'
+      min: '-4000'
+      name: start_Y
+      step: '0.1'
+    - annotation:
+        type: float
+      default: '10'
+      default_defined_in_decorator: true
+      description: Optional. The stop position for the Y motor (horizontal), uses
+        the default units of the motor
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '4000'
+      min: '-4000'
+      name: stop_Y
+      step: '0.1'
+    - annotation:
+        type: int
+      default: '10'
+      default_defined_in_decorator: true
+      description: Optional. The number of points that motor will stop at between
+        the Z (vertical) start and stop.
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '200'
+      min: '0'
+      name: num_Z
+      step: '1'
+    - annotation:
+        type: int
+      default: '10'
+      default_defined_in_decorator: true
+      description: Optional. The number of points that motor will stop at between
+        the Y (horizontal) start and stop.
+      kind:
+        name: POSITIONAL_OR_KEYWORD
+        value: 1
+      max: '200'
+      min: '0'
+      name: num_Y
       step: '1'
     - annotation:
         type: dict

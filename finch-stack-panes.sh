@@ -65,13 +65,13 @@ main() {
   send_cmd 0 "cd /home/bl531user/Repos/bl531-finch && npm run dev -- --host=0.0.0.0"
 
   # Pane 1: OPHYD API (8001)
-  send_cmd 1 "source '$CONDA_SH' && conda activate test_ophyd_websocket && cd /home/bl531user/MoreRepos/ophyd-websocket && python src/ophyd_websocket/server.py --startup-dir /home/bl531user/Repos/bluesky-web/queue-server/startup_bl531/01_devices.py"
+  send_cmd 1 "source '$CONDA_SH' && conda activate test_ophyd_websocket && cd /home/bl531user/MoreRepos/ophyd-websocket && python src/ophyd_websocket/server.py --startup-dir /home/bl531user/Repos/bluesky-web/queue-server/startup_bl531/01_motors.py"
 
   # Pane 2: FRONTEND API (8002)
   send_cmd 2 "source '$CONDA_SH' && conda activate frontend-api && python /home/bl531user/Repos/bluesky-web/frontend-api/main.py"
 
   # Pane 3: QSERVER REST (60610)
-  send_cmd 3 "source '$CONDA_SH' && conda activate bluesky && QSERVER_HTTP_SERVER_SINGLE_USER_API_KEY=test QSERVER_HTTP_SERVER_ALLOW_ORIGINS='http://192.168.10.201 http://localhost:5173 http://192.168.10.155:5173 http://192.168.10.123 http://192.168.10.150' uvicorn --host 0.0.0.0 --port 60610 bluesky_httpserver.server:app"
+  send_cmd 3 "source '$CONDA_SH' && conda activate bluesky && QSERVER_HTTP_SERVER_SINGLE_USER_API_KEY=test QSERVER_HTTP_SERVER_ALLOW_ORIGINS='http://192.168.10.201 http://localhost:5173 http://192.168.10.155:5173 http://localhost:5174 http://192.168.10.155:5174 http://192.168.10.123 http://192.168.10.150' uvicorn --host 0.0.0.0 --port 60610 bluesky_httpserver.server:app"
 
   # Pane 4: RE MANAGER (Queue Server)
   send_cmd 4 "source '$CONDA_SH' && conda activate bluesky && start-re-manager --zmq-publish-console ON --startup-dir /home/bl531user/Repos/bluesky-web/queue-server/startup_bl531 --keep-re"
