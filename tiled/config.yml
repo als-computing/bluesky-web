@@ -3,7 +3,7 @@ authentication:
   allow_anonymous_access: true
 uvicorn:
   host: 0.0.0.0
-  port: 8001
+  port: 8000
 allow_origins:
   - http://localhost
 # NOTE: the paths below are relative to the working directory tiled is launched
