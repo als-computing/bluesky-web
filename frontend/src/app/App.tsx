@@ -2,7 +2,7 @@ import { FinchAppLayout } from '@blueskyproject/finch';
 import type { RouteItem } from '@blueskyproject/finch';
 import ComponentsPage from './pages/ComponentsPage';
 
-import { HouseIcon, TableIcon, TestTubeIcon, QuestionIcon } from '@phosphor-icons/react';
+import { HouseIcon } from '@phosphor-icons/react';
 
 export default function App() {
   const routes: RouteItem[] = [
