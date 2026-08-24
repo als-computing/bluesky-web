@@ -6,15 +6,18 @@ uvicorn:
   port: 8001
 allow_origins:
   - http://localhost
+# NOTE: the paths below are relative to the working directory tiled is launched
+# from, NOT to this file. Run it from this folder:
+#   cd tiled && tiled serve config config.yml
+# (Or set TILED_DIR and use "${TILED_DIR}/..." to make them launch-independent.)
 trees:
   - path: /
     tree: catalog
     args:
-      uri: "sqlite:////Users/seij/Repos/postman-demo/tiled/catalog.db"
+      uri: "sqlite:///catalog.db"
       writable_storage:
-        - "/Users/seij/Repos/postman-demo/tiled/data"               
-        - "sqlite:////Users/seij/Repos/postman-demo/tiled/tabular.db"       
+        - "./data"
+        - "sqlite:///tabular.db"
       readable_storage:
-        - "/Users/seij/Repos/postman-demo/tiled/data"
+        - "./data"
       init_if_not_exists: true
-
