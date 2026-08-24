@@ -38,12 +38,13 @@ bec.disable_plots()
 RE.subscribe(bec)
 
 # Local Tiled Server
-# api_key = os.getenv("TILED_SINGLE_USER_API_KEY")
-# if not api_key:
-#     raise ValueError("TILED_SINGLE_USER_API_KEY environment variable is not set.")
-# tiled_client = from_uri("http://127.0.0.1:8000", api_key=api_key)
-# tw = TiledWriter(tiled_client)
-# RE.subscribe(tw)
+api_key = os.getenv("TILED_SINGLE_USER_API_KEY")
+if not api_key:
+    raise ValueError("TILED_SINGLE_USER_API_KEY environment variable is not set.")
+tiled_uri = os.getenv("TILED_URI", "http://127.0.0.1:8000")
+tiled_client = from_uri(tiled_uri, api_key=api_key)
+tw = TiledWriter(tiled_client)
+RE.subscribe(tw)
 
 # flake8: noqa
 print(f"Loading file {__file__!r}")
