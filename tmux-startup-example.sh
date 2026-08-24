@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# finch-stack-panes.sh
+# This example file shows how tmux can create a set of terminals. 
+# Useful for putting together a 'stack' of processes that can be viewed from a browser with ttyd
 set -euo pipefail
 
 SESSION=finch
