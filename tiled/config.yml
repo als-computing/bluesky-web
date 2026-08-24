@@ -5,7 +5,9 @@ uvicorn:
   host: 0.0.0.0
   port: 8000
 allow_origins:
-  - http://localhost
+  - http://localhost:5173
+  - http://localhost:5174
+  - http://localhost:8081
 # NOTE: the paths below are relative to the working directory tiled is launched
 # from, NOT to this file. Run it from this folder:
 #   cd tiled && tiled serve config config.yml
