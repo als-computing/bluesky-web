@@ -5,7 +5,7 @@ FROM python:3.9-slim
 
 #environment variables for authentication and CORS
 ENV QSERVER_HTTP_SERVER_SINGLE_USER_API_KEY=test
-ENV QSERVER_HTTP_SERVER_ALLOW_ORIGINS=*
+ENV QSERVER_HTTP_SERVER_ALLOW_ORIGINS="http://localhost:8081, http://127.0.0.1:8081 http://localhost:5173"
 
 # pandas is imported by bluesky_queueserver.manager.conversions, which
 # bluesky-httpserver imports at startup, but neither declares it.
