@@ -81,7 +81,9 @@ main() {
   send_cmd 4 "source '$CONDA_SH' && conda activate $ENV_BLUESKY && start-re-manager --zmq-publish-console ON --startup-dir '$STARTUP_DIR' --keep-re"
 
   # Pane 5: TILED (8000)
-  send_cmd 5 "source '$CONDA_SH' && conda activate $ENV_TILED && tiled serve config '$TILED_CONFIG'"
+  # cd into the config's own folder first: relative storage paths in the tiled
+  # config resolve against the working directory, not the config file.
+  send_cmd 5 "source '$CONDA_SH' && conda activate $ENV_TILED && cd '$(dirname "$TILED_CONFIG")' && tiled serve config '$(basename "$TILED_CONFIG")'"
 
   set_titles_and_borders
 
