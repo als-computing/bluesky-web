@@ -4,9 +4,14 @@
 # Useful when testing the addition of new ophyd devices or plans
 
 
-CLOSE_URL="http://localhost:60610/api/environment/close"
-OPEN_URL="http://localhost:60610/api/environment/open"
-API_KEY="test"
+STACK_SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=bluesky-stack.conf
+source "${BLUESKY_STACK_CONF:-$STACK_SCRIPT_DIR/bluesky-stack.conf}"
+
+QSERVER_URL="${QSERVER_URL:-http://localhost:$QSERVER_PORT}"
+CLOSE_URL="$QSERVER_URL/api/environment/close"
+OPEN_URL="$QSERVER_URL/api/environment/open"
+API_KEY="${QSERVER_API_KEY}"
 
 big_message() {
   clear
