@@ -9,14 +9,11 @@ All of the services needed to run a web-based beamline controls / data acquisiti
 - [Docker Compose Setup](#docker-compose-setup)
 
 - [Individual Service Setup](#individual-service-setup)
-- [EPICS-Docker IOC setup](#epics-docker-ioc-setup)
-
-- [Mac Developer Notes](#mac-developer-notes)
 
 </div>
 
 # Docker Compose Setup
-A docker-compose file is used to run the required services together. For full functionality, the host computer should be running an EPICS IOC or connected to one through the local network. If an existing EPICS IOC is not running, then use the script that starts EPICS.
+A docker-compose file is used to run the required services together. Note that the Queue Server and Ophyd API must be run in "host" network mode if they need to access an external EPICS IOC across the container network.
 
 ## 1. Clone the Repository
 
@@ -52,17 +49,7 @@ When using docker bridge network, broadcast UDP messages will not be sent outsid
 #Bluesky-Web/
 docker-compose up -d --build
 ```
-\
-<mark>Run Web Application + EPICS (starts EPICS service in container)</mark>
-```
-#Bluesky-Web/
-docker-compose -f docker-compose.start-epics.yml up -d --build
-```
-Navigate to port 8081 in a web browser to view the application.
 
-http://localhost:8081/
-
-\
 <mark>Run the fully simulated BL 5.3.1 beamline</mark>
 ```
 #Bluesky-Web/
@@ -119,7 +106,7 @@ docker-compose up -d --build
 ```
 
 # Individual Service Setup
-The React frontend and various servers can be run outside of containers for development ease. Additionally either the host computer or another computer on the LAN should be running EPICS. Instructions for running EPICS in a container are also provided.
+Services can be run independently on an as needed basis. For detailed examples of running everything with shell scripts, see the `/shell-scripts` folder.
 
 ## React Frontend
 See [frontend/README.md](frontend/README.md)
@@ -133,7 +120,7 @@ This service is a Python server that provides endpoints for a website client to 
 ## Ophyd API
 See [ophyd-api/README.md](ophyd-api/README.md)
 
-This service is a Python server that provides endpoints for a website client to connect to. Functionality includes direct control over ophyd devices, EPICS devices, area detector image streaming, and queue server console monitoring.
+This service is a Python server that provides endpoints for a website client to connect to. Functionality includes direct control over ophyd devices, EPICS devices, and various area detector image streaming methods.
 
 ## Queue Server
 See [queue-server/README.md](queue-server/README.md)
