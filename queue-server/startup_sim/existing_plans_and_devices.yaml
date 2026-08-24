@@ -1141,7 +1141,7 @@ existing_plans:
         value: 1
       name: backstep
     - annotation:
-        type: typing.Optional[float]
+        type: float | None
       default: '0.8'
       description: threshold for going backward and rescanning a region, default is
         0.8
@@ -1150,7 +1150,7 @@ existing_plans:
         value: 1
       name: threshold
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -1170,7 +1170,7 @@ existing_plans:
         value: 1
       name: flyers
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -1221,7 +1221,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -1254,7 +1254,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       kind:
         name: KEYWORD_ONLY
@@ -1312,7 +1312,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -1350,7 +1350,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -1450,7 +1450,7 @@ existing_plans:
         value: 1
       name: take_pre_data
     - annotation:
-        type: typing.Optional[float]
+        type: float | None
       default: None
       description: 'If not None, the maximum time the ramp can run.
 
@@ -1461,7 +1461,7 @@ existing_plans:
         value: 1
       name: timeout
     - annotation:
-        type: typing.Optional[float]
+        type: float | None
       default: None
       description: 'If not None, take data no faster than this.  If None, take
 
@@ -1479,7 +1479,7 @@ existing_plans:
         value: 1
       name: period
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       kind:
         name: POSITIONAL_OR_KEYWORD
@@ -1553,7 +1553,7 @@ existing_plans:
         value: 1
       name: backstep
     - annotation:
-        type: typing.Optional[float]
+        type: float | None
       default: '0.8'
       description: threshold for going backward and rescanning a region, default is
         0.8
@@ -1562,7 +1562,7 @@ existing_plans:
         value: 1
       name: threshold
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -1613,7 +1613,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -1675,7 +1675,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -1712,7 +1712,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -1766,7 +1766,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -1810,7 +1810,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -1867,7 +1867,7 @@ existing_plans:
         value: 1
       name: nth
     - annotation:
-        type: typing.Optional[float]
+        type: float | None
       default: None
       description: 'Delta radius along the major axis of the ellipse. If None, it
 
@@ -1895,7 +1895,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -1953,7 +1953,7 @@ existing_plans:
         value: 1
       name: factor
     - annotation:
-        type: typing.Optional[float]
+        type: float | None
       default: None
       description: 'Delta radius along the major axis of the ellipse, if not specifed
 
@@ -1963,7 +1963,7 @@ existing_plans:
         value: 3
       name: dr_y
     - annotation:
-        type: typing.Optional[float]
+        type: float | None
       default: '0.0'
       description: Tilt angle in radians, default 0.0
       kind:
@@ -1981,7 +1981,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -2049,7 +2049,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -2082,7 +2082,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       kind:
         name: KEYWORD_ONLY
@@ -2109,7 +2109,7 @@ existing_plans:
         value: 2
       name: args
     - annotation:
-        type: typing.Optional[int]
+        type: int | None
       default: None
       description: number of points
       kind:
@@ -2127,7 +2127,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -2161,7 +2161,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -2232,7 +2232,7 @@ existing_plans:
         value: 1
       name: nth
     - annotation:
-        type: typing.Optional[float]
+        type: float | None
       default: None
       description: 'Delta radius along the major axis of the ellipse. If None, defaults
         to
@@ -2243,7 +2243,7 @@ existing_plans:
         value: 3
       name: dr_y
     - annotation:
-        type: typing.Optional[float]
+        type: float | None
       default: '0.0'
       description: Tilt angle in radians, default 0.0
       kind:
@@ -2261,7 +2261,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -2333,7 +2333,7 @@ existing_plans:
         value: 1
       name: factor
     - annotation:
-        type: typing.Optional[float]
+        type: float | None
       default: None
       description: 'Delta radius along the major axis of the ellipse, if not specifed
 
@@ -2343,7 +2343,7 @@ existing_plans:
         value: 3
       name: dr_y
     - annotation:
-        type: typing.Optional[float]
+        type: float | None
       default: '0.0'
       description: Tilt angle in radians, default 0.0
       kind:
@@ -2361,7 +2361,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -2443,7 +2443,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -2523,7 +2523,7 @@ existing_plans:
         value: 1
       name: snake
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -2560,7 +2560,7 @@ existing_plans:
         value: 1
       name: step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -2625,7 +2625,7 @@ existing_plans:
         value: 3
       name: per_step
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
@@ -2645,7 +2645,7 @@ existing_plans:
         value: 1
       name: detectors
     - annotation:
-        type: typing.Optional[int]
+        type: int | None
       default: '1'
       description: 'number of readings to take; default is 1
 
@@ -2670,7 +2670,7 @@ existing_plans:
         value: 3
       name: per_shot
     - annotation:
-        type: typing.Optional[dict[str, typing.Any]]
+        type: dict[str, typing.Any] | None
       default: None
       description: metadata
       kind:
