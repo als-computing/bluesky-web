@@ -106,7 +106,7 @@ docker-compose up -d --build
 ```
 
 # Individual Service Setup
-Services can be run independently on an as needed basis. For detailed examples of running everything with shell scripts, see the `/shell-scripts` folder.
+Services can be run independently on an as needed basis. For detailed examples of running everything with shell scripts, see [shell-scripts/README.md](shell-scripts/README.md).
 
 ## React Frontend
 See [frontend/README.md](frontend/README.md)
