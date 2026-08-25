@@ -12,8 +12,13 @@ services:
       - EPICS_CA_AUTO_ADDR_LIST=NO
       - ZMQ_HOST=localhost
       - ZMQ_PORT=60625
+      - OAS_STARTUP_DIR=/startup/01_devices.py
+    volumes:
+      - ./queue-server/startup_blank:/startup:ro
     networks: # use HOST mode if connecting to external EPICS
       - qnet
+    ports:
+      - "8001:8001"
   frontend-api:
     build: ./frontend-api
     environment:
@@ -34,14 +39,17 @@ services:
       - TILED_URI=${TILED_URI:-http://tiled:8000}
     networks: 
       - qnet
-    command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "127.0.0.1:6379", "--startup-dir", "/code/startup_blank", "--keep-re"]
+    command: ["start-re-manager", "--zmq-publish-console", "ON", "--redis-addr", "redis:6379", "--startup-dir", "/code/startup_blank", "--keep-re"]
     depends_on:
       - redis
   qserver-api: 
    build: ./queue-server-api
    environment:
-     - QSERVER_HTTP_SERVER_ALLOW_ORIGINS="http://localhost:8081 http://localhost:5173 http://localhost:5174"
      - QSERVER_HTTP_SERVER_SINGLE_USER_API_KEY=test
+     - QSERVER_HTTP_SERVER_CONFIG=/deploy/config.yml
+     - QSERVER_ZMQ_HOST=qserver
+   volumes:
+     - ./queue-server-api/config.yml:/deploy/config.yml:ro
    networks: # use HOST mode if connecting to external EPICS
      - qnet
    command: ["uvicorn", "--host", "0.0.0.0", "--port", "60610", "bluesky_httpserver.server:app"]
@@ -53,7 +61,7 @@ services:
     image: ghcr.io/bluesky/tiled:latest
     networks:
       - qnet
-    user: "0:0"
+    #user: "0:0"
     ports:
       - "8000:8000"
     environment:

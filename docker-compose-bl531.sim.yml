@@ -85,10 +85,14 @@ services:
     ports:
       - "60610:60610"
     environment:
-      QSERVER_ZMQ_CONTROL_ADDRESS: tcp://qserver:60615
-      QSERVER_ZMQ_INFO_ADDRESS: tcp://qserver:60625
+      QSERVER_HTTP_SERVER_CONFIG: /deploy/config.yml
+      # Read by config.yml, which builds both ZMQ addresses from it. The config
+      # takes precedence over QSERVER_ZMQ_*_ADDRESS, so this is the one to set.
+      QSERVER_ZMQ_HOST: qserver
       QSERVER_HTTP_SERVER_ALLOW_ORIGINS: "*"
       QSERVER_HTTP_SERVER_SINGLE_USER_API_KEY: test
+    volumes:
+      - ./queue-server-api/config.yml:/deploy/config.yml:ro
     command: ["uvicorn", "--host", "0.0.0.0", "--port", "60610", "bluesky_httpserver.server:app"]
 
   ophyd-api:
@@ -101,6 +105,7 @@ services:
       <<: *epics-client
       ZMQ_HOST: qserver
       ZMQ_PORT: "60625"
+      OAS_STARTUP_DIR: /startup/01_motors.py
     volumes:
       # Same device definitions the queue server runs, so the two agree.
       - ./queue-server/startup_bl531_sim:/startup:ro

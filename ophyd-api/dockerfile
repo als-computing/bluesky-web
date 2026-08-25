@@ -29,8 +29,23 @@ RUN test -e "$PYEPICS_LIBCA" && python -c "import epics; print('pyepics ok')"
 ENV OAS_HOST=0.0.0.0 \
     OAS_PORT=8001
 
+# Where the device definitions are expected to be bind-mounted. Each compose
+# file mounts its own startup directory here, so the image is not tied to one
+# beamline's file layout.
+ARG STARTUP_DIR=/startup
+
+# ophyd-websocket reads OAS_STARTUP_DIR itself and it takes precedence over the
+# --startup-dir flag, so this single variable is the only knob callers need.
+# It accepts either a directory or a single .py file. Override it per service:
+#
+#   environment:
+#     - OAS_STARTUP_DIR=/startup/01_devices.py
+#   volumes:
+#     - ./queue-server/startup_blank:/startup:ro
+#
+# or at build time with `--build-arg STARTUP_DIR=...`.
+ENV OAS_STARTUP_DIR=${STARTUP_DIR}
+
 EXPOSE 8001
 
-# The device file is bind-mounted at /startup by docker-compose.sim.yml, so the
-# ophyd device definitions stay a single source of truth with the queue server.
-CMD ["ophyd-websocket", "--startup-dir", "/startup/01_motors.py"]
+CMD ["ophyd-websocket"]

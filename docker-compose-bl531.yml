@@ -12,6 +12,9 @@ services:
       - EPICS_CA_AUTO_ADDR_LIST=NO
       - ZMQ_HOST=localhost
       - ZMQ_PORT=60625
+      - OAS_STARTUP_DIR=/startup/01_motors.py
+    volumes:
+      - ./queue-server/startup_bl531:/startup:ro
     network_mode: "host"
   frontend-api:
     build: ./frontend-api
@@ -33,8 +36,11 @@ services:
   qserver-api:
    build: ./queue-server-api
    environment:
-     - QSERVER_HTTP_SERVER_ALLOW_ORIGINS=http://192.168.1.100
      - QSERVER_HTTP_SERVER_SINGLE_USER_API_KEY=test
+     - QSERVER_HTTP_SERVER_CONFIG=/deploy/config.yml
+     - QSERVER_ZMQ_HOST=qserver
+   volumes:
+     - ./queue-server-api/config.yml:/deploy/config.yml:ro
    network_mode: "host"
    command: ["uvicorn", "--host", "0.0.0.0", "--port", "60610", "bluesky_httpserver.server:app"]
    depends_on:
@@ -43,8 +49,6 @@ services:
     build: ./frontend
     ports:
       - "8081:80"
-    env_file:
-      - ./frontend/.env.production
     networks:
       qnet:
         ipv4_address: 192.168.1.100

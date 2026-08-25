@@ -18,6 +18,8 @@ startup_dir=path/queue-server-configuration/startup_sim
 import os
 
 from bluesky import RunEngine
+from tiled.client import from_uri
+from bluesky.callbacks.tiled_writer import TiledWriter
 
 RE = RunEngine({})
 
