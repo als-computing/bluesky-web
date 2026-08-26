@@ -1,0 +1,31 @@
+# Tiled configuration for the simulation stack (docker-compose.sim.yml).
+#
+# The API key is a dummy, hardcoded on purpose so the stack is self-contained
+# and does not pick up the host's real TILED_SINGLE_USER_API_KEY. It only gates
+# writes -- anonymous read access stays on, so the frontend needs no key.
+authentication:
+  single_user_api_key: bl531simdevkey
+  allow_anonymous_access: true
+
+uvicorn:
+  host: 0.0.0.0
+  port: 8000
+
+allow_origins:
+  - http://localhost:5173
+  - http://127.0.0.1:5173
+  - http://localhost:8081
+  - http://localhost:8050
+
+trees:
+  - path: /
+    tree: catalog
+    args:
+      uri: "sqlite:////tiled_db/catalog.db"
+      writable_storage:
+        - "/mnt/data531/tiled/storage"
+        - "sqlite:////tiled_db/tabular.db"
+      readable_storage:
+        - "/mnt/data531/tiled/storage"
+        - "/mnt/data531"
+      init_if_not_exists: true

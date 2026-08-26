@@ -40,21 +40,50 @@ authentication:
 Having this as an environment variable will also help tiled services (tiled_writer) pick it up automatically and make connecting simpler.
 
 ## Database requirements
-In the sample config file, we are using sqlite for both the OLTP database and the OLAP database, but postgress is another option for more horizontally scalable systems. It is also a good idea to make paths absolute.
+In the sample config file, we are using sqlite for both the OLTP database and the OLAP database, but postgress is another option for more horizontally scalable systems.
 
 ```yml
 trees:
   - path: /
     tree: catalog
     args:
-      uri: "sqlite:////Users/seij/Repos/postman-demo/tiled/catalog.db" #OLTP for metadata
+      uri: "sqlite:///catalog.db" #OLTP for metadata
       writable_storage:
-        - "/Users/seij/Repos/postman-demo/tiled/data" #file system storage               
-        - "sqlite:////Users/seij/Repos/postman-demo/tiled/tabular.db" #OLAP for appendable tabular data      
+        - "./data" #file system storage
+        - "sqlite:///tabular.db" #OLAP for appendable tabular data
       readable_storage:
-        - "/Users/seij/Repos/postman-demo/tiled/data"
+        - "./data"
       init_if_not_exists: true #If you didn't create the .db files, this flag will do it for you on startup
 ```
+
+### Relative vs absolute paths
+Tiled resolves relative paths against **the working directory it was launched
+from**, not against the config file's location. So `config.yml` above only puts
+its databases next to itself if you start tiled from this folder:
+
+```bash
+cd tiled
+tiled serve config config.yml
+```
+
+Note the slash counts for sqlite URIs: `sqlite:///catalog.db` (three) is
+relative, `sqlite:////abs/path/catalog.db` (four) is absolute.
+
+If you need the config to work no matter where it is launched from, tiled
+expands environment variables anywhere in the config, so you can anchor the
+paths explicitly:
+
+```bash
+export TILED_DIR=/path/to/repo/tiled
+```
+```yml
+      uri: "sqlite:///${TILED_DIR}/catalog.db"
+      writable_storage:
+        - "${TILED_DIR}/data"
+```
+
+The beamline configs (`config_bl531.yml`) keep absolute paths on purpose, since
+their storage lives outside the repo (`/mnt/data531/...`).
 
 ## Connecting Queue Server Run Engine to Tiled
 Using [Tiled Writer](https://blueskyproject.io/bluesky/main/tiled-writer.html), we can send relevant information from plans going through the Run Engine into a Tiled server. This occurs 'live' as soon as individual run documents are processed through the callback.

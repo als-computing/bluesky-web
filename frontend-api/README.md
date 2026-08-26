@@ -1,9 +1,5 @@
 # Frontend API
-This frontend API is meant to provide endpoints that are not covered in the ophyd-api (ophyd as a service, ophyd websocket, etc).
-
-Examples include a pyfai endpoint that will perform qspace analysis on an image with provided parameters, or a future endpoint for transforming images before sending them to the client.
-
-If the endpoint is directly Bluesky related it may go into ophyd-api instead.
+A barebones FAST API server that can be built on as needed. This is not used by any services in Bluesky-Web, it is meant as a reference point if you need to add some one-off api calls to your frontend that are not covered in Ophyd Websocket, Tiled, or the Queue Server.
 
 # Installation
 Optionally set up a conda environment

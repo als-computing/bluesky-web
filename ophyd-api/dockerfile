@@ -1,0 +1,51 @@
+# install and run ophyd websocket https://pypi.org/project/ophyd-websocket/
+#
+# Installed from PyPI rather than from the submodule checkout, so this image
+# builds whether or not `git submodule update --init` has run.
+FROM python:3.12-slim
+
+# pyepics only bundles libca.so for x86_64, so on Apple Silicon `import epics`
+# dies with "loading Epics CA DLL failed". epicscorelibs has no aarch64 wheel
+# either, but it builds from source in about a minute -- which beats pinning
+# the whole image to linux/amd64 and running the stack under emulation.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gcc g++ make perl \
+    && pip install --no-cache-dir epicscorelibs ophyd-websocket pyepics \
+    && apt-get purge -y gcc g++ make perl \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
+
+# Point pyepics at the library epicscorelibs just built. The symlink lives
+# beside the versioned .so so its RPATH still resolves libCom.
+RUN LIB="$(python -c 'import epicscorelibs.path as p; print(p.get_lib("ca"))')" \
+    && ln -sf "$LIB" "$(dirname "$LIB")/libca.so"
+ENV PYEPICS_LIBCA=/usr/local/lib/python3.12/site-packages/epicscorelibs/lib/libca.so
+
+# Fail the build rather than the container if that path ever drifts.
+RUN test -e "$PYEPICS_LIBCA" && python -c "import epics; print('pyepics ok')"
+
+# ophyd-websocket defaults to localhost:8001; bind all interfaces so the port
+# mapping works from outside the container.
+ENV OAS_HOST=0.0.0.0 \
+    OAS_PORT=8001
+
+# Where the device definitions are expected to be bind-mounted. Each compose
+# file mounts its own startup directory here, so the image is not tied to one
+# beamline's file layout.
+ARG STARTUP_DIR=/startup
+
+# ophyd-websocket reads OAS_STARTUP_DIR itself and it takes precedence over the
+# --startup-dir flag, so this single variable is the only knob callers need.
+# It accepts either a directory or a single .py file. Override it per service:
+#
+#   environment:
+#     - OAS_STARTUP_DIR=/startup/01_devices.py
+#   volumes:
+#     - ./queue-server/startup_blank:/startup:ro
+#
+# or at build time with `--build-arg STARTUP_DIR=...`.
+ENV OAS_STARTUP_DIR=${STARTUP_DIR}
+
+EXPOSE 8001
+
+CMD ["ophyd-websocket"]

@@ -1,0 +1,34 @@
+# bluesky-httpserver configuration
+# https://blueskyproject.io/bluesky-httpserver/configuration.html
+#
+# The HTTP server talks to the queue server (RE Manager) over ZMQ. Where that
+# manager lives depends on how the stack is run:
+#
+#   * docker compose  -- the manager is another container, reachable by service
+#                        name, so compose sets QSERVER_ZMQ_HOST=qserver.
+#   * bare metal      -- the manager is on the same machine, so the default
+#                        QSERVER_ZMQ_HOST=localhost baked into the Dockerfile
+#                        applies and nothing needs to be set.
+#
+# Only the host varies, so it is the only thing parameterized. The config file
+# syntax expands ${VAR} but has no default-value form, so QSERVER_ZMQ_HOST must
+# always be set -- the Dockerfile guarantees that by defaulting it to localhost.
+# Running this config outside the image means setting it yourself.
+#
+# This file is bind-mounted into the container and located through the
+# QSERVER_HTTP_SERVER_CONFIG environment variable, both set by the compose file.
+#
+# Note that values here take precedence over the QSERVER_ZMQ_CONTROL_ADDRESS /
+# QSERVER_ZMQ_INFO_ADDRESS environment variables, so a service using this config
+# must configure the host through QSERVER_ZMQ_HOST rather than those.
+qserver_zmq_configuration:
+  # REQ-REP control channel: queue operations, plan submission, RE control.
+  control_address: tcp://${QSERVER_ZMQ_HOST}:60615
+  # PUB-SUB channel carrying console output, enabled on the manager with
+  # `start-re-manager --zmq-publish-console ON`.
+  info_address: tcp://${QSERVER_ZMQ_HOST}:60625
+
+allow_origins: 
+  - http://localhost:8081
+  - http://localhost:5173
+  - http://localhost:5174

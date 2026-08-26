@@ -1,0 +1,6 @@
+# The host's node_modules are built for macOS; the image installs its own.
+node_modules
+dist
+dist-ssr
+*.log
+.DS_Store
